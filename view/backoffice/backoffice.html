@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EcoTrack - Backoffice</title>
+    <link rel="stylesheet" href="backoffice.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="sidebar-inner">
+            <div class="logo">EcoTrack Admin</div>
+
+            <!-- Dashboard counters moved to sidebar and vertically centered -->
+            <div class="dashboard-stats sidebar-stats">
+                <div class="dash-item">
+                    <div class="dash-label">Messages envoyés</div>
+                    <div id="sentCount" class="dash-count">0</div>
+                </div>
+                <div class="dash-item">
+                    <div class="dash-label">Commentaires ajoutés</div>
+                    <div id="commentCount" class="dash-count">0</div>
+                </div>
+                <div class="dash-item">
+                    <div class="dash-label">Commentaires modifiés</div>
+                    <div id="editCount" class="dash-count">0</div>
+                </div>
+                <div class="dash-item">
+                    <div class="dash-label">Commentaires supprimés</div>
+                    <div id="deleteCount" class="dash-count">0</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Navigation items removed per request -->
+            </nav>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-actions">
+                <a href="../frontoffice/frontoffice.html" class="btn btn-secondary">Accéder au Frontoffice</a>
+            </div>
+        </header>
+
+        <main class="container content-area">
+            <h1 class="page-title">Gestion des publications et commentaires</h1>
+
+            <div class="card table-card">
+                <section id="backofficeFeed" class="feed">
+                    <!-- Comments will be loaded here by backoffice.js -->
+                    <div class="feed-empty">Chargement des publications...</div>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>
+<script src="backoffice.js"></script>
+</body>
+</html>

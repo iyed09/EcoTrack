@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EcoTrack - Communauté Verte</title>
+    <link rel="stylesheet" href="frontoffice.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">EcoTrack</div>
+        <nav>
+            <a href="../backoffice/backoffice.html" class="btn btn-secondary">Accéder au Backoffice</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section id="ecoFeed">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <h2>Mur communautaire</h2>
+                <button id="createPostBtn" class="btn btn-primary">Ajouter un post</button>
+            </div>
+            <div id="postsContainer" style="margin-top:18px;">
+                <!-- Exemple statique visible dans le HTML pour montrer les boutons (sera remplacé lorsque JS charge les posts réels) -->
+                <article id="static-example" class="publication static-sample">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                    
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- Fenêtre modale pour la création d'un post -->
+    <div id="postModal" class="modal" aria-hidden="true" style="display:none;">
+        <div class="modal-content">
+            <button class="close" id="closeModal" aria-label="Fermer">&times;</button>
+            <h3>Créer une publication écologique</h3>
+            <div class="form-group">
+                <label for="postAuthor">Votre nom (optionnel)</label>
+                <input id="postAuthor" type="text" placeholder="Votre nom ou pseudonyme" />
+            </div>
+            <div class="form-group">
+                <label for="postContent">Contenu</label>
+                <textarea id="postContent" placeholder="Écrivez votre post ici..."></textarea>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button id="submitPost" class="btn btn-primary">Publier</button>
+                <span id="postMessage" style="display:none;color:green;font-weight:600;">Publié</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="frontoffice.js"></script>
+</body>
+</html>
