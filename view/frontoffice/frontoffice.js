@@ -296,7 +296,7 @@ postsContainer.addEventListener('click', function (e) {
         if (text.length === 0) { alert('Écris un commentaire avant de répondre.'); return; }
         const parentId = e.target.getAttribute('data-parent-id');
         // Store parent id inside the content for now (for reply threading)
-        const payload = `author=${encodeURIComponent(author)}&contenu=${encodeURIComponent('(reply to ' + parentId + ') ' + text)}`;
+        const payload = `send_by=${encodeURIComponent(author)}&contenu=${encodeURIComponent('(reply to ' + parentId + ') ' + text)}`;
         fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload })
             .then(parseJsonSafe)
             .then(data => {
