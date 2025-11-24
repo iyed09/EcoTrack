@@ -7,28 +7,68 @@
     <link rel="stylesheet" href="frontoffice.css">
 </head>
 <body>
-    <header class="navbar">
-        <div class="logo">EcoTrack</div>
-        <nav>
-            <a href="../backoffice/backoffice.html" class="btn btn-secondary">Accéder au Backoffice</a>
-        </nav>
-    </header>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-inner">
+                <div class="logo">EcoTrack</div>
 
-    <main class="container">
-        <section id="ecoFeed">
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-                <h2>Mur communautaire</h2>
-                <button id="createPostBtn" class="btn btn-primary">Ajouter un post</button>
+                <div class="sidebar-profile">
+                    <div class="avatar" aria-hidden="true">ET</div>
+                    <div class="profile-info">
+                        <div class="profile-name">Communauté EcoTrack</div>
+                        <div class="profile-role">Espace public</div>
+                    </div>
+                </div>
+
+                <div class="community-guide">
+                    <h3>Règles de la communauté</h3>
+                    <p class="guide-excerpt">Respectez les autres, partagez des idées constructives et évitez le spam.</p>
+                    <a href="#" id="openGuideFront" class="btn btn-primary">Lire la charte</a>
+                </div>
+
+                <div class="sidebar-hidden-counters" style="display:none;">
+                    <div id="sentCount">0</div>
+                    <div id="commentCount">0</div>
+                    <div id="editCount">0</div>
+                    <div id="deleteCount">0</div>
+                </div>
+
             </div>
-            <div id="postsContainer" style="margin-top:18px;">
-                <!-- Exemple statique visible dans le HTML pour montrer les boutons (sera remplacé lorsque JS charge les posts réels) -->
-                <article id="static-example" class="publication static-sample">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
-                    
-                </article>
-            </div>
-        </section>
-    </main>
+
+            <!-- slide handle (clickable) -->
+            <button class="sidebar-handle" id="sidebarHandle" aria-label="Fermer la barre">‹</button>
+
+        </aside>
+        </aside>
+
+        <div class="main">
+            <header class="navbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Basculer la barre">☰</button>
+                    <div class="logo">EcoTrack</div>
+                </div>
+                <nav>
+                    <a href="../backoffice/backoffice.html" class="btn btn-secondary">Accéder au Backoffice</a>
+                </nav>
+            </header>
+
+            <main class="container">
+                <section id="ecoFeed">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <h2>Mur communautaire</h2>
+                        <button id="createPostBtn" class="btn btn-primary">Ajouter un post</button>
+                    </div>
+                    <div id="postsContainer" style="margin-top:18px;">
+                        <!-- Exemple statique visible dans le HTML pour montrer les boutons (sera remplacé lorsque JS charge les posts réels) -->
+                        <article id="static-example" class="publication static-sample">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                            
+                        </article>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
 
     <!-- Fenêtre modale pour la création d'un post -->
     <div id="postModal" class="modal" aria-hidden="true" style="display:none;">

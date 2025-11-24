@@ -13,10 +13,51 @@ function updateDashboard() {
     const commentEl = document.getElementById('commentCount');
     const editEl = document.getElementById('editCount');
     const delEl = document.getElementById('deleteCount');
-    if (sentEl) sentEl.textContent = sentCount;
-    if (commentEl) commentEl.textContent = commentCount;
-    if (editEl) editEl.textContent = editCount;
-    if (delEl) delEl.textContent = deleteCount;
+    // animate numeric counters (if present) for a nicer UX
+    const ovSent = document.getElementById('overviewSent');
+    const ovComments = document.getElementById('overviewComments');
+    const ovEdit = document.getElementById('overviewEdit');
+    const ovDelete = document.getElementById('overviewDelete');
+
+    // Helper: animate an element's integer text from current to target
+    function animateCount(el, to, duration = 700) {
+        if (!el) return;
+        const raw = String(el.textContent || el.dataset.value || '0').replace(/[^0-9\-]+/g,'');
+        const from = parseInt(raw, 10) || 0;
+        const start = performance.now();
+        const diff = to - from;
+        if (diff === 0) { el.textContent = String(to); el.dataset.value = to; return; }
+        function easeInOut(t){ return t<0.5 ? 2*t*t : -1 + (4-2*t)*t; }
+        function step(now){
+            const t = Math.min(1, (now - start)/duration);
+            const v = Math.round(from + diff * easeInOut(t));
+            el.textContent = String(v);
+            if (t < 1) requestAnimationFrame(step);
+            else el.dataset.value = String(to);
+        }
+        requestAnimationFrame(step);
+    }
+
+    // animate sidebar counters and overview cards
+    if (sentEl) animateCount(sentEl, sentCount);
+    if (commentEl) animateCount(commentEl, commentCount);
+    if (editEl) animateCount(editEl, editCount);
+    if (delEl) animateCount(delEl, deleteCount);
+
+    if (ovSent) animateCount(ovSent, sentCount);
+    if (ovComments) animateCount(ovComments, commentCount);
+    if (ovEdit) animateCount(ovEdit, editCount);
+    if (ovDelete) animateCount(ovDelete, deleteCount);
+
+    // Add a small pulse effect to overview numbers when updated
+    [ovSent, ovComments, ovEdit, ovDelete].forEach(el => {
+        if (!el) return;
+        el.classList.remove('pulse');
+        // trigger reflow to restart animation
+        void el.offsetWidth;
+        el.classList.add('pulse');
+        setTimeout(() => el.classList.remove('pulse'), 900);
+    });
 }
 
 // Non-blocking user message helper (writes to #backofficeStatus if present)
@@ -227,6 +268,56 @@ function fetchComments() {
 document.addEventListener('DOMContentLoaded', function () {
     // initial load
     fetchComments();
+
+    // Restore sidebar collapsed state if user toggled previously
+    try {
+        const collapsed = localStorage.getItem('eco_sidebar_collapsed');
+        const app = document.querySelector('.app');
+        if (collapsed === '1' && app) app.classList.add('sidebar-collapsed');
+    } catch (e) { /* ignore localStorage errors */ }
+
+    // Sidebar toggle button
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarHandle = document.getElementById('sidebarHandle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function () {
+            const app = document.querySelector('.app');
+            if (!app) return;
+            const collapsed = app.classList.toggle('sidebar-collapsed');
+            // store preference
+            try { localStorage.setItem('eco_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+            // update aria state
+            this.setAttribute('aria-expanded', String(!collapsed));
+        });
+    }
+    if (sidebarHandle) {
+        sidebarHandle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const app = document.querySelector('.app');
+            if (!app) return;
+            const collapsed = app.classList.toggle('sidebar-collapsed');
+            try { localStorage.setItem('eco_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+            // also update toggle button aria if present
+            if (sidebarToggle) sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+        });
+    }
+
+    // Guide modal open/close
+    const openGuide = document.getElementById('openGuide');
+    if (openGuide) {
+        openGuide.addEventListener('click', function () {
+            let modal = document.getElementById('guideModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'guideModal';
+                modal.innerHTML = `<div class="modal-content"><button class="close-guide" aria-label="Fermer">×</button><h2>Charte de la communauté</h2><p>Merci de respecter les autres membres, d'éviter les contenus offensants, de partager des informations vérifiées et de garder les échanges constructifs. Tout comportement abusif pourra entraîner une modération.</p><p style="margin-top:12px;font-weight:600">Principes clés:</p><ul><li>Respect mutuel</li><li>Pas de spam ni publicité</li><li>Contenus sûrs et vérifiables</li><li>Signalement des abus au support</li></ul></div>`;
+                document.body.appendChild(modal);
+                modal.querySelector('.close-guide').addEventListener('click', function () { modal.style.display = 'none'; });
+                modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
+            }
+            modal.style.display = 'flex';
+        });
+    }
 
     // event delegation
     document.addEventListener('click', function (e) {

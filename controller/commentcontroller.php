@@ -18,16 +18,43 @@ try {
     exit;
 }
 
+require_once __DIR__ . '/../model/post.php';
+
 class CommentController {
-    public function addComment($send_by, $contenu) {
-        $comment = new Comment(null, $send_by, $contenu, date('Y-m-d H:i:s'));
-        return CommentCRUD::addComment($comment);
+    // Add both post and comment, link comment to post
+    public function addPostAndComment($send_by, $contenu) {
+        $db = config::getConnexion();
+        try {
+            $db->beginTransaction();
+            // Insert post
+            $postSql = "INSERT INTO post (send_by, time) VALUES (:send_by, :time)";
+            $postStmt = $db->prepare($postSql);
+            $now = date('Y-m-d H:i:s');
+            $postStmt->execute([
+                ':send_by' => $send_by,
+                ':time' => $now
+            ]);
+            $postId = $db->lastInsertId();
+            // Insert comment linked to post
+            $commentSql = "INSERT INTO comments (`comment id`, contenu) VALUES (:comment_id, :contenu)";
+            $commentStmt = $db->prepare($commentSql);
+            $commentStmt->execute([
+                ':comment_id' => $postId,
+                ':contenu' => $contenu
+            ]);
+            $commentId = $db->lastInsertId();
+            $db->commit();
+            return ['post_id' => $postId, 'comment_id' => $commentId];
+        } catch (Exception $e) {
+            $db->rollBack();
+            throw $e;
+        }
     }
     public function getAllComments() {
         return CommentCRUD::getAllComments();
     }
-    public function updateComment($id, $contenu) {
-        CommentCRUD::updateComment($id, $contenu);
+    public function updateComment($id, $contenu, $author = null) {
+        CommentCRUD::updateComment($id, $contenu, $author);
     }
     public function deleteComment($id) {
         CommentCRUD::deleteComment($id);
@@ -38,15 +65,16 @@ class CommentController {
 header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $controller = new CommentController();
-    // Add comment
+    // Add post and comment
     if (isset($_POST['send_by']) && isset($_POST['contenu']) && !isset($_POST['id'])) {
         $send_by = $_POST['send_by'] ?: 'Anonyme';
         $contenu = $_POST['contenu'] ?: '';
         if (trim($contenu) !== '') {
             try {
-                $insertId = $controller->addComment($send_by, $contenu);
-                echo json_encode(['success' => true, 'id' => $insertId]);
+                $result = $controller->addPostAndComment($send_by, $contenu);
+                echo json_encode(['success' => true, 'post_id' => $result['post_id'], 'comment_id' => $result['comment_id']]);
             } catch (Exception $e) {
+                error_log(date('[Y-m-d H:i:s] ') . $e->getMessage() . "\n", 3, __DIR__ . '/../log/error.log');
                 echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
             }
         } else {
@@ -66,9 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 CommentCRUD::updateComment($id, $contenu);
             }
             echo json_encode(['success' => true]);
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
-        }
+            } catch (Exception $e) {
+                error_log(date('[Y-m-d H:i:s] ') . $e->getMessage() . "\n", 3, __DIR__ . '/../log/error.log');
+                echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
+            }
         exit;
     }
     // Delete comment
@@ -76,9 +105,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $controller->deleteComment($_POST['id']);
             echo json_encode(['success' => true]);
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
-        }
+            } catch (Exception $e) {
+                error_log(date('[Y-m-d H:i:s] ') . $e->getMessage() . "\n", 3, __DIR__ . '/../log/error.log');
+                echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
+            }
         exit;
     }
     // POST data debugging removed to avoid writing to a removed/unknown log file

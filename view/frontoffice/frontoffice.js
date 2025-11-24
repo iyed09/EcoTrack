@@ -22,16 +22,28 @@ function parseJsonSafe(response) {
 
 // Ouvre la modale de création de post
 createPostBtn.addEventListener('click', () => {
-    // show modal when user clicks the button
-    modal.style.display = 'block';
-    modal.setAttribute('aria-hidden', 'false');
-    postContent.focus();
+    // show modal when user clicks the button (centered with animation)
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        // small timeout to allow CSS transition and then focus content
+        setTimeout(() => {
+            postContent.focus();
+            // auto-resize the textarea to fit current content
+            autoResizeTextarea(postContent);
+        }, 120);
+    }
 });
 
 // Ferme la modale
 closeModal.addEventListener('click', () => {
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden', 'true');
+    if (modal) {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        // hide after transition
+        setTimeout(() => { modal.style.display = 'none'; }, 260);
+    }
     postContent.value = '';
     postAuthor.value = '';
     postMessage.style.display = 'none';
@@ -46,8 +58,11 @@ closeModal.addEventListener('click', () => {
 // Ferme la modale si on clique dehors
 window.addEventListener('click', (e) => {
     if (e.target == modal) {
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
+        if (modal) {
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            setTimeout(() => { modal.style.display = 'none'; }, 260);
+        }
         postContent.value = '';
         postAuthor.value = '';
         editingId = null;
@@ -93,6 +108,7 @@ function renderComments(list) {
             <div class="comments-zone" style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;">
                 <div class="comments-list" style="margin-bottom:8px;"></div>
                 <div style="display:flex;gap:8px;align-items:center;">
+                    <input class="comment-author" placeholder="Votre nom (optionnel)" style="width:160px;padding:8px;border:1px solid #ddd;border-radius:6px;" />
                     <input class="comment-input" placeholder="Écrire un commentaire..." style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;" />
                     <button class="comment-btn btn btn-primary" data-parent-id="${item.id}">Commenter</button>
                 </div>
@@ -116,12 +132,71 @@ function fetchComments() {
 }
 
 // Load existing comments on open
-document.addEventListener('DOMContentLoaded', () => fetchComments());
+document.addEventListener('DOMContentLoaded', () => {
+    fetchComments();
+    // Wire the community guide modal in frontoffice
+    const openGuideFront = document.getElementById('openGuideFront');
+    if (openGuideFront) {
+        openGuideFront.addEventListener('click', function (e) {
+            e.preventDefault();
+            let modal = document.getElementById('guideModalFront');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'guideModalFront';
+                modal.className = 'modal';
+                modal.innerHTML = `<div class="modal-content"><button class="close" aria-label="Fermer">×</button><h2>Charte de la communauté</h2><p>Merci de respecter les autres membres, d'éviter les contenus offensants, de partager des informations vérifiées et de garder les échanges constructifs. Tout comportement abusif pourra entraîner une modération.</p><p style="margin-top:12px;font-weight:600">Principes clés:</p><ul><li>Respect mutuel</li><li>Pas de spam ni publicité</li><li>Contenus sûrs et vérifiables</li><li>Signalez les abus au support</li></ul></div>`;
+                document.body.appendChild(modal);
+                modal.querySelector('.close').addEventListener('click', function () { modal.style.display = 'none'; });
+                modal.addEventListener('click', function (ev) { if (ev.target === modal) modal.style.display = 'none'; });
+            }
+            modal.style.display = 'flex';
+        });
+    }
+
+    // textarea auto-resize helper (keeps UX nicer and provides more space)
+    function autoResizeTextarea(el) {
+        if (!el) return;
+        el.style.height = 'auto';
+        const newH = Math.max(120, Math.min(600, el.scrollHeight));
+        el.style.height = newH + 'px';
+    }
+
+    // Wire auto-resize on input for the modal textarea
+    if (postContent) {
+        postContent.addEventListener('input', function () { autoResizeTextarea(this); });
+        // ensure a sensible starting height
+        autoResizeTextarea(postContent);
+    }
+
+    // Sidebar slide/collapse wiring: preserve state in localStorage
+    const root = document.querySelector('.app');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarHandle = document.getElementById('sidebarHandle');
+    const SIDEBAR_KEY = 'eco_sidebar_collapsed';
+
+    function setSidebarCollapsed(collapsed) {
+        if (!root) return;
+        if (collapsed) root.classList.add('sidebar-collapsed');
+        else root.classList.remove('sidebar-collapsed');
+        try { localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0'); } catch (e) { /* ignore */ }
+    }
+
+    // Restore saved state
+    try {
+        const saved = localStorage.getItem(SIDEBAR_KEY);
+        if (saved === '1') setSidebarCollapsed(true);
+    } catch (e) { /* ignore */ }
+
+    function toggleSidebar() { setSidebarCollapsed(!root.classList.contains('sidebar-collapsed')); }
+
+    if (sidebarToggle) sidebarToggle.addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); });
+    if (sidebarHandle) sidebarHandle.addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); });
+});
 
 // Ajout d'une publication avec zone de commentaires
 submitPost.addEventListener('click', () => {
     const content = postContent.value.trim();
-    const author = (postAuthor.value || 'Anonyme').trim();
+    const sendBy = (postAuthor.value || 'Anonyme').trim();
     if (content.length === 0) {
         alert('Veuillez écrire quelque chose pour publier.');
         return;
@@ -132,13 +207,16 @@ submitPost.addEventListener('click', () => {
         fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `id=${editingId}&contenu=${encodeURIComponent(content)}&send_by=${encodeURIComponent(author)}`
+            body: `id=${editingId}&contenu=${encodeURIComponent(content)}&send_by=${encodeURIComponent(sendBy)}`
         }).then(parseJsonSafe).then(data => {
             if (data && data.success) {
                 // reset and refresh
                 editingId = null;
-                modal.style.display = 'none';
-                modal.setAttribute('aria-hidden', 'true');
+                if (modal) {
+                    modal.classList.remove('open');
+                    modal.setAttribute('aria-hidden', 'true');
+                    setTimeout(() => { modal.style.display = 'none'; }, 260);
+                }
                 postContent.value = ''; postAuthor.value = '';
                 fetchComments();
             } else {
@@ -151,33 +229,56 @@ submitPost.addEventListener('click', () => {
         fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `send_by=${encodeURIComponent(author)}&contenu=${encodeURIComponent(content)}`
+            body: `send_by=${encodeURIComponent(sendBy)}&contenu=${encodeURIComponent(content)}`
         })
         .then(parseJsonSafe)
         .then(data => {
             if (data && data.success) {
+                // show a small success animation inside the modal, then close
                 postMessage.style.display = 'inline';
                 postMessage.textContent = 'Publié';
-                // Re-fetch from server to show saved comments
                 fetchComments();
-                setTimeout(() => {
+                try {
+                    const inner = modal.querySelector('.modal-content');
+                    let success = inner.querySelector('.publish-success');
+                    if (!success) {
+                        success = document.createElement('div');
+                        success.className = 'publish-success';
+                        success.innerHTML = '<div class="check">✓</div>';
+                        inner.appendChild(success);
+                    }
+                    // trigger animation
+                    setTimeout(() => success.classList.add('show'), 40);
+                    // close after show
+                    setTimeout(() => {
+                        success.classList.remove('show');
+                        // hide modal after animation
+                        modal.classList.remove('open');
+                        modal.setAttribute('aria-hidden', 'true');
+                        setTimeout(() => { modal.style.display = 'none'; }, 260);
+                        postMessage.style.display = 'none';
+                        postContent.value = '';
+                        postAuthor.value = '';
+                    }, 900);
+                } catch (e) {
+                    // fallback: close quickly
+                    modal.classList.remove('open');
+                    setTimeout(() => { modal.style.display = 'none'; }, 260);
                     postMessage.style.display = 'none';
-                    modal.style.display = 'none';
-                    modal.setAttribute('aria-hidden', 'true');
                     postContent.value = '';
                     postAuthor.value = '';
-                }, 700);
+                }
             } else {
                 // server returned JSON with error: add post locally and inform user
                 const now = new Date().toLocaleString();
-                appendLocalPost(author, content, now, '(non sauvegardé: ' + (data.error || 'erreur serveur') + ')');
+                appendLocalPost(sendBy, content, now, '(non sauvegardé: ' + (data.error || 'erreur serveur') + ')');
                 alert('Le post a été ajouté localement mais le serveur a renvoyé une erreur: ' + (data.error || ''));
             }
         })
         .catch(err => {
             console.warn('Submit error — adding post locally:', err);
             const now = new Date().toLocaleString();
-            appendLocalPost(author, content, now, '(publié localement, serveur indisponible)');
+            appendLocalPost(sendBy, content, now, '(publié localement, serveur indisponible)');
         })
         .finally(() => { submitPost.disabled = false; });
     }
@@ -189,19 +290,22 @@ postsContainer.addEventListener('click', function (e) {
     if (e.target.classList.contains('comment-btn')) {
         const container = e.target.closest('.comments-zone');
         const input = container.querySelector('.comment-input');
+        const authorInput = container.querySelector('.comment-author'); // (no change, just for context)
         const text = input.value.trim();
+        const author = (authorInput && authorInput.value.trim()) || 'Anonyme';
         if (text.length === 0) { alert('Écris un commentaire avant de répondre.'); return; }
         const parentId = e.target.getAttribute('data-parent-id');
-        // For simplicity, store parent id inside the content so replies are visible in the feed
-        const payload = `send_by=Utilisateur&contenu=${encodeURIComponent('(reply to ' + parentId + ') ' + text)}`;
+        // Store parent id inside the content for now (for reply threading)
+        const payload = `author=${encodeURIComponent(author)}&contenu=${encodeURIComponent('(reply to ' + parentId + ') ' + text)}`;
         fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload })
             .then(parseJsonSafe)
             .then(data => {
                 if (data && data.success) {
                     input.value = '';
+                    if (authorInput) authorInput.value = '';
                     fetchComments();
                 } else {
-                    alert('Erreur lors de l\'ajout du commentaire: ' + (data && data.error ? data.error : '')); 
+                    alert('Erreur lors de l\'ajout du commentaire: ' + (data && data.error ? data.error : ''));
                 }
             })
             .catch(err => { console.error('Comment submit error', err); alert('Impossible d\'envoyer le commentaire.'); });
@@ -266,6 +370,40 @@ postsContainer.addEventListener('click', function (e) {
                 // Do NOT set editingId for view mode
             })
             .catch(err => { console.error('View fetch error', err); alert('Impossible d\'ouvrir la publication'); });
+    }
+
+    // Edit/delete comments (future: only allow if user is author or admin)
+    if (e.target.classList.contains('edit-comment')) {
+        const commentEl = e.target.closest('.comment-item');
+        if (!commentEl) return;
+        const contentEl = commentEl.querySelector('.comment-content');
+        const authorEl = commentEl.querySelector('.comment-author-label');
+        const editInput = document.createElement('input');
+        editInput.type = 'text';
+        editInput.value = contentEl.textContent;
+        editInput.className = 'comment-edit-input';
+        contentEl.replaceWith(editInput);
+        e.target.style.display = 'none';
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = 'Enregistrer';
+        saveBtn.className = 'btn btn-primary save-comment';
+        e.target.parentNode.insertBefore(saveBtn, e.target.nextSibling);
+        saveBtn.addEventListener('click', function() {
+            const newContent = editInput.value.trim();
+            if (!newContent) return alert('Le commentaire ne peut pas être vide.');
+            // For now, just update locally (future: send to backend)
+            // TODO: send update to backend with comment id
+            contentEl.textContent = newContent;
+            editInput.replaceWith(contentEl);
+            saveBtn.remove();
+            e.target.style.display = '';
+        });
+    }
+    if (e.target.classList.contains('delete-comment')) {
+        const commentEl = e.target.closest('.comment-item');
+        if (!commentEl) return;
+        // TODO: send delete to backend with comment id
+        commentEl.remove();
     }
 });
 

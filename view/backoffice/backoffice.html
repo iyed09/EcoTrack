@@ -11,45 +11,86 @@
     <aside class="sidebar">
         <div class="sidebar-inner">
             <div class="logo">EcoTrack Admin</div>
-            //test gitiiiii
+            <!-- Small profile + community guidelines (replaces static sidebar stats) -->
+            <div class="sidebar-profile">
+                <div class="avatar" aria-hidden="true">ET</div>
+                <div class="profile-info">
+                    <div class="profile-name">EcoTrack Admin</div>
+                    <div class="profile-role">Gestionnaire</div>
+                </div>
+            </div>
 
-            <!-- Dashboard counters moved to sidebar and vertically centered -->
-            <div class="dashboard-stats sidebar-stats">
-                <div class="dash-item">
-                    <div class="dash-label">Messages envoyés</div>
-                    <div id="sentCount" class="dash-count">0</div>
-                </div>
-                <div class="dash-item">
-                    <div class="dash-label">Commentaires ajoutés</div>
-                    <div id="commentCount" class="dash-count">0</div>
-                </div>
-                <div class="dash-item">
-                    <div class="dash-label">Commentaires modifiés</div>
-                    <div id="editCount" class="dash-count">0</div>
-                </div>
-                <div class="dash-item">
-                    <div class="dash-label">Commentaires supprimés</div>
-                    <div id="deleteCount" class="dash-count">0</div>
-                </div>
+            <div class="community-guide">
+                <h3>Règles de la communauté</h3>
+                <p class="guide-excerpt">Soyez respectueux, partagez des idées constructives et évitez les contenus inappropriés.</p>
+                <button id="openGuide" class="btn btn-primary">Lire la charte</button>
+            </div>
+
+            <!-- keep numeric counters hidden for JS compatibility -->
+            <div class="sidebar-hidden-counters" style="display:none;">
+                <div id="sentCount">0</div>
+                <div id="commentCount">0</div>
+                <div id="editCount">0</div>
+                <div id="deleteCount">0</div>
             </div>
 
             <nav class="sidebar-nav">
                 <!-- Navigation items removed per request -->
             </nav>
         </div>
+        <button id="sidebarHandle" class="sidebar-handle" aria-label="Basculer la barre">‹</button>
     </aside>
 
     <div class="main">
         <header class="topbar">
+            <div class="topbar-left">
+                <button id="sidebarToggle" class="btn btn-secondary" aria-expanded="true" aria-label="Basculer la barre latérale">☰</button>
+            </div>
             <div class="topbar-actions">
                 <a href="../frontoffice/frontoffice.html" class="btn btn-secondary">Accéder au Frontoffice</a>
             </div>
         </header>
 
         <main class="container content-area">
-            <h1 class="page-title">Gestion des publications et commentaires</h1>
+            <h1 class="page-title">Tableau de bord</h1>
+            <div class="page-subtitle">Vue d'ensemble des publications et outils de modération</div>
+
+            <!-- Visual dashboard overview (appearance only) -->
+            <div class="dashboard-overview card" aria-hidden="true">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📤</div>
+                        <div class="stat-body">
+                            <div class="stat-number" id="overviewSent">0</div>
+                            <div class="stat-label">Messages envoyés</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💬</div>
+                        <div class="stat-body">
+                            <div class="stat-number" id="overviewComments">0</div>
+                            <div class="stat-label">Commentaires ajoutés</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✏️</div>
+                        <div class="stat-body">
+                            <div class="stat-number" id="overviewEdit">0</div>
+                            <div class="stat-label">Commentaires modifiés</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🗑️</div>
+                        <div class="stat-body">
+                            <div class="stat-number" id="overviewDelete">0</div>
+                            <div class="stat-label">Commentaires supprimés</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="card table-card">
+                <div class="quick-help" role="note">Astuce: cliquez sur une publication pour l'éditer ou la supprimer</div>
                 <section id="backofficeFeed" class="feed">
                     <!-- Comments will be loaded here by backoffice.js -->
                     <div class="feed-empty">Chargement des publications...</div>
