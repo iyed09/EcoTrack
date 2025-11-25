@@ -6,7 +6,29 @@ require_once __DIR__ . '/../model/comment.php';
 class PostsController {
     public function getAllPostsWithComments() {
         $db = config::getConnexion();
-        $sql = 'SELECT p.ID as post_id, p.send_by, p.time as post_time, c.id as comment_id, c.contenu, c.`comment id` as comment_post_id
+        // Ensure post.contenu and comments.send_by exist to avoid SQL errors on older schemas
+        try {
+            $col = $db->query("SHOW COLUMNS FROM post LIKE 'contenu'")->fetch();
+            if (!$col) {
+                $db->exec("ALTER TABLE post ADD COLUMN contenu TEXT NULL AFTER time");
+            }
+        } catch (Exception $_) {}
+        try {
+            $col = $db->query("SHOW COLUMNS FROM comments LIKE 'send_by'")->fetch();
+            if (!$col) {
+                $db->exec("ALTER TABLE comments ADD COLUMN send_by VARCHAR(100) DEFAULT 'Anonyme' AFTER id");
+            }
+            $col = $db->query("SHOW COLUMNS FROM comments LIKE 'time'")->fetch();
+            if (!$col) {
+                $db->exec("ALTER TABLE comments ADD COLUMN time DATETIME NULL AFTER contenu");
+                $db->exec("UPDATE comments SET time = NOW() WHERE time IS NULL");
+            }
+            $col = $db->query("SHOW COLUMNS FROM comments LIKE 'comment id'")->fetch();
+            if (!$col) {
+                $db->exec("ALTER TABLE comments ADD COLUMN `comment id` INT NULL AFTER time");
+            }
+        } catch (Exception $_) {}
+        $sql = 'SELECT p.ID as post_id, p.send_by, p.time as post_time, p.contenu as post_contenu, c.id as comment_id, c.send_by as comment_send_by, c.contenu as comment_contenu, c.`comment id` as comment_post_id
             FROM post p
             LEFT JOIN comments c ON c.`comment id` = p.ID
             ORDER BY p.time DESC, c.id ASC';
@@ -21,13 +43,15 @@ class PostsController {
                     'id' => $pid,
                     'send_by' => $row['send_by'],
                     'time' => $row['post_time'],
+                    'contenu' => $row['post_contenu'],
                     'comments' => []
                 ];
             }
             if ($row['comment_id']) {
                 $posts[$pid]['comments'][] = [
                     'id' => $row['comment_id'],
-                    'contenu' => $row['contenu'],
+                    'send_by' => $row['comment_send_by'] ?: 'Anonyme',
+                    'contenu' => $row['comment_contenu'],
                     'comment_post_id' => $row['comment_post_id']
                 ];
             }
@@ -36,11 +60,18 @@ class PostsController {
     }
     public function addPost($post) {
         $db = config::getConnexion();
-        $sql = 'INSERT INTO post (send_by, time) VALUES (:send_by, :time)';
+        // ensure 'contenu' exists and insert into post table
+        try {
+            $db->query("SELECT contenu FROM post LIMIT 1");
+        } catch (Exception $_) {
+            try { $db->exec("ALTER TABLE post ADD COLUMN contenu TEXT NULL AFTER time"); } catch (Exception $_) {}
+        }
+        $sql = 'INSERT INTO post (send_by, time, contenu) VALUES (:send_by, :time, :contenu)';
         $stmt = $db->prepare($sql);
         $stmt->execute([
-            ':send_by' => $post->getSendBy(),
-            ':time' => $post->getTime()
+            ':send_by' => method_exists($post, 'getSendBy') ? $post->getSendBy() : ($post->getAuthor() ?? 'Anonyme'),
+            ':time' => method_exists($post, 'getTime') ? $post->getTime() : ($post->getCreatedAt() ?? date('Y-m-d H:i:s')),
+            ':contenu' => method_exists($post, 'getContent') ? $post->getContent() : ''
         ]);
         return $db->lastInsertId();
     }

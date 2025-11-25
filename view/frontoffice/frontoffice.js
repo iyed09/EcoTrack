@@ -7,9 +7,12 @@ const postAuthor = document.getElementById('postAuthor');
 const ecoFeed = document.getElementById('ecoFeed');
 const postsContainer = document.getElementById('postsContainer');
 const postMessage = document.getElementById('postMessage');
-let editingId = null; // null => creating new post; otherwise updating existing post id
-const API_URL = new URL('../../controller/commentcontroller.php', window.location.href).href;
+let editingPostId = null; // null => creating new post; otherwise updating existing post id
+let editingCommentId = null; // when editing a post, which comment id is being edited (main comment)
+const API_URL = new URL('../../controller/communityController.php', window.location.href).href;
 console.log('frontoffice.js loaded — API:', API_URL);
+window.addEventListener('error', function (ev) { console.error('Global JS error', ev); });
+window.addEventListener('unhandledrejection', function (ev) { console.error('Unhandled promise rejection', ev); });
 
 // Helper: parse JSON only if server returned JSON
 function parseJsonSafe(response) {
@@ -18,6 +21,16 @@ function parseJsonSafe(response) {
         return response.text().then(text => { throw new Error('Invalid JSON response:\n' + text); });
     }
     return response.json();
+}
+
+// Escape HTML to avoid XSS when rendering user-submitted content
+function escapeHtml(unsafe) {
+    return String(unsafe)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 // Ouvre la modale de création de post
@@ -33,6 +46,7 @@ createPostBtn.addEventListener('click', () => {
             // auto-resize the textarea to fit current content
             autoResizeTextarea(postContent);
         }, 120);
+        console.log('createPostBtn clicked — modal displayed');
     }
 });
 
@@ -47,7 +61,7 @@ closeModal.addEventListener('click', () => {
     postContent.value = '';
     postAuthor.value = '';
     postMessage.style.display = 'none';
-    editingId = null;
+    editingPostId = null; editingCommentId = null;
     // Ensure fields and submit are re-enabled when modal closes
     postAuthor.disabled = false;
     postContent.disabled = false;
@@ -65,7 +79,7 @@ window.addEventListener('click', (e) => {
         }
         postContent.value = '';
         postAuthor.value = '';
-        editingId = null;
+        editingPostId = null; editingCommentId = null;
         // Re-enable inputs and submit
         postAuthor.disabled = false;
         postContent.disabled = false;
@@ -94,7 +108,7 @@ function renderComments(list) {
         article.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
                 <div style="flex:1">
-                    <p><strong>${sendBy}</strong>: <span class="post-body">${contenu}</span></p>
+                    <p><strong>${escapeHtml(sendBy)}</strong>: <span class="post-body">${escapeHtml(contenu)}</span></p>
                     <div class="pub-date">${time}</div>
                 </div>
                 <div style="flex:0 0 auto;">
@@ -114,6 +128,23 @@ function renderComments(list) {
                 </div>
             </div>
         `;
+        // populate comments for this post
+        const commentsList = article.querySelector('.comments-list');
+        if (Array.isArray(item.comments) && item.comments.length > 0) {
+            item.comments.forEach(c => {
+                const cEl = document.createElement('div');
+                cEl.className = 'comment-item';
+                cEl.innerHTML = `
+                    <strong class="comment-author-label">${escapeHtml(c.send_by || 'Anonyme')}</strong>
+                    <span class="comment-content">${escapeHtml(c.contenu || '')}</span>
+                    <div style="display:inline-block; margin-left:8px;">
+                        <button class="edit-comment btn btn-sm btn-primary" data-comment-id="${c.id}">Modifier</button>
+                        <button class="delete-comment btn btn-sm btn-danger" data-comment-id="${c.id}">Supprimer</button>
+                    </div>
+                `;
+                commentsList.appendChild(cEl);
+            });
+        }
         postsContainer.appendChild(article);
     });
 }
@@ -122,9 +153,11 @@ function fetchComments() {
     fetch(API_URL)
         .then(parseJsonSafe)
         .then(data => {
+            console.log('create post returned:', data);
             renderComments(data);
         })
         .catch(err => {
+            console.error('create post fetch error', err);
             console.warn('Fetch comments error — showing empty feed:', err);
             // Show empty feed instead of error message to avoid alarming users
             renderComments([]);
@@ -194,7 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Ajout d'une publication avec zone de commentaires
-submitPost.addEventListener('click', () => {
+submitPost.addEventListener('click', (e) => {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    console.log('submitPost clicked', { editingPostId, editingCommentId });
     const content = postContent.value.trim();
     const sendBy = (postAuthor.value || 'Anonyme').trim();
     if (content.length === 0) {
@@ -202,16 +237,18 @@ submitPost.addEventListener('click', () => {
         return;
     }
     submitPost.disabled = true;
-    // If editingId is set, update existing post; otherwise create new
-    if (editingId) {
+    // If editingPostId is set, update existing post; otherwise create new
+    if (editingPostId) {
+        console.log('Update post payload', { post_id: editingPostId, send_by: sendBy, contenu: content });
         fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `id=${editingId}&contenu=${encodeURIComponent(content)}&send_by=${encodeURIComponent(sendBy)}`
+            body: `post_id=${editingPostId}&contenu=${encodeURIComponent(content)}&send_by=${encodeURIComponent(sendBy)}`
         }).then(parseJsonSafe).then(data => {
+            console.log('Update post response', data);
             if (data && data.success) {
                 // reset and refresh
-                editingId = null;
+                editingPostId = null; editingCommentId = null;
                 if (modal) {
                     modal.classList.remove('open');
                     modal.setAttribute('aria-hidden', 'true');
@@ -233,6 +270,7 @@ submitPost.addEventListener('click', () => {
         })
         .then(parseJsonSafe)
         .then(data => {
+            console.log('Create post response', data);
             if (data && data.success) {
                 // show a small success animation inside the modal, then close
                 postMessage.style.display = 'inline';
@@ -287,16 +325,18 @@ submitPost.addEventListener('click', () => {
 // Handle comment, edit, delete and view actions via event delegation
 postsContainer.addEventListener('click', function (e) {
     // Comment on a post (creates a new comment record)
-    if (e.target.classList.contains('comment-btn')) {
-        const container = e.target.closest('.comments-zone');
+    const clickedCommentBtn = e.target.closest('.comment-btn');
+    if (clickedCommentBtn) {
+        const container = clickedCommentBtn.closest('.comments-zone');
         const input = container.querySelector('.comment-input');
         const authorInput = container.querySelector('.comment-author'); // (no change, just for context)
         const text = input.value.trim();
         const author = (authorInput && authorInput.value.trim()) || 'Anonyme';
+        console.log('Comment submit', { parentId: clickedCommentBtn.getAttribute('data-parent-id'), author, text });
         if (text.length === 0) { alert('Écris un commentaire avant de répondre.'); return; }
-        const parentId = e.target.getAttribute('data-parent-id');
-        // Store parent id inside the content for now (for reply threading)
-        const payload = `send_by=${encodeURIComponent(author)}&contenu=${encodeURIComponent('(reply to ' + parentId + ') ' + text)}`;
+        const parentId = clickedCommentBtn.getAttribute('data-parent-id');
+        // Add comment to existing post using parent_id
+        const payload = `parent_id=${encodeURIComponent(parentId)}&contenu=${encodeURIComponent(text)}&send_by=${encodeURIComponent(author)}`;
         fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload })
             .then(parseJsonSafe)
             .then(data => {
@@ -312,33 +352,40 @@ postsContainer.addEventListener('click', function (e) {
     }
 
     // Edit post: open modal pre-filled so user can edit content (and submit updates)
-    if (e.target.classList && e.target.classList.contains('edit-post')) {
-        const id = e.target.getAttribute('data-id');
+    const clickedEditPost = e.target.closest('.edit-post');
+    if (clickedEditPost) {
+        const id = clickedEditPost.getAttribute('data-id');
         // fetch the single post data then open modal for editing
         fetch(API_URL).then(parseJsonSafe).then(data => {
             const post = (data || []).find(p => String(p.id) === String(id));
             if (!post) { alert('Publication introuvable.'); return; }
             document.getElementById('postAuthor').value = post.send_by || '';
             document.getElementById('postContent').value = post.contenu || '';
-            modal.style.display = 'block';
+            // Display modal using the same UI flow as the Create modal
+            modal.style.display = 'flex';
+            modal.classList.add('open');
             modal.setAttribute('aria-hidden', 'false');
             // Enable fields for editing and show submit
             postAuthor.disabled = false;
             postContent.disabled = false;
             submitPost.disabled = false;
             submitPost.style.display = '';
-            editingId = id; // will make the Save button send update
+            // Set editingPostId to the post id and editingCommentId to the id of the main comment (if any)
+            editingPostId = id;
+            console.log('editingPostId set to', editingPostId);
+            editingCommentId = null;
         }).catch(err => { console.error('Edit fetch error', err); alert('Impossible d\'ouvrir la publication pour modification.'); });
     }
 
     // Delete post (no confirm dialog — perform deletion immediately)
-    if (e.target.classList && e.target.classList.contains('delete-post')) {
-        const id = e.target.getAttribute('data-id');
+    const clickedDeletePost = e.target.closest('.delete-post');
+    if (clickedDeletePost) {
+        const id = clickedDeletePost.getAttribute('data-id');
         const btn = e.target;
         btn.disabled = true;
         const prevText = btn.textContent;
         btn.textContent = 'Suppression...';
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `id=${id}` })
+        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `post_id=${id}` })
             .then(parseJsonSafe)
             .then(data => {
                 if (data && data.success) { fetchComments(); } else { alert('Erreur lors de la suppression: ' + (data && data.error ? data.error : '')); }
@@ -348,8 +395,9 @@ postsContainer.addEventListener('click', function (e) {
     }
 
     // View post - open a basic modal by reusing the create modal for simplicity
-    if (e.target.classList && e.target.classList.contains('view-post')) {
-        const id = e.target.getAttribute('data-id');
+    const clickedViewPost = e.target.closest('.view-post');
+    if (clickedViewPost) {
+        const id = clickedViewPost.getAttribute('data-id');
         // Find the post data from the last fetched list by re-fetching and opening modal when found
         fetch(API_URL)
             .then(parseJsonSafe)
@@ -359,22 +407,26 @@ postsContainer.addEventListener('click', function (e) {
                 // populate modal fields for quick editing/viewing
                 document.getElementById('postAuthor').value = post.send_by || '';
                 document.getElementById('postContent').value = post.contenu || '';
+                // Display modal using the same UI flow as the Create modal
+                modal.style.display = 'flex';
+                modal.classList.add('open');
+                modal.setAttribute('aria-hidden', 'false');
                 // Disable inputs so this modal is view-only
                 postAuthor.disabled = true;
                 postContent.disabled = true;
                 // hide/disable the submit button while viewing
                 submitPost.disabled = true;
                 submitPost.style.display = 'none';
-                modal.style.display = 'block';
-                modal.setAttribute('aria-hidden', 'false');
-                // Do NOT set editingId for view mode
+                // Do NOT set editingPostId/editingCommentId for view mode
+                // Do NOT set editingPostId/editingCommentId for view mode
             })
             .catch(err => { console.error('View fetch error', err); alert('Impossible d\'ouvrir la publication'); });
     }
 
     // Edit/delete comments (future: only allow if user is author or admin)
-    if (e.target.classList.contains('edit-comment')) {
-        const commentEl = e.target.closest('.comment-item');
+    const clickedEditComment = e.target.closest('.edit-comment');
+    if (clickedEditComment) {
+        const commentEl = clickedEditComment.closest('.comment-item');
         if (!commentEl) return;
         const contentEl = commentEl.querySelector('.comment-content');
         const authorEl = commentEl.querySelector('.comment-author-label');
@@ -388,22 +440,42 @@ postsContainer.addEventListener('click', function (e) {
         saveBtn.textContent = 'Enregistrer';
         saveBtn.className = 'btn btn-primary save-comment';
         e.target.parentNode.insertBefore(saveBtn, e.target.nextSibling);
-        saveBtn.addEventListener('click', function() {
+            saveBtn.addEventListener('click', function() {
             const newContent = editInput.value.trim();
             if (!newContent) return alert('Le commentaire ne peut pas être vide.');
-            // For now, just update locally (future: send to backend)
-            // TODO: send update to backend with comment id
-            contentEl.textContent = newContent;
+            const commentId = clickedEditComment.getAttribute('data-comment-id');
+            console.log('Updating comment', { commentId, newContent });
+            // send update to backend with comment id
+            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `id=${encodeURIComponent(commentId)}&contenu=${encodeURIComponent(newContent)}` })
+                .then(parseJsonSafe)
+                .then(data => {
+                    if (data && data.success) {
+                        fetchComments();
+                    } else {
+                        alert('Erreur lors de la mise à jour du commentaire: ' + (data && data.error ? data.error : ''));
+                    }
+                }).catch(err => { console.error('Update comment error', err); alert('Impossible de mettre à jour le commentaire.'); });
             editInput.replaceWith(contentEl);
             saveBtn.remove();
             e.target.style.display = '';
         });
     }
-    if (e.target.classList.contains('delete-comment')) {
-        const commentEl = e.target.closest('.comment-item');
+    const clickedDeleteComment = e.target.closest('.delete-comment');
+    if (clickedDeleteComment) {
+        const commentEl = clickedDeleteComment.closest('.comment-item');
         if (!commentEl) return;
-        // TODO: send delete to backend with comment id
-        commentEl.remove();
+        const commentId = clickedDeleteComment.getAttribute('data-comment-id');
+        const btn = e.target;
+        btn.disabled = true;
+        const prevText = btn.textContent;
+        btn.textContent = 'Suppression...';
+        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `id=${encodeURIComponent(commentId)}` })
+            .then(parseJsonSafe)
+            .then(data => {
+                if (data && data.success) { fetchComments(); } else { alert('Erreur lors de la suppression: ' + (data && data.error ? data.error : '')); }
+            })
+            .catch(err => { console.error('Delete comment error', err); alert('Erreur lors de la suppression du commentaire.'); })
+            .finally(() => { btn.disabled = false; btn.textContent = prevText; });
     }
 });
 

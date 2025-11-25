@@ -36,11 +36,14 @@ class CommentController {
             ]);
             $postId = $db->lastInsertId();
             // Insert comment linked to post
-            $commentSql = "INSERT INTO comments (`comment id`, contenu) VALUES (:comment_id, :contenu)";
+            // Use explicit column list so it matches the current DB schema
+            $commentSql = "INSERT INTO comments (send_by, contenu, time, `comment id`) VALUES (:send_by, :contenu, :time, :comment_id)";
             $commentStmt = $db->prepare($commentSql);
             $commentStmt->execute([
                 ':comment_id' => $postId,
-                ':contenu' => $contenu
+                ':contenu' => $contenu,
+                ':send_by' => $send_by,
+                ':time' => $now
             ]);
             $commentId = $db->lastInsertId();
             $db->commit();
@@ -117,8 +120,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 // Get all comments
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $controller = new CommentController();
-    $comments = $controller->getAllComments();
-    echo json_encode($comments);
+    try {
+        $controller = new CommentController();
+        $comments = $controller->getAllComments();
+        echo json_encode($comments);
+    } catch (Exception $e) {
+        error_log(date('[Y-m-d H:i:s] ') . $e->getMessage() . "\n", 3, __DIR__ . '/../log/error.log');
+        echo json_encode([]);
+    }
     exit;
 }

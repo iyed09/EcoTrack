@@ -17,3 +17,41 @@
 [2025-11-24 17:42:18] SQLSTATE[42S22]: Column not found: 1054 Unknown column 'send_by' in 'field list'
 [2025-11-24 17:42:27] SQLSTATE[42S22]: Column not found: 1054 Unknown column 'send by' in 'field list'
 [2025-11-24 17:44:39] SQLSTATE[42S22]: Column not found: 1054 Unknown column 'send_by' in 'field list'
+[2025-11-25 12:56:36] SQLSTATE[HY000]: General error: 2006 MySQL server has gone away
+[2025-11-25 13:19:33] New post create request: send_by=iyed1236, contenu=aya wnk 111254
+[2025-11-25 13:20:18] New post create request: send_by=ieyddddddd, contenu=fewxfxwfew
+[2025-11-25 13:20:52] New post create request: send_by=ieyddddddd, contenu=effsrfws
+[2025-11-25 13:27:10] New post create request: send_by=cd, contenu=dcdcdcdc
+[2025-11-25 13:32:16] New post create request: send_by=damin, contenu=aya tjieeeeeeeeeeee
+[2025-11-25 13:32:16] There is no active transaction
+[2025-11-25 13:32:27] New post create request: send_by=damin, contenu=aya tjieeeeeeeeeeee
+[2025-11-25 13:32:44] New post create request: send_by=scsc, contenu=sdvdvc
+[2025-11-25 13:32:50] Add comment request parent_id=14, contenu=dccsc
+[2025-11-25 13:32:58] Add comment request parent_id=14, contenu=cdvvvvvvvvvvvvvvv
+[2025-11-25 13:33:01] Delete comment request id=60
+[2025-11-25 13:33:02] Delete comment request id=61
+[2025-11-25 13:38:22] New post create request: send_by=iyed, contenu=wiwwwwwwwwwwwwwwwww
+[2025-11-25 13:38:41] New post create request: send_by=dwdw, contenu=dwwdwd
+[2025-11-25 13:39:30] Add comment request parent_id=16, contenu=hey
+[2025-11-25 13:54:43] Add comment request parent_id=16, contenu=yrt
+[2025-11-25 14:11:17] New post create request: send_by=dwdw, contenu=dsds
+[2025-11-25 14:11:36] New post create request: send_by=dwef, contenu=eFDA
+[2025-11-25 14:14:27] New post create request: send_by=JKK, contenu=HHH
+[2025-11-25 14:14:35] Add comment request parent_id=17, contenu=EFD
+[2025-11-25 14:16:39] New post create request: send_by=HGV, contenu=HBKHB
+[2025-11-25 14:16:50] Add comment request parent_id=18, send_by=YUGGU, contenu=JHB
+[2025-11-25 14:19:51] New post create request: send_by=dwdw, contenu=HG
+[2025-11-25 14:20:00] Add comment request parent_id=21, send_by=JJ, contenu=L;
+[2025-11-25 14:20:08] Add comment request parent_id=18, send_by=J, contenu=J
+[2025-11-25 14:21:13] New post create request: send_by=FMFM, contenu=MG TK R
+[2025-11-25 14:21:20] Add comment request parent_id=22, send_by=VFVFV, contenu=BYFVY
+[2025-11-25 14:23:46] New post create request: send_by=IJA HOUNI, contenu=MG TK R DNEH
+[2025-11-25 14:34:12] New post create request: send_by=dwdw, contenu=RFRGRG
+[2025-11-25 14:36:25] New post create request: send_by=,,, contenu=K
+[2025-11-25 14:40:35] Update post request post_id=24, send_by=dwdw, contenu=RFRGRG
+[2025-11-25 14:40:45] Add comment request parent_id=24, send_by=xv, contenu=cd
+[2025-11-25 14:40:51] Update comment request id=67, contenu=cd
+[2025-11-25 14:40:54] Delete comment request id=66
+[2025-11-25 14:46:07] Update post request post_id=22, send_by=FMFM, contenu=MG TK R
+[2025-11-25 14:46:45] New post create request: send_by=iyed, contenu=hamdouleh
+[2025-11-25 14:47:05] Add comment request parent_id=26, send_by=het, contenu=vevf
