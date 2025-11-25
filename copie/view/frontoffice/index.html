@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Eco-Track | Analyse Énergétique</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/font-awesome.css">
+    <link rel="stylesheet" href="assets/css/templatemo-art-factory.css">
+    <link rel="stylesheet" href="assets/css/owl-carousel.css">
+    <link rel="stylesheet" href="assets/css/custom-eco.css">
+</head>
+<body>
+
+<!-- ***** Header Area Start ***** -->
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <a href="#" class="logo">🌱 <em>Eco</em>Track</a>
+                    <ul class="nav">
+                        <li class="scroll-to-section"><a href="#welcome" class="active">Accueil</a></li>
+                        <li class="scroll-to-section"><a href="#about">À propos</a></li>
+                        <li class="scroll-to-section"><a href="#formulaire">Analyser</a></li>
+                        <li class="scroll-to-section"><a href="../backoffice/admin-login.html">Admin</a></li>
+                    </ul>        
+                    <a class='menu-trigger'><span>Menu</span></a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- ***** Header Area End ***** -->
+
+<!-- ***** Welcome Area Start ***** -->
+<div class="welcome-area" id="welcome">
+    <div class="header-text">
+        <div class="container">
+            <div class="row">
+                <div class="left-text col-lg-6 col-md-12 col-sm-12 col-xs-12" data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                    <h1>🌱 Bienvenue sur <em>Eco-Track</em></h1>
+                    <p>Analysez votre consommation énergétique et créez votre plan énergétique personnalisé avec notre simulateur intelligent.</p>
+                    <a href="#formulaire" class="main-button-slider">Commencer l'analyse</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ***** Welcome Area End ***** -->
+
+<!-- ***** About Section Start ***** -->
+<section class="section" id="about">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-heading">
+                    <h2>Comment ça marche ?</h2>
+                    <img src="assets/images/about-icon-03.jpg" alt="">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="about-item">
+                    <img src="assets/images/service-icon-01.jpg" alt="">
+                    <h4>1. Enregistrez</h4>
+                    <p>Remplissez le formulaire avec vos données de consommation (électricité, eau, gaz).</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="about-item">
+                    <img src="assets/images/service-icon-02.jpg" alt="">
+                    <h4>2. Analysez</h4>
+                    <p>Notre système évalue votre consommation et vous donne des conseils personnalisés.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="about-item">
+                    <img src="assets/images/service-icon-03.jpg" alt="">
+                    <h4>3. Créez</h4>
+                    <p>Construisez votre plan énergétique virtuel avec 7 sources d'énergie renouvelable.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ***** About Section End ***** -->
+
+<!-- ***** Formulaire Section Start ***** -->
+<section class="section" id="formulaire">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-heading">
+                    <h2>📊 Analysez votre Consommation</h2>
+                    <img src="assets/images/about-icon-01.jpg" alt="">
+                    <p>Remplissez le formulaire ci-dessous pour obtenir une analyse personnalisée</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <form id="consommation-form" class="eco-form">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <fieldset>
+                                <label>👤 Identifiant Utilisateur *</label>
+                                <input type="text" id="idUser" required placeholder="ex: User123">
+                            </fieldset>
+                        </div>
+                        <div class="col-lg-12">
+                            <fieldset>
+                                <label>⚡ Type d'énergie *</label>
+                                <select id="typeEnergie" required>
+                                    <option value="" disabled selected>Choisissez...</option>
+                                    <option value="electricite">⚡ Électricité</option>
+                                    <option value="eau">💧 Eau</option>
+                                    <option value="gaz">🔥 Gaz</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="col-lg-12">
+                            <fieldset>
+                                <label>📊 Quantité (kWh ou m³) *</label>
+                                <input type="number" id="quantite" required step="0.01" min="0" placeholder="ex: 150">
+                            </fieldset>
+                        </div>
+                        <div class="col-lg-6">
+                            <fieldset>
+                                <label>📅 Date début *</label>
+                                <input type="date" id="dateDebut" required>
+                            </fieldset>
+                        </div>
+                        <div class="col-lg-6">
+                            <fieldset>
+                                <label>📅 Date fin *</label>
+                                <input type="date" id="dateFin" required>
+                            </fieldset>
+                        </div>
+                        <div class="col-lg-12">
+                            <fieldset>
+                                <button type="submit" class="main-button">💾 Analyser ma Consommation</button>
+                            </fieldset>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ***** Formulaire Section End ***** -->
+
+<!-- ***** Modal Résultat ***** -->
+<div id="result-modal" class="modal-eco">
+    <div class="modal-overlay" onclick="closeModal()"></div>
+    <div class="modal-content-eco">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="result-header-eco" id="result-header">
+            <div class="emoji-result" id="result-icon">🌟</div>
+            <h2 id="result-title">EXCELLENT</h2>
+            <p id="result-subtitle">Votre consommation est exemplaire !</p>
+        </div>
+        <div class="result-body-eco">
+            <div class="stats-row">
+                <div class="stat-box">
+                    <span id="daily-consumption">0 kWh/jour</span>
+                    <small>Consommation quotidienne</small>
+                </div>
+                <div class="stat-box">
+                    <span id="period-days">0 jours</span>
+                    <small>Période analysée</small>
+                </div>
+            </div>
+            <div class="conseils-box">
+                <h3>💡 Conseils Personnalisés</h3>
+                <ul id="conseils-list-modal"></ul>
+            </div>
+            <button id="go-simulator-btn" class="simulator-btn">🚀 Créer mon Plan Énergétique</button>
+        </div>
+    </div>
+</div>
+
+<!-- ***** Footer Start ***** -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="copyright">Copyright © 2025 Eco-Track - Analyse Énergétique Intelligente</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="../../controller/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+/* ==================== ADMIN ECOTRACK - GREEN THEME ==================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Poppins', sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+    color: #2e7d32;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ==================== HEADER - GREEN GRADIENT ==================== */
+.admin-header {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    color: white;
+    padding: 25px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(46, 125, 50, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.admin-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.9rem;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.admin-name {
+    font-weight: 600;
+    color: #c8e6c9;
+    font-size: 1.05rem;
+}
+
+.logout-btn {
+    background: linear-gradient(135deg, #ef5350 0%, #d32f2f 100%);
+    padding: 12px 24px;
+    border-radius: 25px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(239, 83, 80, 0.3);
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(239, 83, 80, 0.4);
+}
+
+/* ==================== CONTAINER ==================== */
+.admin-container {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 40px;
+    flex-grow: 1;
+}
+
+/* ==================== STATS CARDS - GREEN THEME ==================== */
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    margin-bottom: 45px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(46, 125, 50, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid #a5d6a7;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, #4CAF50 0%, #2e7d32 100%);
+}
+
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(46, 125, 50, 0.25);
+    border-color: #4CAF50;
+}
+
+.stat-icon {
+    font-size: 3rem;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+    flex-shrink: 0;
+}
+
+.stat-info h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+
+.stat-info p {
+    color: #558b2f;
+    font-size: 0.95rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ==================== TABLE CONTAINER ==================== */
+.table-container {
+    background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.15);
+    padding: 35px;
+    overflow: hidden;
+    border: 2px solid #c8e6c9;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 3px solid #a5d6a7;
+}
+
+.table-header h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.7rem;
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+/* ==================== BUTTONS - GREEN THEME ==================== */
+.btn-primary,
+button.btn-primary {
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+    color: white;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover {
+    background: linear-gradient(135deg, #4CAF50 0%, #388e3c 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+    color: white;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(120, 144, 156, 0.3);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef5350 0%, #d32f2f 100%);
+    color: white;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 6px 20px rgba(239, 83, 80, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(239, 83, 80, 0.4);
+}
+
+/* ==================== TABLE - GREEN STYLE ==================== */
+.table-responsive {
+    overflow-x: auto;
+    margin-bottom: 25px;
+    border-radius: 12px;
+}
+
+table,
+.content-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+thead {
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+}
+
+th {
+    padding: 18px 15px;
+    text-align: left;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: white;
+    border: none;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+th:first-child {
+    border-top-left-radius: 12px;
+}
+
+th:last-child {
+    border-top-right-radius: 12px;
+}
+
+td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #e8f5e9;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+tbody tr {
+    transition: all 0.3s;
+}
+
+tbody tr:hover {
+    background: linear-gradient(90deg, #e8f5e9 0%, #f1f8e9 100%);
+    transform: scale(1.01);
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.1);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ==================== ACTION BUTTONS ==================== */
+.action-btns {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #29b6f6 0%, #039be5 100%);
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(41, 182, 246, 0.3);
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, #039be5 0%, #0277bd 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 18px rgba(41, 182, 246, 0.4);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ef5350 0%, #d32f2f 100%);
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(239, 83, 80, 0.3);
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 18px rgba(239, 83, 80, 0.4);
+}
+
+/* ==================== BULK ACTIONS ==================== */
+.bulk-actions {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 2px solid #c8e6c9;
+}
+
+/* ==================== CHECKBOX - GREEN ACCENT ==================== */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #4CAF50;
+}
+
+/* ==================== MODAL - GREEN THEME ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(46, 125, 50, 0.4);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 650px;
+    box-shadow: 0 25px 70px rgba(46, 125, 50, 0.4);
+    animation: slideDown 0.4s;
+    border: 3px solid #a5d6a7;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+    color: white;
+    padding: 25px 35px;
+    border-radius: 22px 22px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    font-size: 2.2rem;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s;
+    line-height: 1;
+    font-weight: bold;
+}
+
+.close:hover {
+    transform: scale(1.3) rotate(90deg);
+    color: #ffebee;
+}
+
+/* ==================== FORM - GREEN THEME ==================== */
+#edit-form {
+    padding: 35px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #2e7d32;
+    font-size: 1rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #c8e6c9;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background: #f1f8e9;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.15);
+    background: white;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 18px;
+    justify-content: flex-end;
+    margin-top: 35px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .admin-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .admin-container {
+        padding: 0 20px;
+        margin: 20px auto;
+    }
+    
+    .stats-cards {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .table-responsive {
+        overflow-x: scroll;
+    }
+    
+    .action-btns {
+        flex-direction: column;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.stat-card:hover .stat-icon {
+    animation: pulse 1s infinite;
+}
