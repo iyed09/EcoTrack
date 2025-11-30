@@ -1,12 +1,43 @@
-// Backoffice script: final cleaned implementation
+/**
+ * EcoTrack Backoffice Administration Panel
+ * 
+ * This script manages the backoffice interface for moderating posts and comments.
+ * Features include:
+ * - Dynamic loading and rendering of posts with comments
+ * - Interactive dashboard with animated counters
+ * - Modal-based editing and deletion workflows
+ * - Real-time updates and user feedback
+ * - Accessibility-compliant UI elements
+ * 
+ * @version 2.1
+ * @author EcoTrack Team
+ */
+
+'use strict';
+
+// ============================================================================
+// STATE MANAGEMENT
+// ============================================================================
 
 let posts = [];
 
-// Dashboard counters
-let sentCount = 0;
-let commentCount = 0;
-let editCount = 0;
-let deleteCount = 0;
+/**
+ * Dashboard statistics counters
+ * Track user actions for overview display
+ */
+let sentCount = 0;       // Total posts sent
+let commentCount = 0;    // Total comments across all posts
+let editCount = 0;       // Number of edits made
+let deleteCount = 0;     // Number of deletions made
+
+// ============================================================================
+// DASHBOARD UPDATE FUNCTIONS
+// ============================================================================
+
+/**
+ * Updates all dashboard counter displays with smooth animations
+ * Syncs both sidebar counters and overview card statistics
+ */
 
 function updateDashboard() {
     const sentEl = document.getElementById('sentCount');
@@ -60,7 +91,18 @@ function updateDashboard() {
     });
 }
 
-// Non-blocking user message helper (writes to #backofficeStatus if present)
+// ============================================================================
+// USER FEEDBACK FUNCTIONS
+// ============================================================================
+
+/**
+ * Displays a status message to the user in the backoffice status element
+ * Falls back to console logging if status element is not found
+ * 
+ * @param {string} msg - The message to display
+ * @param {boolean} isError - Whether this is an error message (affects styling)
+ * @param {number} timeout - Auto-clear timeout in milliseconds (0 = no auto-clear)
+ */
 function showBackofficeMessage(msg, isError = false, timeout = 6000) {
     const statusEl = document.getElementById('backofficeStatus');
     if (statusEl) {
@@ -150,6 +192,7 @@ function renderPosts() {
                 </div>
                 <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:8px;margin-left:12px;">
                     <button class="view-post-btn" data-post-id="${post.id}" style="background:#357a38;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Voir</button>
+                    <button class="add-comment-btn" data-post-id="${post.id}" style="background:#60c072;color:#fff;border:none;padding:8px 10px;border-radius:6px;">💬 Commenter</button>
                     <button class="edit-post-btn" data-post-id="${post.id}" style="background:#2b6f2e;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Modifier</button>
                     <button class="delete-post-btn" data-post-id="${post.id}" style="background:#D9534F;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Supprimer</button>
                 </div>
@@ -173,7 +216,14 @@ function renderPosts() {
     }
 }
 
-// Modal creation for viewing/editing a single comment
+// ============================================================================
+// MODAL MANAGEMENT
+// ============================================================================
+
+/**
+ * Creates and initializes the comment/post editing modal if it doesn't exist
+ * Sets up event handlers for save, delete, and close actions
+ */
 function ensureModal() {
     if (document.getElementById('commentModal')) return;
     const modal = document.createElement('div');
@@ -217,6 +267,27 @@ function ensureModal() {
             }).then(parseJsonSafe).then(data => {
                 if (data && data.success) { closeModal(); fetchPosts(); } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
             }).catch(err => { showBackofficeMessage('Erreur lors de la sauvegarde. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); });
+        } else if (type === 'add-comment') {
+            // Add new comment to post
+            const postId = this.getAttribute('data-post-id');
+            if (!contenu.trim()) {
+                showBackofficeMessage('Le commentaire ne peut pas être vide', true);
+                return;
+            }
+            fetch('../../controller/communityController.php', {
+                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `parent_id=${postId}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
+            }).then(parseJsonSafe).then(data => {
+                if (data && data.success) {
+                    commentCount++;
+                    updateDashboard();
+                    showBackofficeMessage('Commentaire ajouté avec succès!', false);
+                    closeModal();
+                    fetchPosts();
+                } else {
+                    showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true);
+                }
+            }).catch(err => { showBackofficeMessage('Erreur lors de l\'ajout du commentaire. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); });
         }
     });
     document.getElementById('modalDelete').addEventListener('click', function () {
@@ -333,7 +404,65 @@ function toggleCommentsForPost(postId) {
     }
 }
 
-function closeModal() { const modal = document.getElementById('commentModal'); if (modal) modal.style.display = 'none'; }
+/**
+ * Shows a modal to add a new comment to a post
+ * @param {string|number} postId - The ID of the post to add a comment to
+ */
+function showAddCommentModal(postId) {
+    ensureModal();
+    const modal = document.getElementById('commentModal');
+    const modalAuthor = document.getElementById('modalAuthor');
+    const modalTime = document.getElementById('modalTime');
+    const modalContent = document.getElementById('modalContent');
+    const modalSave = document.getElementById('modalSave');
+    const modalDelete = document.getElementById('modalDelete');
+
+    const post = posts.find(x => String(x.id) === String(postId));
+    if (!post) { showBackofficeMessage('Publication introuvable', true); return; }
+
+    // Set up modal for adding a new comment
+    modalAuthor.value = 'Admin EcoTrack'; // Default admin username
+    modalTime.textContent = 'Nouveau commentaire';
+    modalContent.value = '';
+    modalContent.placeholder = 'Entrez votre commentaire ici...';
+
+    // Configure save button for adding comment
+    modalSave.setAttribute('data-post-id', postId);
+    modalSave.setAttribute('data-type', 'add-comment');
+    modalSave.textContent = 'Ajouter le commentaire';
+
+    // Show delete button again (might be hidden from previous use)
+    modalDelete.style.display = 'inline-block';
+    // But make it disabled for add operation
+    modalDelete.disabled = true;
+    modalDelete.style.opacity = '0.3';
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * Closes the editing modal
+ */
+function closeModal() {
+    const modal = document.getElementById('commentModal');
+    if (modal) modal.style.display = 'none';
+    // Re-enable delete button
+    const modalDelete = document.getElementById('modalDelete');
+    if (modalDelete) {
+        modalDelete.disabled = false;
+        modalDelete.style.opacity = '1';
+        modalDelete.style.display = 'inline-block';
+    }
+}
+
+// ============================================================================
+// DATA FETCHING AND LOADING
+// ============================================================================
+
+/**
+ * Fetches all posts from the server and renders them
+ * Includes comprehensive error handling and debug information
+ */
 
 function fetchPosts() {
     // Build an absolute URL relative to the current document to avoid incorrect relative paths
@@ -367,6 +496,15 @@ function fetchPosts() {
             if (backofficeFeed) backofficeFeed.innerHTML = '<div class="server-error">Erreur réseau lors du chargement des publications. Voir console pour détails.</div>';
         });
 }
+
+// ============================================================================
+// INITIALIZATION AND EVENT HANDLERS
+// ============================================================================
+
+/**
+ * Main initialization function - runs when DOM is ready
+ * Sets up event listeners and loads initial data
+ */
 
 document.addEventListener('DOMContentLoaded', function () {
     // initial load
@@ -430,6 +568,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.target.classList && e.target.classList.contains('view-post-btn')) {
             const postId = e.target.getAttribute('data-post-id');
             toggleCommentsForPost(postId);
+        }
+
+        // Add comment to post
+        if (e.target.classList && e.target.classList.contains('add-comment-btn')) {
+            const postId = e.target.getAttribute('data-post-id');
+            showAddCommentModal(postId);
         }
 
         // Edit post

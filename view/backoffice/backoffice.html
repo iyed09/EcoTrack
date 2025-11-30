@@ -3,8 +3,13 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>EcoTrack - Backoffice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="EcoTrack Backoffice - Interface de gestion administrative pour modérer les publications et commentaires" />
+    <meta name="author" content="EcoTrack Team" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>EcoTrack - Backoffice Administration</title>
     <link rel="stylesheet" href="backoffice.css">
 </head>
 
@@ -26,7 +31,8 @@
                     <h3>Règles de la communauté</h3>
                     <p class="guide-excerpt">Soyez respectueux, partagez des idées constructives et évitez les contenus
                         inappropriés.</p>
-                    <button id="openGuide" class="btn btn-primary">Lire la charte</button>
+                    <button id="openGuide" class="btn btn-primary" aria-label="Ouvrir la charte de la communauté">Lire
+                        la charte</button>
                 </div>
 
                 <!-- keep numeric counters hidden for JS compatibility -->
@@ -45,19 +51,25 @@
         </aside>
 
         <div class="main">
-            <header class="topbar">
+            <header class="topbar" role="banner">
                 <div class="topbar-left">
                     <button id="sidebarToggle" class="btn btn-secondary" aria-expanded="true"
                         aria-label="Basculer la barre latérale">☰</button>
+                    <h1 class="topbar-brand"
+                        style="margin: 0 0 0 16px; font-size: 1.1rem; font-weight: 700; color: var(--accent);">
+                        Administration</h1>
                 </div>
                 <div class="topbar-actions">
-                    <a href="../frontoffice/frontoffice.html" class="btn btn-secondary">Accéder au Frontoffice</a>
+                    <a href="../frontoffice/frontoffice.html" class="btn btn-secondary"
+                        aria-label="Accéder à l'interface utilisateur">
+                        <span aria-hidden="true">👁️</span> Accéder au Frontoffice
+                    </a>
                 </div>
             </header>
 
-            <main class="container content-area">
+            <main class="container content-area" role="main">
                 <h1 class="page-title">Tableau de bord</h1>
-                <div class="page-subtitle">Vue d'ensemble des publications et outils de modération</div>
+                <p class="page-subtitle">Vue d'ensemble des publications et outils de modération</p>
 
                 <!-- Visual dashboard overview (appearance only) -->
                 <div class="dashboard-overview card" aria-hidden="true">
@@ -94,11 +106,15 @@
                 </div>
 
                 <div class="card table-card">
-                    <div class="quick-help" role="note">Astuce: cliquez sur une publication pour l'éditer ou la
-                        supprimer</div>
-                    <section id="backofficeFeed" class="feed">
-                        <!-- Comments will be loaded here by backoffice.js -->
-                        <div class="feed-empty">Chargement des publications...</div>
+                    <div class="quick-help" role="note" aria-live="polite">
+                        <strong>💡 Astuce:</strong> Cliquez sur "Voir" pour afficher les commentaires, ou utilisez
+                        "Modifier"/"Supprimer" pour gérer les publications
+                    </div>
+                    <section id="backofficeFeed" class="feed" aria-live="polite" aria-busy="true">
+                        <!-- Posts and comments will be loaded here dynamically by backoffice.js -->
+                        <div class="feed-empty" role="status">
+                            <span class="loading-spinner" aria-hidden="true">⏳</span> Chargement des publications...
+                        </div>
                     </section>
                 </div>
             </main>

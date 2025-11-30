@@ -443,3 +443,56 @@
 [2025-11-30 19:06:36] Fetched posts rows: 1
 [2025-11-30 19:06:36] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
 [2025-11-30 19:06:36] Fetched posts rows: 1
+[2025-11-30 19:25:09] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:09] Fetched posts rows: 1
+[2025-11-30 19:25:15] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:15] Fetched posts rows: 1
+[2025-11-30 19:25:18] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:18] Fetched posts rows: 1
+[2025-11-30 19:25:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:19] Fetched posts rows: 1
+[2025-11-30 19:25:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:19] Fetched posts rows: 1
+[2025-11-30 19:25:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:19] Fetched posts rows: 1
+[2025-11-30 19:25:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:19] Fetched posts rows: 1
+[2025-11-30 19:25:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:19] Fetched posts rows: 1
+[2025-11-30 19:25:33] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:33] New post create request: send_by=Neur, contenu=ich liebe dich
+[2025-11-30 19:25:33] New post insert ok: id=4
+[2025-11-30 19:25:33] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:33] Fetched posts rows: 2
+[2025-11-30 19:25:47] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:48] Add comment request parent_id=4, send_by=Kane, contenu=GOAAAAALLLLLLLLLL
+[2025-11-30 19:25:48] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:48] Fetched posts rows: 2
+[2025-11-30 19:25:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:25:51] Fetched posts rows: 2
+[2025-11-30 19:26:07] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:26:07] Fetched posts rows: 2
+[2025-11-30 19:26:18] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:26:18] Add comment request parent_id=4, send_by=Muller, contenu=GG TEAM
+[2025-11-30 19:26:18] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:26:18] Fetched posts rows: 3
+[2025-11-30 19:26:21] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:26:21] Fetched posts rows: 3
+[2025-11-30 19:28:33] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:28:33] Fetched posts rows: 3
+[2025-11-30 19:28:34] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:28:34] Fetched posts rows: 3
+[2025-11-30 19:28:41] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:28:41] Fetched posts rows: 3
+[2025-11-30 19:28:41] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:28:41] Fetched posts rows: 3
+[2025-11-30 19:28:41] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:28:41] Fetched posts rows: 3
+[2025-11-30 19:28:42] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:28:42] Fetched posts rows: 3
+[2025-11-30 19:28:42] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:28:42] Fetched posts rows: 3
+[2025-11-30 19:28:42] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:28:42] Fetched posts rows: 3
+[2025-11-30 19:34:56] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-11-30 19:34:56] Fetched posts rows: 3

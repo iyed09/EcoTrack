@@ -151,9 +151,9 @@ body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica
 .server-error{color:#a33;background:#fff6f6;padding:12px;border:1px solid #f3c2c2;border-radius:8px}
 .publication .actions{display:flex;flex-direction:column;gap:8px}
 
-/* Welcoming and interactive enhancements (visual only) */
-.page-title{display:inline-block;padding:6px 10px;border-radius:8px;background:linear-gradient(90deg, rgba(47,155,74,0.06), rgba(47,155,74,0.02));}
-.page-title::after{content:"Bienvenue — bon retour !";display:block;font-size:0.95rem;color:var(--muted);margin-top:8px;font-weight:600;opacity:0.95}
+/* Page title and subtitle styling */
+.page-title{display:inline-block;padding:8px 0;font-size:28px;font-weight:800;color:#0f2f20;margin-bottom:8px;letter-spacing:-0.02em}
+.page-subtitle{color:var(--muted);font-size:1rem;margin:0 0 20px 0;font-weight:500}
 
 /* Gentle logo pulse to make sidebar feel alive (subtle) */
 .sidebar .logo{position:relative;overflow:visible}
@@ -236,8 +236,13 @@ body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica
 .feed .publication{opacity:0;transform:translateY(8px) scale(.995);animation:card-in 420ms forwards}
 @keyframes card-in{to{opacity:1;transform:none}}
 
-/* Floating quick help bubble on the right (non-intrusive visual) */
-.quick-help{position:fixed;right:18px;bottom:18px;background:linear-gradient(180deg,#fff,#f8fff8);padding:12px 14px;border-radius:12px;box-shadow:0 16px 40px rgba(2,6,4,0.12);border:1px solid rgba(47,155,74,0.06);font-weight:700;color:#0b2a1a;z-index:1300}
+/* Quick help info box styling */
+.quick-help{background:linear-gradient(180deg,#f0fdf4,#ecfdf5);padding:14px 18px;border-radius:10px;border:1px solid rgba(47,155,74,0.12);font-weight:600;color:#166534;margin-bottom:16px;box-shadow:0 4px 12px rgba(47,155,74,0.06)}
+.quick-help strong{color:var(--accent-600);font-weight:800}
+
+/* Loading spinner animation */
+.loading-spinner{display:inline-block;animation:spin 2s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
 /* animate dashboard overview on load */
 .dashboard-overview{opacity:0;transform:translateY(8px);animation:overview-in 480ms forwards 80ms}
