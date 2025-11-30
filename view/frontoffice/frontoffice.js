@@ -224,103 +224,148 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sidebarToggle) sidebarToggle.addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); });
     if (sidebarHandle) sidebarHandle.addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); });
+    // Move publish click handler registration here (after DOM is ready)
+    if (submitPost) {
+        submitPost.addEventListener('click', (e) => {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            console.log('submitPost clicked', { editingPostId, editingCommentId, contentPreview: postContent ? postContent.value : null });
+            const content = postContent ? postContent.value.trim() : '';
+            const sendBy = (postAuthor && postAuthor.value ? postAuthor.value : 'Anonyme').trim();
+            if (content.length === 0) {
+                alert('Veuillez écrire quelque chose pour publier.');
+                return;
+            }
+            submitPost.disabled = true;
+            // Play animation immediately to show the post is being published
+            try {
+                postMessage.style.display = 'inline';
+                postMessage.textContent = 'Publication en cours...';
+            } catch (e) {}
+            const now = new Date().toLocaleString();
+            // Optimistic local append — show the post immediately while saving
+            const localEl = appendLocalPost(sendBy, content, now, 'Enregistrement...', 'saving');
+            // If editingPostId is set, update existing post; otherwise create new
+            if (editingPostId) {
+                console.log('Update post payload', { post_id: editingPostId, send_by: sendBy, contenu: content });
+                fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `post_id=${editingPostId}&contenu=${encodeURIComponent(content)}&send_by=${encodeURIComponent(sendBy)}`
+                }).then(parseJsonSafe).then(data => {
+                    console.log('Update post response', data);
+                    if (data && data.success) {
+                        editingPostId = null; editingCommentId = null;
+                        if (modal) {
+                            modal.classList.remove('open');
+                            modal.setAttribute('aria-hidden', 'true');
+                            setTimeout(() => { modal.style.display = 'none'; }, 260);
+                        }
+                        postContent.value = ''; postAuthor.value = '';
+                        fetchComments();
+                    } else {
+                        alert('Erreur lors de la mise à jour: ' + (data && data.error ? data.error : ''));
+                    }
+                }).catch(err => { console.error('Update error', err); alert('Erreur lors de la mise à jour.'); })
+                  .finally(() => { submitPost.disabled = false; });
+            } else {
+                // Envoi du post au backend (create)
+                console.log('Create post payload', { send_by: sendBy, contenu: content });
+                fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `send_by=${encodeURIComponent(sendBy)}&contenu=${encodeURIComponent(content)}`
+                })
+                .then(parseJsonSafe)
+                .then(data => {
+                    console.log('Create post response', data);
+                    if (data && data.success) {
+                        // On success: remove local optimistic post and refresh feed
+                        if (localEl && localEl.parentNode) localEl.parentNode.removeChild(localEl);
+                        // show a small success animation inside the modal, then close
+                        postMessage.style.display = 'inline';
+                        postMessage.textContent = 'Publié';
+                        fetchComments();
+                        try {
+                            const inner = modal.querySelector('.modal-content');
+                            let success = inner.querySelector('.publish-success');
+                            if (!success) {
+                                success = document.createElement('div');
+                                success.className = 'publish-success';
+                                success.innerHTML = '<div class="check">✓</div>';
+                                inner.appendChild(success);
+                            }
+                            // trigger animation
+                            setTimeout(() => success.classList.add('show'), 40);
+                            // close after show
+                            setTimeout(() => {
+                                success.classList.remove('show');
+                                // hide modal after animation
+                                modal.classList.remove('open');
+                                modal.setAttribute('aria-hidden', 'true');
+                                setTimeout(() => { modal.style.display = 'none'; }, 260);
+                                postMessage.style.display = 'none';
+                                postContent.value = '';
+                                postAuthor.value = '';
+                            }, 900);
+                        } catch (e) {
+                            // fallback: close quickly
+                            modal.classList.remove('open');
+                            setTimeout(() => { modal.style.display = 'none'; }, 260);
+                            postMessage.style.display = 'none';
+                            postContent.value = '';
+                            postAuthor.value = '';
+                        }
+                    } else {
+                        // server returned JSON with error: add post locally and inform user
+                        const now = new Date().toLocaleString();
+                        appendLocalPost(sendBy, content, now, '(non sauvegardé: ' + (data.error || 'erreur serveur') + ')');
+                        alert('Le post a été ajouté localement mais le serveur a renvoyé une erreur: ' + (data.error || ''));
+                    }
+                })
+                .catch(err => {
+                    console.warn('Submit error — adding post locally:', err);
+                    if (localEl) {
+                        // Mark local post as failed so user can retry
+                        const note = '(non sauvegardé: serveur indisponible)';
+                        const timeEl = localEl.querySelector('.pub-date');
+                        if (timeEl) timeEl.innerHTML = `${now} <span style="color:#a33; font-weight:600;">${note}</span>`;
+                        localEl.classList.add('failed');
+                        const retryBtn = localEl.querySelector('.retry-post');
+                        if (!retryBtn) {
+                            const actionsDiv = localEl.querySelector('[style*="flex-direction:column"]');
+                            if (actionsDiv) {
+                                const btn = document.createElement('button');
+                                btn.className = 'retry-post btn btn-secondary';
+                                btn.textContent = 'Réessayer';
+                                btn.addEventListener('click', function () {
+                                    // Retry by calling the API again
+                                    btn.disabled = true;
+                                    fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `send_by=${encodeURIComponent(sendBy)}&contenu=${encodeURIComponent(content)}` })
+                                        .then(parseJsonSafe)
+                                        .then(data => {
+                                            if (data && data.success) {
+                                                if (localEl && localEl.parentNode) localEl.parentNode.removeChild(localEl);
+                                                fetchComments();
+                                            } else {
+                                                alert('Erreur lors de la ré-essai: ' + (data && data.error ? data.error : ''));
+                                            }
+                                        }).catch(err2 => { alert('Ré-essai impossible: ' + (err2.message || 'erreur serveur')); })
+                                        .finally(() => btn.disabled = false);
+                                });
+                                actionsDiv.appendChild(btn);
+                            }
+                        }
+                    } else {
+                        appendLocalPost(sendBy, content, now, '(publié localement, serveur indisponible)');
+                    }
+                })
+                .finally(() => { submitPost.disabled = false; });
+            }
+        });
+    }
 });
 
-// Ajout d'une publication avec zone de commentaires
-submitPost.addEventListener('click', (e) => {
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    console.log('submitPost clicked', { editingPostId, editingCommentId });
-    const content = postContent.value.trim();
-    const sendBy = (postAuthor.value || 'Anonyme').trim();
-    if (content.length === 0) {
-        alert('Veuillez écrire quelque chose pour publier.');
-        return;
-    }
-    submitPost.disabled = true;
-    // If editingPostId is set, update existing post; otherwise create new
-    if (editingPostId) {
-        console.log('Update post payload', { post_id: editingPostId, send_by: sendBy, contenu: content });
-        fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `post_id=${editingPostId}&contenu=${encodeURIComponent(content)}&send_by=${encodeURIComponent(sendBy)}`
-        }).then(parseJsonSafe).then(data => {
-            console.log('Update post response', data);
-            if (data && data.success) {
-                // reset and refresh
-                editingPostId = null; editingCommentId = null;
-                if (modal) {
-                    modal.classList.remove('open');
-                    modal.setAttribute('aria-hidden', 'true');
-                    setTimeout(() => { modal.style.display = 'none'; }, 260);
-                }
-                postContent.value = ''; postAuthor.value = '';
-                fetchComments();
-            } else {
-                alert('Erreur lors de la mise à jour: ' + (data && data.error ? data.error : ''));
-            }
-        }).catch(err => { console.error('Update error', err); alert('Erreur lors de la mise à jour.'); })
-          .finally(() => { submitPost.disabled = false; });
-    } else {
-        // Envoi du post au backend (create)
-        fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `send_by=${encodeURIComponent(sendBy)}&contenu=${encodeURIComponent(content)}`
-        })
-        .then(parseJsonSafe)
-        .then(data => {
-            console.log('Create post response', data);
-            if (data && data.success) {
-                // show a small success animation inside the modal, then close
-                postMessage.style.display = 'inline';
-                postMessage.textContent = 'Publié';
-                fetchComments();
-                try {
-                    const inner = modal.querySelector('.modal-content');
-                    let success = inner.querySelector('.publish-success');
-                    if (!success) {
-                        success = document.createElement('div');
-                        success.className = 'publish-success';
-                        success.innerHTML = '<div class="check">✓</div>';
-                        inner.appendChild(success);
-                    }
-                    // trigger animation
-                    setTimeout(() => success.classList.add('show'), 40);
-                    // close after show
-                    setTimeout(() => {
-                        success.classList.remove('show');
-                        // hide modal after animation
-                        modal.classList.remove('open');
-                        modal.setAttribute('aria-hidden', 'true');
-                        setTimeout(() => { modal.style.display = 'none'; }, 260);
-                        postMessage.style.display = 'none';
-                        postContent.value = '';
-                        postAuthor.value = '';
-                    }, 900);
-                } catch (e) {
-                    // fallback: close quickly
-                    modal.classList.remove('open');
-                    setTimeout(() => { modal.style.display = 'none'; }, 260);
-                    postMessage.style.display = 'none';
-                    postContent.value = '';
-                    postAuthor.value = '';
-                }
-            } else {
-                // server returned JSON with error: add post locally and inform user
-                const now = new Date().toLocaleString();
-                appendLocalPost(sendBy, content, now, '(non sauvegardé: ' + (data.error || 'erreur serveur') + ')');
-                alert('Le post a été ajouté localement mais le serveur a renvoyé une erreur: ' + (data.error || ''));
-            }
-        })
-        .catch(err => {
-            console.warn('Submit error — adding post locally:', err);
-            const now = new Date().toLocaleString();
-            appendLocalPost(sendBy, content, now, '(publié localement, serveur indisponible)');
-        })
-        .finally(() => { submitPost.disabled = false; });
-    }
-});
+// (publish handler now attached above within DOMContentLoaded; old duplicate removed)
 
 // Handle comment, edit, delete and view actions via event delegation
 postsContainer.addEventListener('click', function (e) {
@@ -480,15 +525,26 @@ postsContainer.addEventListener('click', function (e) {
 });
 
 // Append a local-only post to the top of the list with an optional note
-function appendLocalPost(author, content, time, note) {
+function appendLocalPost(author, content, time, note, status = 'saving') {
     const article = document.createElement('article');
-    article.className = 'publication';
+    article.className = 'publication local-post';
+    article.setAttribute('data-local', '1');
     const sendBy = author || 'Anonyme';
+    const statusText = status === 'saving' ? '<span class="local-status saving">Enregistrement...</span>' : `<span class="local-status failed">${note}</span>`;
+    // add a small actions area: retry if failed
     article.innerHTML = `
-        <p><strong>${sendBy}</strong>: ${content}</p>
-        <div class="pub-date">${time} <span style="color:#a33; font-weight:600;">${note}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+            <div style="flex:1">
+                <p><strong>${escapeHtml(sendBy)}</strong>: <span class="post-body">${escapeHtml(content)}</span></p>
+                <div class="pub-date">${time} ${status === 'failed' ? '<span style="color:#a33; font-weight:600;">' + escapeHtml(note) + '</span>' : statusText}</div>
+            </div>
+            <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+                ${status === 'failed' ? '<button class="retry-post btn btn-secondary">Réessayer</button>' : ''}
+            </div>
+        </div>
     `;
     // insert at top
     if (postsContainer.firstChild) postsContainer.insertBefore(article, postsContainer.firstChild);
     else postsContainer.appendChild(article);
+    return article;
 }

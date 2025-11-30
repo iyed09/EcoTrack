@@ -1,6 +1,6 @@
 // Backoffice script: final cleaned implementation
 
-let comments = [];
+let posts = [];
 
 // Dashboard counters
 let sentCount = 0;
@@ -22,14 +22,14 @@ function updateDashboard() {
     // Helper: animate an element's integer text from current to target
     function animateCount(el, to, duration = 700) {
         if (!el) return;
-        const raw = String(el.textContent || el.dataset.value || '0').replace(/[^0-9\-]+/g,'');
+        const raw = String(el.textContent || el.dataset.value || '0').replace(/[^0-9\-]+/g, '');
         const from = parseInt(raw, 10) || 0;
         const start = performance.now();
         const diff = to - from;
         if (diff === 0) { el.textContent = String(to); el.dataset.value = to; return; }
-        function easeInOut(t){ return t<0.5 ? 2*t*t : -1 + (4-2*t)*t; }
-        function step(now){
-            const t = Math.min(1, (now - start)/duration);
+        function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+        function step(now) {
+            const t = Math.min(1, (now - start) / duration);
             const v = Math.round(from + diff * easeInOut(t));
             el.textContent = String(v);
             if (t < 1) requestAnimationFrame(step);
@@ -103,7 +103,7 @@ function parseJsonSafe(response) {
 function escapeHtml(text) {
     if (text === null || text === undefined) return '';
     return String(text).replace(/[&<>"']/g, function (s) {
-        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s]);
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[s]);
     });
 }
 
@@ -115,7 +115,7 @@ function renderPosts() {
         '<div class="feed-toolbar" style="margin:12px 0; display:flex; gap:8px; align-items:center;"><button id="refreshFeed" class="btn-primary">Rafraîchir</button></div>' +
         '<div id="backofficeStatus" style="margin-bottom:8px;color:#2b3b36;font-weight:600"></div>';
 
-    if (!Array.isArray(comments) || comments.length === 0) {
+    if (!Array.isArray(posts) || posts.length === 0) {
         backofficeFeed.innerHTML += '<div style="color:#666">Aucune publication pour le moment.</div>';
         sentCount = 0;
         commentCount = 0;
@@ -123,45 +123,53 @@ function renderPosts() {
         return;
     }
 
-    // Render each comment as a clear card so it's visible
-    comments.forEach(comment => {
-        const commentEl = document.createElement('div');
-        commentEl.style.background = '#ffffff';
-        commentEl.style.border = '1px solid #e6e6e6';
-        commentEl.style.padding = '14px';
-        commentEl.style.marginBottom = '12px';
-        commentEl.style.borderRadius = '8px';
-        commentEl.classList.add('publication');
+    let totalComments = 0;
+    // Render each post as a clear card
+    posts.forEach(post => {
+        const postEl = document.createElement('div');
+        postEl.style.background = '#ffffff';
+        postEl.style.border = '1px solid #e6e6e6';
+        postEl.style.padding = '14px';
+        postEl.style.marginBottom = '12px';
+        postEl.style.borderRadius = '8px';
+        postEl.classList.add('publication');
+        postEl.dataset.postId = post.id;
 
-        const author = escapeHtml(comment.send_by || 'Anonyme');
-        const body = escapeHtml(comment.contenu || '');
-        const time = escapeHtml(comment.time || '');
+        const author = escapeHtml(post.send_by || 'Anonyme');
+        const body = escapeHtml(post.contenu || '');
+        const time = escapeHtml(post.time || '');
+        const commentCount = (post.comments && Array.isArray(post.comments)) ? post.comments.length : 0;
+        totalComments += commentCount;
 
-        commentEl.innerHTML = `
+        postEl.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
                 <div style="flex:1">
                     <div style="font-weight:700;color:#2b3b36;margin-bottom:6px;">${author}</div>
-                    <div class="comment-text" style="color:#222;">${body}</div>
-                    <div class="pub-date" style="color:#666;margin-top:8px;font-size:0.9em;">${time}</div>
+                    <div class="post-text" style="color:#222;">${body}</div>
+                    <div class="pub-date" style="color:#666;margin-top:8px;font-size:0.9em;">${time} • ${commentCount} commentaire(s)</div>
                 </div>
                 <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:8px;margin-left:12px;">
-                    <button class="view-btn" data-id="${comment.id}" style="background:#357a38;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Voir</button>
-                    <button class="edit-btn" data-id="${comment.id}" style="background:#2b6f2e;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Modifier</button>
-                    <button class="delete-btn" data-id="${comment.id}" style="background:#D9534F;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Supprimer</button>
+                    <button class="view-post-btn" data-post-id="${post.id}" style="background:#357a38;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Voir</button>
+                    <button class="edit-post-btn" data-post-id="${post.id}" style="background:#2b6f2e;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Modifier</button>
+                    <button class="delete-post-btn" data-post-id="${post.id}" style="background:#D9534F;color:#fff;border:none;padding:8px 10px;border-radius:6px;">Supprimer</button>
                 </div>
             </div>
+            <div class="comments-section" data-post-id="${post.id}" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e6e6e6;">
+                <h4 style="margin:0 0 12px 0;color:#2b3b36;">Commentaires (${commentCount})</h4>
+                <div class="comments-list"></div>
+            </div>
         `;
-        backofficeFeed.appendChild(commentEl);
+        backofficeFeed.appendChild(postEl);
     });
 
-    sentCount = comments.length;
-    commentCount = comments.length;
+    sentCount = posts.length;
+    commentCount = totalComments;
     updateDashboard();
 
     // update status
     const status = document.getElementById('backofficeStatus');
     if (status) {
-        status.textContent = `Commentaires chargés: ${comments.length}`;
+        status.textContent = `Publications chargées: ${posts.length} (${totalComments} commentaires)`;
     }
 }
 
@@ -189,30 +197,52 @@ function ensureModal() {
     document.body.appendChild(modal);
     document.getElementById('closeModal').addEventListener('click', closeModal);
     document.getElementById('modalSave').addEventListener('click', function () {
-        const id = this.getAttribute('data-id');
+        const type = this.getAttribute('data-type');
         const contenu = document.getElementById('modalContent').value;
         const send_by = document.getElementById('modalAuthor').value || '';
-        fetch('../../controller/commentcontroller.php', {
-            method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `id=${id}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
-        }).then(parseJsonSafe).then(data => {
-            if (data && data.success) { closeModal(); fetchComments(); } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
-        }).catch(err => { showBackofficeMessage('Erreur lors de la sauvegarde. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); });
+
+        if (type === 'post') {
+            const postId = this.getAttribute('data-post-id');
+            fetch('../../controller/communityController.php', {
+                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `post_id=${postId}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
+            }).then(parseJsonSafe).then(data => {
+                if (data && data.success) { closeModal(); fetchPosts(); } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
+            }).catch(err => { showBackofficeMessage('Erreur lors de la sauvegarde. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); });
+        } else if (type === 'comment') {
+            const commentId = this.getAttribute('data-comment-id');
+            fetch('../../controller/communityController.php', {
+                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${commentId}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
+            }).then(parseJsonSafe).then(data => {
+                if (data && data.success) { closeModal(); fetchPosts(); } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
+            }).catch(err => { showBackofficeMessage('Erreur lors de la sauvegarde. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); });
+        }
     });
     document.getElementById('modalDelete').addEventListener('click', function () {
-        const id = this.getAttribute('data-id');
+        const type = this.getAttribute('data-type');
         const btn = this;
         btn.disabled = true;
         const prev = btn.textContent;
         btn.textContent = 'Suppression...';
-        fetch('../../controller/commentcontroller.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `id=${id}` })
-            .then(parseJsonSafe).then(data => { if (data && data.success) { closeModal(); fetchComments(); } else { showBackofficeMessage('Erreur suppression: ' + (data && data.error ? data.error : 'Réponse invalide'), true); } })
-            .catch(err => { showBackofficeMessage('Erreur lors de la suppression. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); })
-            .finally(() => { btn.disabled = false; btn.textContent = prev; });
+
+        if (type === 'post') {
+            const postId = this.getAttribute('data-post-id');
+            fetch('../../controller/communityController.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `post_id=${postId}` })
+                .then(parseJsonSafe).then(data => { if (data && data.success) { closeModal(); fetchPosts(); } else { showBackofficeMessage('Erreur suppression: ' + (data && data.error ? data.error : 'Réponse invalide'), true); } })
+                .catch(err => { showBackofficeMessage('Erreur lors de la suppression. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); })
+                .finally(() => { btn.disabled = false; btn.textContent = prev; });
+        } else if (type === 'comment') {
+            const commentId = this.getAttribute('data-comment-id');
+            fetch('../../controller/communityController.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `id=${commentId}` })
+                .then(parseJsonSafe).then(data => { if (data && data.success) { closeModal(); fetchPosts(); } else { showBackofficeMessage('Erreur suppression: ' + (data && data.error ? data.error : 'Réponse invalide'), true); } })
+                .catch(err => { showBackofficeMessage('Erreur lors de la suppression. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); })
+                .finally(() => { btn.disabled = false; btn.textContent = prev; });
+        }
     });
 }
 
-function showModalForComment(id) {
+function showModalForPost(postId) {
     ensureModal();
     const modal = document.getElementById('commentModal');
     const modalAuthor = document.getElementById('modalAuthor');
@@ -220,22 +250,95 @@ function showModalForComment(id) {
     const modalContent = document.getElementById('modalContent');
     const modalSave = document.getElementById('modalSave');
     const modalDelete = document.getElementById('modalDelete');
-    const c = comments.find(x => String(x.id) === String(id));
-    if (!c) { showBackofficeMessage('Commentaire introuvable', true); return; }
-    modalAuthor.textContent = c.send_by || 'Anonyme';
-    modalTime.textContent = c.time || '';
-    modalContent.value = c.contenu || '';
-    modalSave.setAttribute('data-id', c.id);
-    modalDelete.setAttribute('data-id', c.id);
+    const post = posts.find(x => String(x.id) === String(postId));
+    if (!post) { showBackofficeMessage('Publication introuvable', true); return; }
+    modalAuthor.value = post.send_by || 'Anonyme';
+    modalTime.textContent = post.time || '';
+    modalContent.value = post.contenu || '';
+    modalSave.setAttribute('data-post-id', post.id);
+    modalSave.setAttribute('data-type', 'post');
+    modalDelete.setAttribute('data-post-id', post.id);
+    modalDelete.setAttribute('data-type', 'post');
     modal.style.display = 'flex';
+}
+
+function showModalForComment(commentId, postId) {
+    ensureModal();
+    const modal = document.getElementById('commentModal');
+    const modalAuthor = document.getElementById('modalAuthor');
+    const modalTime = document.getElementById('modalTime');
+    const modalContent = document.getElementById('modalContent');
+    const modalSave = document.getElementById('modalSave');
+    const modalDelete = document.getElementById('modalDelete');
+    const post = posts.find(x => String(x.id) === String(postId));
+    if (!post) { showBackofficeMessage('Publication introuvable', true); return; }
+    const c = post.comments.find(x => String(x.id) === String(commentId));
+    if (!c) { showBackofficeMessage('Commentaire introuvable', true); return; }
+    modalAuthor.value = c.send_by || 'Anonyme';
+    modalTime.textContent = '';
+    modalContent.value = c.contenu || '';
+    modalSave.setAttribute('data-comment-id', c.id);
+    modalSave.setAttribute('data-type', 'comment');
+    modalDelete.setAttribute('data-comment-id', c.id);
+    modalDelete.setAttribute('data-type', 'comment');
+    modal.style.display = 'flex';
+}
+
+function toggleCommentsForPost(postId) {
+    const commentsSection = document.querySelector(`.comments-section[data-post-id="${postId}"]`);
+    if (!commentsSection) return;
+
+    const isVisible = commentsSection.style.display !== 'none';
+    if (isVisible) {
+        commentsSection.style.display = 'none';
+    } else {
+        // Render comments
+        const post = posts.find(x => String(x.id) === String(postId));
+        if (!post) return;
+
+        const commentsList = commentsSection.querySelector('.comments-list');
+        commentsList.innerHTML = '';
+
+        if (!post.comments || post.comments.length === 0) {
+            commentsList.innerHTML = '<div style="color:#666;font-style:italic;">Aucun commentaire</div>';
+        } else {
+            post.comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.style.background = '#f9f9f9';
+                commentDiv.style.padding = '10px';
+                commentDiv.style.marginBottom = '8px';
+                commentDiv.style.borderRadius = '6px';
+                commentDiv.style.border = '1px solid #e0e0e0';
+
+                const author = escapeHtml(comment.send_by || 'Anonyme');
+                const body = escapeHtml(comment.contenu || '');
+
+                commentDiv.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
+                        <div style="flex:1">
+                            <div style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
+                            <div style="color:#333;">${body}</div>
+                        </div>
+                        <div style="flex:0 0 auto;display:flex;gap:6px;">
+                            <button class="edit-comment-btn" data-comment-id="${comment.id}" data-post-id="${postId}" style="background:#2b6f2e;color:#fff;border:none;padding:6px 8px;border-radius:4px;font-size:0.85em;">Modifier</button>
+                            <button class="delete-comment-btn" data-comment-id="${comment.id}" style="background:#D9534F;color:#fff;border:none;padding:6px 8px;border-radius:4px;font-size:0.85em;">Supprimer</button>
+                        </div>
+                    </div>
+                `;
+                commentsList.appendChild(commentDiv);
+            });
+        }
+
+        commentsSection.style.display = 'block';
+    }
 }
 
 function closeModal() { const modal = document.getElementById('commentModal'); if (modal) modal.style.display = 'none'; }
 
-function fetchComments() {
+function fetchPosts() {
     // Build an absolute URL relative to the current document to avoid incorrect relative paths
-    const url = new URL('../../controller/commentcontroller.php', window.location.href).href;
-    console.log('Fetching comments from', url);
+    const url = new URL('../../controller/communityController.php', window.location.href).href;
+    console.log('Fetching posts from', url);
     fetch(url)
         .then(response => {
             const status = response.status;
@@ -250,7 +353,7 @@ function fetchComments() {
             // Try to parse JSON from the text
             try {
                 const data = JSON.parse(text);
-                comments = data || [];
+                posts = data || [];
                 renderPosts();
             } catch (ex) {
                 console.error('Failed to parse JSON from controller response', ex);
@@ -259,7 +362,7 @@ function fetchComments() {
             }
         })
         .catch(err => {
-            console.error('Network or fetch error when requesting comments:', err);
+            console.error('Network or fetch error when requesting posts:', err);
             const backofficeFeed = document.getElementById('backofficeFeed');
             if (backofficeFeed) backofficeFeed.innerHTML = '<div class="server-error">Erreur réseau lors du chargement des publications. Voir console pour détails.</div>';
         });
@@ -267,7 +370,7 @@ function fetchComments() {
 
 document.addEventListener('DOMContentLoaded', function () {
     // initial load
-    fetchComments();
+    fetchPosts();
 
     // Restore sidebar collapsed state if user toggled previously
     try {
@@ -285,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!app) return;
             const collapsed = app.classList.toggle('sidebar-collapsed');
             // store preference
-            try { localStorage.setItem('eco_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+            try { localStorage.setItem('eco_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) { }
             // update aria state
             this.setAttribute('aria-expanded', String(!collapsed));
         });
@@ -296,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const app = document.querySelector('.app');
             if (!app) return;
             const collapsed = app.classList.toggle('sidebar-collapsed');
-            try { localStorage.setItem('eco_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+            try { localStorage.setItem('eco_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) { }
             // also update toggle button aria if present
             if (sidebarToggle) sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
         });
@@ -323,53 +426,86 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (e) {
         if (!e.target) return;
 
-        // Edit
-        if (e.target.classList && e.target.classList.contains('edit-btn')) {
-            const id = e.target.getAttribute('data-id');
-            // open modal for editing (author + content) — same interaction as frontoffice
-            showModalForComment(id);
+        // View post (toggle comments)
+        if (e.target.classList && e.target.classList.contains('view-post-btn')) {
+            const postId = e.target.getAttribute('data-post-id');
+            toggleCommentsForPost(postId);
         }
 
-        // View
-        if (e.target.classList && e.target.classList.contains('view-btn')) {
-            const id = e.target.getAttribute('data-id');
-            showModalForComment(id);
+        // Edit post
+        if (e.target.classList && e.target.classList.contains('edit-post-btn')) {
+            const postId = e.target.getAttribute('data-post-id');
+            showModalForPost(postId);
         }
 
-        // Toolbar: refresh
-        if (e.target.id === 'refreshFeed') {
-            fetchComments();
-        }
-
-        
-
-        // Delete (no confirm) — perform deletion immediately
-        if (e.target.classList && e.target.classList.contains('delete-btn')) {
-            const id = e.target.getAttribute('data-id');
+        // Delete post
+        if (e.target.classList && e.target.classList.contains('delete-post-btn')) {
+            const postId = e.target.getAttribute('data-post-id');
             const btn = e.target;
             btn.disabled = true;
             const prev = btn.textContent;
             btn.textContent = 'Suppression...';
-            fetch('../../controller/commentcontroller.php', {
+            fetch('../../controller/communityController.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${id}`
+                body: `post_id=${postId}`
             })
-            .then(parseJsonSafe)
-            .then(data => {
-                if (data && data.success) {
-                    deleteCount++;
-                    fetchComments();
-                } else {
-                    showBackofficeMessage('Erreur lors de la suppression: ' + (data && data.error ? data.error : 'Réponse invalide'), true);
-                }
+                .then(parseJsonSafe)
+                .then(data => {
+                    if (data && data.success) {
+                        deleteCount++;
+                        fetchPosts();
+                    } else {
+                        showBackofficeMessage('Erreur lors de la suppression: ' + (data && data.error ? data.error : 'Réponse invalide'), true);
+                    }
+                })
+                .catch(err => {
+                    console.error('Delete parse error:', err);
+                    const raw = err && err.raw ? err.raw : (err && err.message ? err.message : String(err));
+                    showBackofficeMessage('Erreur lors de la suppression. ' + (raw ? '\nRaw response:\n' + raw : 'Voir console pour détails.'), true);
+                })
+                .finally(() => { btn.disabled = false; btn.textContent = prev; });
+        }
+
+        // Edit comment
+        if (e.target.classList && e.target.classList.contains('edit-comment-btn')) {
+            const commentId = e.target.getAttribute('data-comment-id');
+            const postId = e.target.getAttribute('data-post-id');
+            showModalForComment(commentId, postId);
+        }
+
+        // Delete comment
+        if (e.target.classList && e.target.classList.contains('delete-comment-btn')) {
+            const commentId = e.target.getAttribute('data-comment-id');
+            const btn = e.target;
+            btn.disabled = true;
+            const prev = btn.textContent;
+            btn.textContent = 'Suppression...';
+            fetch('../../controller/communityController.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${commentId}`
             })
-            .catch(err => {
-                console.error('Delete parse error:', err);
-                const raw = err && err.raw ? err.raw : (err && err.message ? err.message : String(err));
-                showBackofficeMessage('Erreur lors de la suppression. ' + (raw ? '\nRaw response:\n' + raw : 'Voir console pour détails.'), true);
-            })
-            .finally(() => { btn.disabled = false; btn.textContent = prev; });
+                .then(parseJsonSafe)
+                .then(data => {
+                    if (data && data.success) {
+                        deleteCount++;
+                        fetchPosts();
+                    } else {
+                        showBackofficeMessage('Erreur lors de la suppression: ' + (data && data.error ? data.error : 'Réponse invalide'), true);
+                    }
+                })
+                .catch(err => {
+                    console.error('Delete parse error:', err);
+                    const raw = err && err.raw ? err.raw : (err && err.message ? err.message : String(err));
+                    showBackofficeMessage('Erreur lors de la suppression. ' + (raw ? '\nRaw response:\n' + raw : 'Voir console pour détails.'), true);
+                })
+                .finally(() => { btn.disabled = false; btn.textContent = prev; });
+        }
+
+        // Toolbar: refresh
+        if (e.target.id === 'refreshFeed') {
+            fetchPosts();
         }
     });
 });

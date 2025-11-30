@@ -75,7 +75,7 @@ class CommentCRUD {
     public static function getAllComments() {
         $db = config::getConnexion();
         // Use correct column names: id, contenu, `comment id`
-        $sql = "SELECT id, send_by, contenu, `comment id` FROM comments ORDER BY id DESC";
+        $sql = "SELECT id, send_by, contenu, time, `comment id` FROM comments ORDER BY id DESC";
         $query = $db->prepare($sql);
         $query->execute();
         return $query->fetchAll();

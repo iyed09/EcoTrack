@@ -59,21 +59,16 @@ class PostsController {
         return array_values($posts);
     }
     public function addPost($post) {
-        $db = config::getConnexion();
-        // ensure 'contenu' exists and insert into post table
+        // Delegate insert to model helper for consistency
+        $sendBy = method_exists($post, 'getSendBy') ? $post->getSendBy() : ($post->getAuthor() ?? 'Anonyme');
+        $time = method_exists($post, 'getTime') ? $post->getTime() : ($post->getCreatedAt() ?? date('Y-m-d H:i:s'));
+        $contenu = method_exists($post, 'getContent') ? $post->getContent() : '';
         try {
-            $db->query("SELECT contenu FROM post LIMIT 1");
-        } catch (Exception $_) {
-            try { $db->exec("ALTER TABLE post ADD COLUMN contenu TEXT NULL AFTER time"); } catch (Exception $_) {}
+            $id = \PostCRUD::addPost($sendBy, $contenu);
+            return $id;
+        } catch (Exception $e) {
+            throw $e;
         }
-        $sql = 'INSERT INTO post (send_by, time, contenu) VALUES (:send_by, :time, :contenu)';
-        $stmt = $db->prepare($sql);
-        $stmt->execute([
-            ':send_by' => method_exists($post, 'getSendBy') ? $post->getSendBy() : ($post->getAuthor() ?? 'Anonyme'),
-            ':time' => method_exists($post, 'getTime') ? $post->getTime() : ($post->getCreatedAt() ?? date('Y-m-d H:i:s')),
-            ':contenu' => method_exists($post, 'getContent') ? $post->getContent() : ''
-        ]);
-        return $db->lastInsertId();
     }
     public function addComment($comment) {
         $db = config::getConnexion();

@@ -9,30 +9,12 @@ class CommunityController {
     public function addPost($send_by, $contenu) {
         $db = config::getConnexion();
         try {
-            $db->beginTransaction();
-            // using DB columns: send_by and time
-            // Ensure the post table has a 'contenu' column. If missing, add it (best-effort migration)
-            try {
-                $db->query("SELECT contenu FROM post LIMIT 1");
-            } catch (Exception $_e) {
-                // Attempt to add the column to the post table
-                try {
-                    $db->exec("ALTER TABLE post ADD COLUMN contenu TEXT NULL");
-                } catch (Exception $_) { /* ignore - user may prefer manual migration */ }
-            }
-            $postSql = "INSERT INTO post (send_by, time, contenu) VALUES (:send_by, :time, :contenu)";
-            $postStmt = $db->prepare($postSql);
-            $now = date('Y-m-d H:i:s');
-            $postStmt->execute([
-                ':send_by' => $send_by,
-                ':time' => $now,
-                ':contenu' => $contenu
-            ]);
-            $postId = $db->lastInsertId();
-            $db->commit();
+            // Use the PostCRUD helper (model) to ensure table and insert
+            // PostCRUD::createTable() already called at model include
+            $postId = \PostCRUD::addPost($send_by, $contenu);
+            // Automatic comment creation removed as per user request
+            error_log(date('[Y-m-d H:i:s] ') . "New post insert ok: id=" . $postId . "\n", 3, __DIR__ . '/../log/error.log');
             return ['post_id' => $postId];
-            $db->commit();
-            return ['post_id' => $postId, 'comment_id' => $commentId];
         } catch (Exception $e) {
             try { $db->rollBack(); } catch (Exception $_) {}
             error_log(date('[Y-m-d H:i:s] ') . $e->getMessage() . "\n", 3, __DIR__ . '/../log/error.log');
@@ -69,6 +51,7 @@ class CommunityController {
         $query = $db->prepare($sql);
         $query->execute();
         $rows = $query->fetchAll();
+        error_log(date('[Y-m-d H:i:s] ') . "Fetched posts rows: " . count($rows) . "\n", 3, __DIR__ . '/../log/error.log');
         $posts = [];
         foreach ($rows as $row) {
             $pid = $row['post_id'];

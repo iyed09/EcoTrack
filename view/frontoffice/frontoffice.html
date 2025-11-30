@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>EcoTrack - Communauté Verte</title>
     <link rel="stylesheet" href="frontoffice.css">
 </head>
+
 <body>
     <div class="app">
         <aside class="sidebar">
@@ -22,7 +24,8 @@
 
                 <div class="community-guide">
                     <h3>Règles de la communauté</h3>
-                    <p class="guide-excerpt">Respectez les autres, partagez des idées constructives et évitez le spam.</p>
+                    <p class="guide-excerpt">Respectez les autres, partagez des idées constructives et évitez le spam.
+                    </p>
                     <a href="#" id="openGuideFront" class="btn btn-primary">Lire la charte</a>
                 </div>
 
@@ -62,7 +65,7 @@
                         <!-- Exemple statique visible dans le HTML pour montrer les boutons (sera remplacé lorsque JS charge les posts réels) -->
                         <article id="static-example" class="publication static-sample">
                             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
-                            
+
                         </article>
                     </div>
                 </section>
@@ -83,7 +86,7 @@
                 <label for="postContent">Contenu</label>
                 <textarea id="postContent" placeholder="Écrivez votre post ici..."></textarea>
             </div>
-                <div style="display:flex; gap:8px; align-items:center;">
+            <div style="display:flex; gap:8px; align-items:center;">
                 <button id="submitPost" type="button" class="btn btn-primary">Publier</button>
                 <span id="postMessage" style="display:none;color:green;font-weight:600;">Publié</span>
             </div>
@@ -92,4 +95,5 @@
 
     <script src="frontoffice.js"></script>
 </body>
+
 </html>
