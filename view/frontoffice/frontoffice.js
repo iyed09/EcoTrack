@@ -101,15 +101,18 @@ function renderComments(list) {
     list.forEach(item => {
         const article = document.createElement('article');
         article.className = 'publication server-post';
+        article.dataset.postId = item.id;
         const sendBy = item.send_by || 'Anonyme';
         const contenu = item.contenu || '';
         const time = item.time || '';
-        // Build a post card with management buttons and a comment box
+        const commentCount = (item.comments && Array.isArray(item.comments)) ? item.comments.length : 0;
+
+        // Build a post card with management buttons and a collapsible comments section
         article.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
                 <div style="flex:1">
                     <p><strong>${escapeHtml(sendBy)}</strong>: <span class="post-body">${escapeHtml(contenu)}</span></p>
-                    <div class="pub-date">${time}</div>
+                    <div class="pub-date">${time} • ${commentCount} commentaire(s)</div>
                 </div>
                 <div style="flex:0 0 auto;">
                     <div class="actions" style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
@@ -119,8 +122,11 @@ function renderComments(list) {
                     </div>
                 </div>
             </div>
+            <div class="comments-section" data-post-id="${item.id}" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e6e6e6;">
+                <h4 style="margin:0 0 12px 0;color:#2b3b36;">Commentaires (${commentCount})</h4>
+                <div class="comments-display" style="margin-bottom:12px;"></div>
+            </div>
             <div class="comments-zone" style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;">
-                <div class="comments-list" style="margin-bottom:8px;"></div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <input class="comment-author" placeholder="Votre nom (optionnel)" style="width:160px;padding:8px;border:1px solid #ddd;border-radius:6px;" />
                     <input class="comment-input" placeholder="Écrire un commentaire..." style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;" />
@@ -128,23 +134,6 @@ function renderComments(list) {
                 </div>
             </div>
         `;
-        // populate comments for this post
-        const commentsList = article.querySelector('.comments-list');
-        if (Array.isArray(item.comments) && item.comments.length > 0) {
-            item.comments.forEach(c => {
-                const cEl = document.createElement('div');
-                cEl.className = 'comment-item';
-                cEl.innerHTML = `
-                    <strong class="comment-author-label">${escapeHtml(c.send_by || 'Anonyme')}</strong>
-                    <span class="comment-content">${escapeHtml(c.contenu || '')}</span>
-                    <div style="display:inline-block; margin-left:8px;">
-                        <button class="edit-comment btn btn-sm btn-primary" data-comment-id="${c.id}">Modifier</button>
-                        <button class="delete-comment btn btn-sm btn-danger" data-comment-id="${c.id}">Supprimer</button>
-                    </div>
-                `;
-                commentsList.appendChild(cEl);
-            });
-        }
         postsContainer.appendChild(article);
     });
 }
@@ -240,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 postMessage.style.display = 'inline';
                 postMessage.textContent = 'Publication en cours...';
-            } catch (e) {}
+            } catch (e) { }
             const now = new Date().toLocaleString();
             // Optimistic local append — show the post immediately while saving
             const localEl = appendLocalPost(sendBy, content, now, 'Enregistrement...', 'saving');
@@ -266,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Erreur lors de la mise à jour: ' + (data && data.error ? data.error : ''));
                     }
                 }).catch(err => { console.error('Update error', err); alert('Erreur lors de la mise à jour.'); })
-                  .finally(() => { submitPost.disabled = false; });
+                    .finally(() => { submitPost.disabled = false; });
             } else {
                 // Envoi du post au backend (create)
                 console.log('Create post payload', { send_by: sendBy, contenu: content });
@@ -275,95 +264,158 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `send_by=${encodeURIComponent(sendBy)}&contenu=${encodeURIComponent(content)}`
                 })
-                .then(parseJsonSafe)
-                .then(data => {
-                    console.log('Create post response', data);
-                    if (data && data.success) {
-                        // On success: remove local optimistic post and refresh feed
-                        if (localEl && localEl.parentNode) localEl.parentNode.removeChild(localEl);
-                        // show a small success animation inside the modal, then close
-                        postMessage.style.display = 'inline';
-                        postMessage.textContent = 'Publié';
-                        fetchComments();
-                        try {
-                            const inner = modal.querySelector('.modal-content');
-                            let success = inner.querySelector('.publish-success');
-                            if (!success) {
-                                success = document.createElement('div');
-                                success.className = 'publish-success';
-                                success.innerHTML = '<div class="check">✓</div>';
-                                inner.appendChild(success);
-                            }
-                            // trigger animation
-                            setTimeout(() => success.classList.add('show'), 40);
-                            // close after show
-                            setTimeout(() => {
-                                success.classList.remove('show');
-                                // hide modal after animation
+                    .then(parseJsonSafe)
+                    .then(data => {
+                        console.log('Create post response', data);
+                        if (data && data.success) {
+                            // On success: remove local optimistic post and refresh feed
+                            if (localEl && localEl.parentNode) localEl.parentNode.removeChild(localEl);
+                            // show a small success animation inside the modal, then close
+                            postMessage.style.display = 'inline';
+                            postMessage.textContent = 'Publié';
+                            fetchComments();
+                            try {
+                                const inner = modal.querySelector('.modal-content');
+                                let success = inner.querySelector('.publish-success');
+                                if (!success) {
+                                    success = document.createElement('div');
+                                    success.className = 'publish-success';
+                                    success.innerHTML = '<div class="check">✓</div>';
+                                    inner.appendChild(success);
+                                }
+                                // trigger animation
+                                setTimeout(() => success.classList.add('show'), 40);
+                                // close after show
+                                setTimeout(() => {
+                                    success.classList.remove('show');
+                                    // hide modal after animation
+                                    modal.classList.remove('open');
+                                    modal.setAttribute('aria-hidden', 'true');
+                                    setTimeout(() => { modal.style.display = 'none'; }, 260);
+                                    postMessage.style.display = 'none';
+                                    postContent.value = '';
+                                    postAuthor.value = '';
+                                }, 900);
+                            } catch (e) {
+                                // fallback: close quickly
                                 modal.classList.remove('open');
-                                modal.setAttribute('aria-hidden', 'true');
                                 setTimeout(() => { modal.style.display = 'none'; }, 260);
                                 postMessage.style.display = 'none';
                                 postContent.value = '';
                                 postAuthor.value = '';
-                            }, 900);
-                        } catch (e) {
-                            // fallback: close quickly
-                            modal.classList.remove('open');
-                            setTimeout(() => { modal.style.display = 'none'; }, 260);
-                            postMessage.style.display = 'none';
-                            postContent.value = '';
-                            postAuthor.value = '';
-                        }
-                    } else {
-                        // server returned JSON with error: add post locally and inform user
-                        const now = new Date().toLocaleString();
-                        appendLocalPost(sendBy, content, now, '(non sauvegardé: ' + (data.error || 'erreur serveur') + ')');
-                        alert('Le post a été ajouté localement mais le serveur a renvoyé une erreur: ' + (data.error || ''));
-                    }
-                })
-                .catch(err => {
-                    console.warn('Submit error — adding post locally:', err);
-                    if (localEl) {
-                        // Mark local post as failed so user can retry
-                        const note = '(non sauvegardé: serveur indisponible)';
-                        const timeEl = localEl.querySelector('.pub-date');
-                        if (timeEl) timeEl.innerHTML = `${now} <span style="color:#a33; font-weight:600;">${note}</span>`;
-                        localEl.classList.add('failed');
-                        const retryBtn = localEl.querySelector('.retry-post');
-                        if (!retryBtn) {
-                            const actionsDiv = localEl.querySelector('[style*="flex-direction:column"]');
-                            if (actionsDiv) {
-                                const btn = document.createElement('button');
-                                btn.className = 'retry-post btn btn-secondary';
-                                btn.textContent = 'Réessayer';
-                                btn.addEventListener('click', function () {
-                                    // Retry by calling the API again
-                                    btn.disabled = true;
-                                    fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `send_by=${encodeURIComponent(sendBy)}&contenu=${encodeURIComponent(content)}` })
-                                        .then(parseJsonSafe)
-                                        .then(data => {
-                                            if (data && data.success) {
-                                                if (localEl && localEl.parentNode) localEl.parentNode.removeChild(localEl);
-                                                fetchComments();
-                                            } else {
-                                                alert('Erreur lors de la ré-essai: ' + (data && data.error ? data.error : ''));
-                                            }
-                                        }).catch(err2 => { alert('Ré-essai impossible: ' + (err2.message || 'erreur serveur')); })
-                                        .finally(() => btn.disabled = false);
-                                });
-                                actionsDiv.appendChild(btn);
                             }
+                        } else {
+                            // server returned JSON with error: add post locally and inform user
+                            const now = new Date().toLocaleString();
+                            appendLocalPost(sendBy, content, now, '(non sauvegardé: ' + (data.error || 'erreur serveur') + ')');
+                            alert('Le post a été ajouté localement mais le serveur a renvoyé une erreur: ' + (data.error || ''));
                         }
-                    } else {
-                        appendLocalPost(sendBy, content, now, '(publié localement, serveur indisponible)');
-                    }
-                })
-                .finally(() => { submitPost.disabled = false; });
+                    })
+                    .catch(err => {
+                        console.warn('Submit error — adding post locally:', err);
+                        if (localEl) {
+                            // Mark local post as failed so user can retry
+                            const note = '(non sauvegardé: serveur indisponible)';
+                            const timeEl = localEl.querySelector('.pub-date');
+                            if (timeEl) timeEl.innerHTML = `${now} <span style="color:#a33; font-weight:600;">${note}</span>`;
+                            localEl.classList.add('failed');
+                            const retryBtn = localEl.querySelector('.retry-post');
+                            if (!retryBtn) {
+                                const actionsDiv = localEl.querySelector('[style*="flex-direction:column"]');
+                                if (actionsDiv) {
+                                    const btn = document.createElement('button');
+                                    btn.className = 'retry-post btn btn-secondary';
+                                    btn.textContent = 'Réessayer';
+                                    btn.addEventListener('click', function () {
+                                        // Retry by calling the API again
+                                        btn.disabled = true;
+                                        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `send_by=${encodeURIComponent(sendBy)}&contenu=${encodeURIComponent(content)}` })
+                                            .then(parseJsonSafe)
+                                            .then(data => {
+                                                if (data && data.success) {
+                                                    if (localEl && localEl.parentNode) localEl.parentNode.removeChild(localEl);
+                                                    fetchComments();
+                                                } else {
+                                                    alert('Erreur lors de la ré-essai: ' + (data && data.error ? data.error : ''));
+                                                }
+                                            }).catch(err2 => { alert('Ré-essai impossible: ' + (err2.message || 'erreur serveur')); })
+                                            .finally(() => btn.disabled = false);
+                                    });
+                                    actionsDiv.appendChild(btn);
+                                }
+                            }
+                        } else {
+                            appendLocalPost(sendBy, content, now, '(publié localement, serveur indisponible)');
+                        }
+                    })
+                    .finally(() => { submitPost.disabled = false; });
             }
         });
     }
 });
+
+/**
+ * Toggle visibility of comments section for a specific post
+ * Similar to the backoffice implementation
+ * @param {string|number} postId - ID of the post to toggle comments for
+ */
+function toggleCommentsForPost(postId) {
+    const commentsSection = document.querySelector(`.comments-section[data-post-id="${postId}"]`);
+    if (!commentsSection) return;
+
+    const isVisible = commentsSection.style.display !== 'none';
+    if (isVisible) {
+        // Hide comments section
+        commentsSection.style.display = 'none';
+    } else {
+        // Show and render comments
+        fetch(API_URL)
+            .then(parseJsonSafe)
+            .then(data => {
+                const post = (data || []).find(p => String(p.id) === String(postId));
+                if (!post) return;
+
+                const commentsDisplay = commentsSection.querySelector('.comments-display');
+                commentsDisplay.innerHTML = '';
+
+                if (!post.comments || post.comments.length === 0) {
+                    commentsDisplay.innerHTML = '<div style="color:#666;font-style:italic;">Aucun commentaire</div>';
+                } else {
+                    post.comments.forEach(comment => {
+                        const commentDiv = document.createElement('div');
+                        commentDiv.style.background = '#f9f9f9';
+                        commentDiv.style.padding = '10px';
+                        commentDiv.style.marginBottom = '8px';
+                        commentDiv.style.borderRadius = '6px';
+                        commentDiv.style.border = '1px solid #e0e0e0';
+
+                        const author = escapeHtml(comment.send_by || 'Anonyme');
+                        const body = escapeHtml(comment.contenu || '');
+
+                        commentDiv.innerHTML = `
+                            <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
+                                <div style="flex:1">
+                                    <div style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
+                                    <div class="comment-content" style="color:#333;">${body}</div>
+                                </div>
+                                <div style="flex:0 0 auto;display:flex;gap:6px;">
+                                    <button class="edit-comment btn btn-sm btn-primary" data-comment-id="${comment.id}" style="padding:6px 8px;border-radius:4px;font-size:0.85em;">Modifier</button>
+                                    <button class="delete-comment btn btn-sm btn-danger" data-comment-id="${comment.id}" style="padding:6px 8px;border-radius:4px;font-size:0.85em;">Supprimer</button>
+                                </div>
+                            </div>
+                        `;
+                        commentsDisplay.appendChild(commentDiv);
+                    });
+                }
+
+                commentsSection.style.display = 'block';
+            })
+            .catch(err => {
+                console.error('Error fetching comments:', err);
+                alert('Impossible de charger les commentaires');
+            });
+    }
+}
 
 // (publish handler now attached above within DOMContentLoaded; old duplicate removed)
 
@@ -439,34 +491,14 @@ postsContainer.addEventListener('click', function (e) {
             .finally(() => { btn.disabled = false; btn.textContent = prevText; });
     }
 
-    // View post - open a basic modal by reusing the create modal for simplicity
+
+    // View post - toggle comments section (like in backoffice)
     const clickedViewPost = e.target.closest('.view-post');
     if (clickedViewPost) {
         const id = clickedViewPost.getAttribute('data-id');
-        // Find the post data from the last fetched list by re-fetching and opening modal when found
-        fetch(API_URL)
-            .then(parseJsonSafe)
-            .then(data => {
-                const post = (data || []).find(p => String(p.id) === String(id));
-                if (!post) { alert('Publication introuvable.'); return; }
-                // populate modal fields for quick editing/viewing
-                document.getElementById('postAuthor').value = post.send_by || '';
-                document.getElementById('postContent').value = post.contenu || '';
-                // Display modal using the same UI flow as the Create modal
-                modal.style.display = 'flex';
-                modal.classList.add('open');
-                modal.setAttribute('aria-hidden', 'false');
-                // Disable inputs so this modal is view-only
-                postAuthor.disabled = true;
-                postContent.disabled = true;
-                // hide/disable the submit button while viewing
-                submitPost.disabled = true;
-                submitPost.style.display = 'none';
-                // Do NOT set editingPostId/editingCommentId for view mode
-                // Do NOT set editingPostId/editingCommentId for view mode
-            })
-            .catch(err => { console.error('View fetch error', err); alert('Impossible d\'ouvrir la publication'); });
+        toggleCommentsForPost(id);
     }
+
 
     // Edit/delete comments (future: only allow if user is author or admin)
     const clickedEditComment = e.target.closest('.edit-comment');
@@ -485,7 +517,7 @@ postsContainer.addEventListener('click', function (e) {
         saveBtn.textContent = 'Enregistrer';
         saveBtn.className = 'btn btn-primary save-comment';
         e.target.parentNode.insertBefore(saveBtn, e.target.nextSibling);
-            saveBtn.addEventListener('click', function() {
+        saveBtn.addEventListener('click', function () {
             const newContent = editInput.value.trim();
             if (!newContent) return alert('Le commentaire ne peut pas être vide.');
             const commentId = clickedEditComment.getAttribute('data-comment-id');
@@ -548,3 +580,120 @@ function appendLocalPost(author, content, time, note, status = 'saving') {
     else postsContainer.appendChild(article);
     return article;
 }
+
+// ============================================================================
+// PROFESSIONAL ANIMATIONS - Ripple Effect & Page Transitions
+// ============================================================================
+
+/**
+ * Create ripple effect on button clicks
+ * @param {Event} e - Click event
+ */
+function createRipple(e) {
+    const button = e.currentTarget;
+
+    // Remove any existing ripples
+    const existingRipple = button.querySelector('.ripple');
+    if (existingRipple) {
+        existingRipple.remove();
+    }
+
+    const circle = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+
+    const rect = button.getBoundingClientRect();
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${e.clientX - rect.left - radius}px`;
+    circle.style.top = `${e.clientY - rect.top - radius}px`;
+    circle.classList.add('ripple');
+
+    button.appendChild(circle);
+
+    // Remove ripple after animation
+    setTimeout(() => circle.remove(), 600);
+}
+
+/**
+ * Add ripple effect to all buttons
+ */
+function initializeRippleEffects() {
+    const buttons = document.querySelectorAll('.btn, .comment-btn, button');
+    buttons.forEach(button => {
+        // Remove existing listener if any
+        button.removeEventListener('click', createRipple);
+        // Add ripple effect
+        button.addEventListener('click', createRipple);
+    });
+}
+
+/**
+ * Create page transition overlay
+ */
+function createPageTransitionOverlay() {
+    if (document.querySelector('.page-transition-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'page-transition-overlay';
+    overlay.innerHTML = `
+        <div style="text-align: center;">
+            <div class="page-loader"></div>
+            <div class="page-loader-text">Chargement...</div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+/**
+ * Show page transition with animation
+ * @param {string} url - URL to navigate to
+ */
+function navigateWithTransition(url) {
+    const overlay = document.querySelector('.page-transition-overlay');
+    if (!overlay) {
+        createPageTransitionOverlay();
+        // Wait a bit for overlay to be created
+        setTimeout(() => navigateWithTransition(url), 10);
+        return;
+    }
+
+    // Show transition
+    overlay.classList.add('active');
+
+    // Navigate after animation
+    setTimeout(() => {
+        window.location.href = url;
+    }, 400);
+}
+
+/**
+ * Initialize page transition for navigation links
+ */
+function initializePageTransitions() {
+    // Create overlay on page load
+    createPageTransitionOverlay();
+
+    // Add smooth transition to backoffice link
+    const navLinks = document.querySelectorAll('a[href*="backoffice"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const url = this.href;
+            navigateWithTransition(url);
+        });
+    });
+}
+
+// Initialize animations when DOM is ready
+document.addEventListener('DOMContentLoaded', function () {
+    initializeRippleEffects();
+    initializePageTransitions();
+});
+
+// Re-initialize ripple effects after new content is added (after fetching comments)
+const originalFetchComments = fetchComments;
+fetchComments = function () {
+    originalFetchComments();
+    // Add delay to ensure DOM is updated
+    setTimeout(initializeRippleEffects, 100);
+};

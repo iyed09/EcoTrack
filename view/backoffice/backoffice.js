@@ -330,6 +330,43 @@ function showModalForPost(postId) {
     modalSave.setAttribute('data-type', 'post');
     modalDelete.setAttribute('data-post-id', post.id);
     modalDelete.setAttribute('data-type', 'post');
+
+    // Apply green styling to save button
+    modalSave.innerHTML = '✏️ Enregistrer';
+    modalSave.classList.add('btn-admin-comment');
+    modalSave.style.background = 'linear-gradient(135deg, #60c072 0%, #357a38 100%)';
+    modalSave.style.padding = '12px 24px';
+    modalSave.style.fontSize = '15px';
+    modalSave.style.fontWeight = '800';
+    modalSave.style.boxShadow = '0 8px 24px rgba(47, 155, 74, 0.35)';
+    modalSave.style.transition = 'all 0.3s ease';
+    modalSave.style.border = 'none';
+    modalSave.style.borderRadius = '8px';
+    modalSave.style.color = 'white';
+    modalSave.style.cursor = 'pointer';
+    modalSave.style.textTransform = 'uppercase';
+    modalSave.style.letterSpacing = '0.5px';
+
+    // Apply red styling to delete button
+    modalDelete.style.display = 'inline-block';
+    modalDelete.classList.add('btn-admin-delete');
+    modalDelete.innerHTML = '🗑️ Supprimer';
+    modalDelete.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%)';
+    modalDelete.style.padding = '12px 24px';
+    modalDelete.style.fontSize = '15px';
+    modalDelete.style.fontWeight = '800';
+    modalDelete.style.boxShadow = '0 8px 24px rgba(201, 42, 42, 0.35)';
+    modalDelete.style.transition = 'all 0.3s ease';
+    modalDelete.style.border = 'none';
+    modalDelete.style.borderRadius = '8px';
+    modalDelete.style.color = 'white';
+    modalDelete.style.cursor = 'pointer';
+    modalDelete.style.textTransform = 'uppercase';
+    modalDelete.style.letterSpacing = '0.5px';
+    modalDelete.disabled = false;
+    modalDelete.style.opacity = '1';
+    modalDelete.style.filter = '';
+
     modal.style.display = 'flex';
 }
 
@@ -352,6 +389,43 @@ function showModalForComment(commentId, postId) {
     modalSave.setAttribute('data-type', 'comment');
     modalDelete.setAttribute('data-comment-id', c.id);
     modalDelete.setAttribute('data-type', 'comment');
+
+    // Apply green styling to save button
+    modalSave.innerHTML = '✏️ Enregistrer';
+    modalSave.classList.add('btn-admin-comment');
+    modalSave.style.background = 'linear-gradient(135deg, #60c072 0%, #357a38 100%)';
+    modalSave.style.padding = '12px 24px';
+    modalSave.style.fontSize = '15px';
+    modalSave.style.fontWeight = '800';
+    modalSave.style.boxShadow = '0 8px 24px rgba(47, 155, 74, 0.35)';
+    modalSave.style.transition = 'all 0.3s ease';
+    modalSave.style.border = 'none';
+    modalSave.style.borderRadius = '8px';
+    modalSave.style.color = 'white';
+    modalSave.style.cursor = 'pointer';
+    modalSave.style.textTransform = 'uppercase';
+    modalSave.style.letterSpacing = '0.5px';
+
+    // Apply red styling to delete button
+    modalDelete.style.display = 'inline-block';
+    modalDelete.classList.add('btn-admin-delete');
+    modalDelete.innerHTML = '🗑️ Supprimer';
+    modalDelete.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%)';
+    modalDelete.style.padding = '12px 24px';
+    modalDelete.style.fontSize = '15px';
+    modalDelete.style.fontWeight = '800';
+    modalDelete.style.boxShadow = '0 8px 24px rgba(201, 42, 42, 0.35)';
+    modalDelete.style.transition = 'all 0.3s ease';
+    modalDelete.style.border = 'none';
+    modalDelete.style.borderRadius = '8px';
+    modalDelete.style.color = 'white';
+    modalDelete.style.cursor = 'pointer';
+    modalDelete.style.textTransform = 'uppercase';
+    modalDelete.style.letterSpacing = '0.5px';
+    modalDelete.disabled = false;
+    modalDelete.style.opacity = '1';
+    modalDelete.style.filter = '';
+
     modal.style.display = 'flex';
 }
 
@@ -426,16 +500,49 @@ function showAddCommentModal(postId) {
     modalContent.value = '';
     modalContent.placeholder = 'Entrez votre commentaire ici...';
 
-    // Configure save button for adding comment
+    // Configure save button for adding comment with special admin styling
     modalSave.setAttribute('data-post-id', postId);
     modalSave.setAttribute('data-type', 'add-comment');
-    modalSave.textContent = 'Ajouter le commentaire';
+    modalSave.innerHTML = '💬 Ajouter le commentaire'; // Add icon
+    modalSave.classList.add('btn-admin-comment'); // Special CSS class
 
-    // Show delete button again (might be hidden from previous use)
+    // Apply special inline styles for admin comment button
+    modalSave.style.background = 'linear-gradient(135deg, #60c072 0%, #357a38 100%)';
+    modalSave.style.padding = '12px 24px';
+    modalSave.style.fontSize = '15px';
+    modalSave.style.fontWeight = '800';
+    modalSave.style.boxShadow = '0 8px 24px rgba(47, 155, 74, 0.35)';
+    modalSave.style.transition = 'all 0.3s ease';
+    modalSave.style.border = 'none';
+    modalSave.style.borderRadius = '8px';
+    modalSave.style.color = 'white';
+    modalSave.style.cursor = 'pointer';
+    modalSave.style.textTransform = 'uppercase';
+    modalSave.style.letterSpacing = '0.5px';
+
+    // Style delete button with red admin design
     modalDelete.style.display = 'inline-block';
-    // But make it disabled for add operation
+    modalDelete.classList.add('btn-admin-delete'); // Special CSS class
+    modalDelete.innerHTML = '🗑️ Supprimer'; // Add icon
+
+    // Apply special inline styles for admin delete button
+    modalDelete.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%)';
+    modalDelete.style.padding = '12px 24px';
+    modalDelete.style.fontSize = '15px';
+    modalDelete.style.fontWeight = '800';
+    modalDelete.style.boxShadow = '0 8px 24px rgba(201, 42, 42, 0.35)';
+    modalDelete.style.transition = 'all 0.3s ease';
+    modalDelete.style.border = 'none';
+    modalDelete.style.borderRadius = '8px';
+    modalDelete.style.color = 'white';
+    modalDelete.style.cursor = 'not-allowed';
+    modalDelete.style.textTransform = 'uppercase';
+    modalDelete.style.letterSpacing = '0.5px';
+
+    // Make it disabled for add operation but keep the styling
     modalDelete.disabled = true;
-    modalDelete.style.opacity = '0.3';
+    modalDelete.style.opacity = '0.5';
+    modalDelete.style.filter = 'saturate(0.7)';
 
     modal.style.display = 'flex';
 }
@@ -446,12 +553,47 @@ function showAddCommentModal(postId) {
 function closeModal() {
     const modal = document.getElementById('commentModal');
     if (modal) modal.style.display = 'none';
-    // Re-enable delete button
+
+    // Re-enable and reset delete button
     const modalDelete = document.getElementById('modalDelete');
     if (modalDelete) {
+        modalDelete.classList.remove('btn-admin-delete');
+        modalDelete.innerHTML = 'Supprimer';
         modalDelete.disabled = false;
         modalDelete.style.opacity = '1';
+        modalDelete.style.filter = '';
         modalDelete.style.display = 'inline-block';
+        modalDelete.style.background = '';
+        modalDelete.style.padding = '';
+        modalDelete.style.fontSize = '';
+        modalDelete.style.fontWeight = '';
+        modalDelete.style.boxShadow = '';
+        modalDelete.style.transition = '';
+        modalDelete.style.border = '';
+        modalDelete.style.borderRadius = '';
+        modalDelete.style.color = '';
+        modalDelete.style.cursor = '';
+        modalDelete.style.textTransform = '';
+        modalDelete.style.letterSpacing = '';
+    }
+
+    // Reset save button styling to default
+    const modalSave = document.getElementById('modalSave');
+    if (modalSave) {
+        modalSave.classList.remove('btn-admin-comment');
+        modalSave.textContent = 'Enregistrer';
+        modalSave.style.background = '';
+        modalSave.style.padding = '';
+        modalSave.style.fontSize = '';
+        modalSave.style.fontWeight = '';
+        modalSave.style.boxShadow = '';
+        modalSave.style.transition = '';
+        modalSave.style.border = '';
+        modalSave.style.borderRadius = '';
+        modalSave.style.color = '';
+        modalSave.style.cursor = '';
+        modalSave.style.textTransform = '';
+        modalSave.style.letterSpacing = '';
     }
 }
 
