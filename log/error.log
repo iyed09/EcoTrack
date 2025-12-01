@@ -905,3 +905,60 @@
 [2025-12-01 19:03:46] Fetched posts rows: 3
 [2025-12-01 19:03:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
 [2025-12-01 19:03:50] Fetched posts rows: 3
+[2025-12-01 19:08:35] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:08:35] Fetched posts rows: 3
+[2025-12-01 19:08:36] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:08:36] Fetched posts rows: 3
+[2025-12-01 19:08:36] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:08:36] Fetched posts rows: 3
+[2025-12-01 19:08:36] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:08:36] Fetched posts rows: 3
+[2025-12-01 19:08:48] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:08:48] Update post request post_id=4, send_by=Neur, contenu=HALF TIME GUYS
+[2025-12-01 19:08:48] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:08:48] Fetched posts rows: 3
+[2025-12-01 19:11:03] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:11:03] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:11:03] Fetched posts rows: 3
+[2025-12-01 19:11:03] Fetched posts rows: 3
+[2025-12-01 19:11:03] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:11:03] Fetched posts rows: 3
+[2025-12-01 19:11:03] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:11:04] Fetched posts rows: 3
+[2025-12-01 19:11:15] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:11:15] Update post request post_id=4, send_by=Neur, contenu=HALF TIME GUYS IN ALLIANZ
+[2025-12-01 19:11:15] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:11:15] Fetched posts rows: 3
+[2025-12-01 19:11:53] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:11:53] Update comment request id=4, contenu=GOAAAAALLLLLLLLLL #09
+[2025-12-01 19:11:53] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:11:54] Fetched posts rows: 3
+[2025-12-01 19:15:51] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:15:51] Fetched posts rows: 3
+[2025-12-01 19:15:59] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:15:59] Fetched posts rows: 3
+[2025-12-01 19:16:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:16:19] New post create request: send_by=iyeed, contenu=Hamdouoleh web rja3 yekhdm
+[2025-12-01 19:16:19] New post insert ok: id=7
+[2025-12-01 19:16:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:16:19] Fetched posts rows: 4
+[2025-12-01 19:16:23] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:16:23] Fetched posts rows: 4
+[2025-12-01 19:16:33] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:16:34] Add comment request parent_id=7, send_by=iyed, contenu=test final
+[2025-12-01 19:16:34] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:16:34] Fetched posts rows: 4
+[2025-12-01 19:16:38] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:16:38] Fetched posts rows: 4
+[2025-12-01 19:16:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:16:50] Fetched posts rows: 4
+[2025-12-01 19:17:37] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:17:37] Fetched posts rows: 4
+[2025-12-01 19:17:37] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:17:38] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:17:38] Fetched posts rows: 4
+[2025-12-01 19:17:38] Fetched posts rows: 4
+[2025-12-01 19:17:38] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:17:38] Fetched posts rows: 4
+[2025-12-01 19:17:38] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-01 19:17:38] Fetched posts rows: 4

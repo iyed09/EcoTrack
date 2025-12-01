@@ -254,6 +254,7 @@ function ensureModal() {
         <div style="margin-bottom:8px;"><label for="modalAuthor" style="display:block;font-weight:600;margin-bottom:6px;">Auteur</label><input id="modalAuthor" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"/></div>
         <div id="modalTime" style="color:#666;margin-bottom:12px"></div>
         <div style="margin-bottom:8px;"><label for="modalContent" style="display:block;font-weight:600;margin-bottom:6px;">Contenu</label><textarea id="modalContent" style="width:100%;min-height:120px;padding:8px;border:1px solid #ddd;border-radius:6px;"></textarea></div>
+        <input type="hidden" id="modalOriginalContent" />
         <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;"><button id="modalSave" class="btn-primary">Enregistrer</button><button id="modalDelete" class="btn-danger">Supprimer</button></div>
     </div>`;
     document.body.appendChild(modal);
@@ -262,6 +263,7 @@ function ensureModal() {
         const type = this.getAttribute('data-type');
         const contenu = document.getElementById('modalContent').value;
         const send_by = document.getElementById('modalAuthor').value || '';
+        const originalContent = document.getElementById('modalOriginalContent').value || '';
 
         if (type === 'post') {
             const postId = this.getAttribute('data-post-id');
@@ -279,6 +281,7 @@ function ensureModal() {
                         id: postId,
                         author: send_by,
                         content: contenu,
+                        original: originalContent,
                         time: new Date().toLocaleTimeString()
                     });
                     updateDashboard();
@@ -300,6 +303,7 @@ function ensureModal() {
                         id: commentId,
                         author: send_by,
                         content: contenu,
+                        original: originalContent,
                         time: new Date().toLocaleTimeString()
                     });
                     updateDashboard();
@@ -364,6 +368,7 @@ function showModalForPost(postId) {
     modalAuthor.value = post.send_by || 'Anonyme';
     modalTime.textContent = post.time || '';
     modalContent.value = post.contenu || '';
+    document.getElementById('modalOriginalContent').value = post.contenu || ''; // Capture original
     modalSave.setAttribute('data-post-id', post.id);
     modalSave.setAttribute('data-type', 'post');
     modalDelete.setAttribute('data-post-id', post.id);
@@ -423,6 +428,7 @@ function showModalForComment(commentId, postId) {
     modalAuthor.value = c.send_by || 'Anonyme';
     modalTime.textContent = '';
     modalContent.value = c.contenu || '';
+    document.getElementById('modalOriginalContent').value = c.contenu || ''; // Capture original
     modalSave.setAttribute('data-comment-id', c.id);
     modalSave.setAttribute('data-type', 'comment');
     modalDelete.setAttribute('data-comment-id', c.id);
@@ -1053,3 +1059,74 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+// ============================================================================
+// MODIFIED ITEMS DISPLAY
+// ============================================================================
+
+function showModifiedItemsModal() {
+    let modal = document.getElementById('modifiedItemsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modifiedItemsModal';
+        modal.style.position = 'fixed';
+        modal.style.left = '0';
+        modal.style.top = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.display = 'none';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.background = 'rgba(0,0,0,0.45)';
+        modal.style.zIndex = '2000';
+        modal.innerHTML = `<div style="background:#fff;padding:20px;border-radius:8px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,0.2);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3 style="margin:0;color:#2b3b36;">Modifications récentes (Session)</h3>
+                <button id="closeModifiedModal" style="background:transparent;border:none;font-size:20px;cursor:pointer;">✕</button>
+            </div>
+            <div id="modifiedList"></div>
+        </div>`;
+        document.body.appendChild(modal);
+        document.getElementById('closeModifiedModal').addEventListener('click', () => modal.style.display = 'none');
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    }
+
+    const list = document.getElementById('modifiedList');
+    list.innerHTML = '';
+
+    if (modifiedItems.length === 0) {
+        list.innerHTML = '<div style="color:#666;font-style:italic;">Aucune modification dans cette session.</div>';
+    } else {
+        // Show newest first
+        [...modifiedItems].reverse().forEach(item => {
+            const div = document.createElement('div');
+            div.style.borderBottom = '1px solid #eee';
+            div.style.padding = '12px 0';
+
+            const original = escapeHtml(item.original || '');
+            const current = escapeHtml(item.content || '');
+
+            div.innerHTML = `
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                    <span style="font-weight:700;color:#2f9b4a;">${item.type} #${item.id}</span>
+                    <span style="font-size:0.85em;color:#888;">${item.time}</span>
+                </div>
+                <div style="font-size:0.9em;color:#555;margin-bottom:8px;">Par: <strong>${escapeHtml(item.author)}</strong></div>
+                
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div>
+                        <div style="font-size:0.8em;text-transform:uppercase;color:#d9534f;font-weight:700;margin-bottom:4px;">Avant</div>
+                        <div style="background:#fff5f5;padding:8px;border-radius:4px;color:#333;font-size:0.95em;border:1px solid #ffcccc;min-height:40px;">${original}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.8em;text-transform:uppercase;color:#357a38;font-weight:700;margin-bottom:4px;">Après</div>
+                        <div style="background:#f7fff8;padding:8px;border-radius:4px;color:#333;font-size:0.95em;border:1px solid #e6f2e8;min-height:40px;">${current}</div>
+                    </div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    modal.style.display = 'flex';
+}
