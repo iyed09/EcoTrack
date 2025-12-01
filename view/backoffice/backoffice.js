@@ -29,6 +29,7 @@ let sentCount = 0;       // Total posts sent
 let commentCount = 0;    // Total comments across all posts
 let editCount = 0;       // Number of edits made
 let deleteCount = 0;     // Number of deletions made
+let modifiedItems = [];  // Track details of modified items for display
 
 // ============================================================================
 // DASHBOARD UPDATE FUNCTIONS
@@ -268,7 +269,20 @@ function ensureModal() {
                 method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `post_id=${postId}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
             }).then(parseJsonSafe).then(data => {
-                if (data && data.success) { closeModal(); fetchPosts(); } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
+                if (data && data.success) {
+                    closeModal();
+                    fetchPosts();
+                    // Track modification
+                    editCount++;
+                    modifiedItems.push({
+                        type: 'Publication',
+                        id: postId,
+                        author: send_by,
+                        content: contenu,
+                        time: new Date().toLocaleTimeString()
+                    });
+                    updateDashboard();
+                } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
             }).catch(err => { showBackofficeMessage('Erreur lors de la sauvegarde. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); });
         } else if (type === 'comment') {
             const commentId = this.getAttribute('data-comment-id');
@@ -276,7 +290,20 @@ function ensureModal() {
                 method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `id=${commentId}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
             }).then(parseJsonSafe).then(data => {
-                if (data && data.success) { closeModal(); fetchPosts(); } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
+                if (data && data.success) {
+                    closeModal();
+                    fetchPosts();
+                    // Track modification
+                    editCount++;
+                    modifiedItems.push({
+                        type: 'Commentaire',
+                        id: commentId,
+                        author: send_by,
+                        content: contenu,
+                        time: new Date().toLocaleTimeString()
+                    });
+                    updateDashboard();
+                } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
             }).catch(err => { showBackofficeMessage('Erreur lors de la sauvegarde. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); });
         } else if (type === 'add-comment') {
             // Add new comment to post
@@ -711,6 +738,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             modal.style.display = 'flex';
         });
+    }
+
+    // Listener for Modified Comments Card
+    const overviewEdit = document.getElementById('overviewEdit');
+    if (overviewEdit) {
+        const card = overviewEdit.closest('.stat-card');
+        if (card) {
+            card.style.cursor = 'pointer';
+            card.title = 'Cliquez pour voir les détails';
+            card.addEventListener('click', showModifiedItemsModal);
+        }
     }
 
     // event delegation

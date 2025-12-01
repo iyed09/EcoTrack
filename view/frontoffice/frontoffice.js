@@ -231,8 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 postMessage.textContent = 'Publication en cours...';
             } catch (e) { }
             const now = new Date().toLocaleString();
-            // Optimistic local append — show the post immediately while saving
-            const localEl = appendLocalPost(sendBy, content, now, 'Enregistrement...', 'saving');
+            // Optimistic local append — show the post immediately while saving (ONLY for new posts)
+            let localEl = null;
+            if (!editingPostId) {
+                localEl = appendLocalPost(sendBy, content, now, 'Enregistrement...', 'saving');
+            }
             // If editingPostId is set, update existing post; otherwise create new
             if (editingPostId) {
                 console.log('Update post payload', { post_id: editingPostId, send_by: sendBy, contenu: content });
@@ -383,6 +386,7 @@ function toggleCommentsForPost(postId) {
                 } else {
                     post.comments.forEach(comment => {
                         const commentDiv = document.createElement('div');
+                        commentDiv.className = 'comment-item'; // Added class for event delegation
                         commentDiv.style.background = '#f9f9f9';
                         commentDiv.style.padding = '10px';
                         commentDiv.style.marginBottom = '8px';
@@ -395,7 +399,7 @@ function toggleCommentsForPost(postId) {
                         commentDiv.innerHTML = `
                             <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
                                 <div style="flex:1">
-                                    <div style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
+                                    <div class="comment-author-label" style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
                                     <div class="comment-content" style="color:#333;">${body}</div>
                                 </div>
                                 <div style="flex:0 0 auto;display:flex;gap:6px;">
