@@ -1324,3 +1324,72 @@ button:active,
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(47, 155, 74, 0.15);
 }
+
+/* ============================================================================
+   NEW BUTTON STYLES (Refresh & Clear)
+   ============================================================================ */
+
+/* Refresh Button - Blue Gradient */
+.btn-feed-refresh {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-feed-refresh:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.btn-feed-refresh:active {
+    transform: translateY(0);
+}
+
+/* Spin animation for refresh icon */
+.btn-feed-refresh .refresh-icon {
+    transition: transform 0.5s ease;
+}
+
+.btn-feed-refresh:hover .refresh-icon {
+    transform: rotate(180deg);
+}
+
+/* Clear Search Button - Orange Gradient */
+.btn-search-clear {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-search-clear:hover {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+}
+
+.btn-search-clear:active {
+    transform: translateY(0);
+}

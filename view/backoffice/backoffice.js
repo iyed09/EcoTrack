@@ -149,25 +149,33 @@ function escapeHtml(text) {
     });
 }
 
-function renderPosts() {
+function renderPosts(postsToRender = null) {
+    // If no specific array passed, use the global posts array
+    const currentPosts = postsToRender || posts;
+
     const backofficeFeed = document.getElementById('backofficeFeed');
     if (!backofficeFeed) return;
     // clear and add a strong heading + toolbar + debug area
     backofficeFeed.innerHTML = '<h2 style="margin-top:0;">Gestion des publications et commentaires</h2>' +
-        '<div class="feed-toolbar" style="margin:12px 0; display:flex; gap:8px; align-items:center;"><button id="refreshFeed" class="btn-primary">Rafraîchir</button></div>' +
+        '<div class="feed-toolbar" style="margin:12px 0; display:flex; gap:8px; align-items:center;">' +
+        '<button id="refreshFeed" class="btn-feed-refresh"><span class="refresh-icon">🔄</span> Rafraîchir</button>' +
+        '</div>' +
         '<div id="backofficeStatus" style="margin-bottom:8px;color:#2b3b36;font-weight:600"></div>';
 
-    if (!Array.isArray(posts) || posts.length === 0) {
-        backofficeFeed.innerHTML += '<div style="color:#666">Aucune publication pour le moment.</div>';
-        sentCount = 0;
-        commentCount = 0;
-        updateDashboard();
+    if (!Array.isArray(currentPosts) || currentPosts.length === 0) {
+        backofficeFeed.innerHTML += '<div style="color:#666">Aucune publication trouvée.</div>';
+        // Only update global stats if we are rendering the full list (not filtered)
+        if (!postsToRender) {
+            sentCount = 0;
+            commentCount = 0;
+            updateDashboard();
+        }
         return;
     }
 
     let totalComments = 0;
     // Render each post as a clear card
-    posts.forEach(post => {
+    currentPosts.forEach(post => {
         const postEl = document.createElement('div');
         postEl.style.background = '#ffffff';
         postEl.style.border = '1px solid #e6e6e6';
@@ -205,14 +213,17 @@ function renderPosts() {
         backofficeFeed.appendChild(postEl);
     });
 
-    sentCount = posts.length;
-    commentCount = totalComments;
-    updateDashboard();
+    // Only update global dashboard stats if not filtering
+    if (!postsToRender) {
+        sentCount = currentPosts.length;
+        commentCount = totalComments;
+        updateDashboard();
+    }
 
     // update status
     const status = document.getElementById('backofficeStatus');
     if (status) {
-        status.textContent = `Publications chargées: ${posts.length} (${totalComments} commentaires)`;
+        status.textContent = `Publications affichées: ${currentPosts.length}`;
     }
 }
 
@@ -794,4 +805,213 @@ document.addEventListener('DOMContentLoaded', function () {
             fetchPosts();
         }
     });
+});
+
+// ============================================================================
+// PROFESSIONAL ANIMATIONS - Ripple Effect & Page Transitions
+// ============================================================================
+
+/**
+ * Create ripple effect on button clicks
+ * @param {Event} e - Click event
+ */
+function createRipple(e) {
+    const button = e.currentTarget;
+
+    // Don't add ripple if button is disabled
+    if (button.disabled) return;
+
+    // Remove any existing ripples
+    const existingRipple = button.querySelector('.ripple');
+    if (existingRipple) {
+        existingRipple.remove();
+    }
+
+    const circle = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+
+    const rect = button.getBoundingClientRect();
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${e.clientX - rect.left - radius}px`;
+    circle.style.top = `${e.clientY - rect.top - radius}px`;
+    circle.classList.add('ripple');
+
+    button.appendChild(circle);
+
+    // Remove ripple after animation
+    setTimeout(() => circle.remove(), 600);
+}
+
+/**
+ * Add ripple effect to all buttons
+ */
+function initializeRippleEffects() {
+    const buttons = document.querySelectorAll('.btn, .btn-primary, .btn-secondary, .btn-danger, .btn-admin-comment, .btn-admin-delete, button');
+    buttons.forEach(button => {
+        // Remove existing listener if any
+        button.removeEventListener('click', createRipple);
+        // Add ripple effect
+        button.addEventListener('click', createRipple);
+    });
+}
+
+/**
+ * Create page transition overlay
+ */
+function createPageTransitionOverlay() {
+    if (document.querySelector('.page-transition-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'page-transition-overlay';
+    overlay.innerHTML = `
+        <div style="text-align: center;">
+            <div class="page-loader"></div>
+            <div class="page-loader-text">Chargement...</div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+/**
+ * Show page transition with animation
+ * @param {string} url - URL to navigate to
+ */
+function navigateWithTransition(url) {
+    const overlay = document.querySelector('.page-transition-overlay');
+    if (!overlay) {
+        createPageTransitionOverlay();
+        // Wait a bit for overlay to be created
+        setTimeout(() => navigateWithTransition(url), 10);
+        return;
+    }
+
+    // Show transition
+    overlay.classList.add('active');
+
+    // Navigate after animation
+    setTimeout(() => {
+        window.location.href = url;
+    }, 400);
+}
+
+/**
+ * Initialize page transition for navigation links
+ */
+function initializePageTransitions() {
+    // Create overlay on page load
+    createPageTransitionOverlay();
+
+    // Add smooth transition to frontoffice link
+    const navLinks = document.querySelectorAll('a[href*="frontoffice"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const url = this.href;
+            navigateWithTransition(url);
+        });
+    });
+}
+
+// Initialize all animations when DOM is ready
+document.addEventListener('DOMContentLoaded', function () {
+    initializeRippleEffects();
+    initializePageTransitions();
+});
+
+// Re-initialize ripple effects after posts are rendered
+const originalRenderPosts = renderPosts;
+renderPosts = function (postsToRender = null) {
+    originalRenderPosts(postsToRender);
+    // Add delay to ensure DOM is updated
+    setTimeout(initializeRippleEffects, 100);
+};
+
+// ============================================================================
+// SEARCH AND FILTER FUNCTIONALITY
+// ============================================================================
+
+/**
+ * Filter posts based on search input and filter type
+ */
+function filterAndRender() {
+    const searchInput = document.getElementById('searchInput');
+    const filterType = document.getElementById('filterType');
+    const searchResults = document.getElementById('searchResults');
+
+    if (!searchInput || !filterType) return;
+
+    const query = searchInput.value.toLowerCase().trim();
+    const type = filterType.value; // 'all', 'posts', 'comments'
+
+    // If empty query, render all posts
+    if (!query) {
+        renderPosts(null); // null means render all global posts
+        if (searchResults) searchResults.textContent = '';
+        return;
+    }
+
+    // Filter logic
+    const filteredPosts = posts.filter(post => {
+        const postContent = (post.contenu || '').toLowerCase();
+        const postAuthor = (post.send_by || '').toLowerCase();
+
+        // Check post matches
+        const postMatches = postContent.includes(query) || postAuthor.includes(query);
+
+        // Check comment matches
+        const comments = post.comments || [];
+        const commentMatches = comments.some(comment => {
+            const commentContent = (comment.contenu || '').toLowerCase();
+            const commentAuthor = (comment.send_by || '').toLowerCase();
+            return commentContent.includes(query) || commentAuthor.includes(query);
+        });
+
+        if (type === 'posts') {
+            return postMatches;
+        } else if (type === 'comments') {
+            return commentMatches;
+        } else {
+            // 'all'
+            return postMatches || commentMatches;
+        }
+    });
+
+    // Render filtered results
+    renderPosts(filteredPosts);
+
+    // Update results text
+    if (searchResults) {
+        const count = filteredPosts.length;
+        if (count === 0) {
+            searchResults.textContent = 'Aucun résultat trouvé.';
+        } else {
+            searchResults.textContent = `${count} résultat(s) trouvé(s)`;
+        }
+    }
+}
+
+// Initialize search listeners
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const filterType = document.getElementById('filterType');
+    const clearSearch = document.getElementById('clearSearch');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', filterAndRender);
+    }
+
+    if (filterType) {
+        filterType.addEventListener('change', filterAndRender);
+    }
+
+    if (clearSearch) {
+        clearSearch.addEventListener('click', function () {
+            if (searchInput) {
+                searchInput.value = '';
+                filterAndRender();
+                searchInput.focus();
+            }
+        });
+    }
 });
