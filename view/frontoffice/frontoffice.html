@@ -93,8 +93,21 @@
                 <label for="postContent">Contenu</label>
                 <textarea id="postContent" placeholder="Écrivez votre post ici..."></textarea>
             </div>
+            <div class="form-group">
+                <label for="postAttachment">📎 Joindre un fichier (optionnel)</label>
+                <input id="postAttachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" />
+                <div id="filePreview" style="margin-top:8px;display:none;">
+                    <img id="previewImage" style="max-width:200px;max-height:200px;border-radius:6px;display:none;" />
+                    <div id="previewFile" style="padding:8px;background:#f0f0f0;border-radius:6px;display:none;">
+                        <span id="fileName"></span>
+                        <button type="button" id="removeFile"
+                            style="margin-left:8px;background:#d9534f;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">✕</button>
+                    </div>
+                </div>
+            </div>
             <div style="display:flex; gap:8px; align-items:center;">
                 <button id="submitPost" type="button" class="btn btn-primary">Publier</button>
+                <button id="cancelPost" type="button" class="btn btn-danger">Annuler</button>
                 <span id="postMessage" style="display:none;color:green;font-weight:600;">Publié</span>
             </div>
         </div>

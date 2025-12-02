@@ -192,11 +192,24 @@ function renderPosts(postsToRender = null) {
         const commentCount = (post.comments && Array.isArray(post.comments)) ? post.comments.length : 0;
         totalComments += commentCount;
 
+        // Build attachment HTML if present
+        let attachmentHTML = '';
+        if (post.attachment) {
+            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(post.attachment);
+            if (isImage) {
+                attachmentHTML = `<div style="margin-top:8px;"><img src="../../${escapeHtml(post.attachment)}" style="max-width:300px;max-height:300px;border-radius:6px;border:1px solid #ddd;" alt="Attachment" /></div>`;
+            } else {
+                const fileName = post.attachment.split('/').pop();
+                attachmentHTML = `<div style="margin-top:8px;"><a href="../../${escapeHtml(post.attachment)}" target="_blank" style="color:#357a38;text-decoration:none;">📎 ${escapeHtml(fileName)}</a></div>`;
+            }
+        }
+
         postEl.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
                 <div style="flex:1">
                     <div style="font-weight:700;color:#2b3b36;margin-bottom:6px;">${author}</div>
                     <div class="post-text" style="color:#222;">${body}</div>
+                    ${attachmentHTML}
                     <div class="pub-date" style="color:#666;margin-top:8px;font-size:0.9em;">${time} • ${commentCount} commentaire(s)</div>
                 </div>
                 <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:8px;margin-left:12px;">
@@ -254,6 +267,8 @@ function ensureModal() {
         <div style="margin-bottom:8px;"><label for="modalAuthor" style="display:block;font-weight:600;margin-bottom:6px;">Auteur</label><input id="modalAuthor" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"/></div>
         <div id="modalTime" style="color:#666;margin-bottom:12px"></div>
         <div style="margin-bottom:8px;"><label for="modalContent" style="display:block;font-weight:600;margin-bottom:6px;">Contenu</label><textarea id="modalContent" style="width:100%;min-height:120px;padding:8px;border:1px solid #ddd;border-radius:6px;"></textarea></div>
+        <div style="margin-bottom:8px;"><label for="modalAttachment" style="display:block;font-weight:600;margin-bottom:6px;">📎 Fichier joint (optionnel)</label><input id="modalAttachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"/></div>
+        <div id="modalFilePreview" style="margin-top:8px;display:none;padding:8px;background:#f0f0f0;border-radius:6px;"><span id="modalFileName"></span></div>
         <input type="hidden" id="modalOriginalContent" />
         <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;"><button id="modalSave" class="btn-primary">Enregistrer</button><button id="modalDelete" class="btn-danger">Supprimer</button></div>
     </div>`;
@@ -267,9 +282,18 @@ function ensureModal() {
 
         if (type === 'post') {
             const postId = this.getAttribute('data-post-id');
+            const formData = new FormData();
+            formData.append('post_id', postId);
+            formData.append('contenu', contenu);
+            formData.append('send_by', send_by);
+            // Add file if selected
+            const fileInput = document.getElementById('modalAttachment');
+            if (fileInput && fileInput.files.length > 0) {
+                formData.append('attachment', fileInput.files[0]);
+            }
             fetch('../../controller/communityController.php', {
-                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `post_id=${postId}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
+                method: 'POST',
+                body: formData
             }).then(parseJsonSafe).then(data => {
                 if (data && data.success) {
                     closeModal();
@@ -289,9 +313,18 @@ function ensureModal() {
             }).catch(err => { showBackofficeMessage('Erreur lors de la sauvegarde. Voir console. ' + (err.raw || err.message || ''), true); console.error(err); });
         } else if (type === 'comment') {
             const commentId = this.getAttribute('data-comment-id');
+            const formData = new FormData();
+            formData.append('id', commentId);
+            formData.append('contenu', contenu);
+            formData.append('send_by', send_by);
+            // Add file if selected
+            const fileInput = document.getElementById('modalAttachment');
+            if (fileInput && fileInput.files.length > 0) {
+                formData.append('attachment', fileInput.files[0]);
+            }
             fetch('../../controller/communityController.php', {
-                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${commentId}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
+                method: 'POST',
+                body: formData
             }).then(parseJsonSafe).then(data => {
                 if (data && data.success) {
                     closeModal();
@@ -316,9 +349,18 @@ function ensureModal() {
                 showBackofficeMessage('Le commentaire ne peut pas être vide', true);
                 return;
             }
+            const formData = new FormData();
+            formData.append('parent_id', postId);
+            formData.append('contenu', contenu);
+            formData.append('send_by', send_by);
+            // Add file if selected
+            const fileInput = document.getElementById('modalAttachment');
+            if (fileInput && fileInput.files.length > 0) {
+                formData.append('attachment', fileInput.files[0]);
+            }
             fetch('../../controller/communityController.php', {
-                method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `parent_id=${postId}&contenu=${encodeURIComponent(contenu)}&send_by=${encodeURIComponent(send_by)}`
+                method: 'POST',
+                body: formData
             }).then(parseJsonSafe).then(data => {
                 if (data && data.success) {
                     commentCount++;
@@ -502,11 +544,24 @@ function toggleCommentsForPost(postId) {
                 const author = escapeHtml(comment.send_by || 'Anonyme');
                 const body = escapeHtml(comment.contenu || '');
 
+                // Build attachment HTML if present
+                let commentAttachmentHTML = '';
+                if (comment.attachment) {
+                    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(comment.attachment);
+                    if (isImage) {
+                        commentAttachmentHTML = `<div style="margin-top:6px;"><img src="../../${escapeHtml(comment.attachment)}" style="max-width:200px;max-height:200px;border-radius:4px;border:1px solid #ccc;" alt="Attachment" /></div>`;
+                    } else {
+                        const fileName = comment.attachment.split('/').pop();
+                        commentAttachmentHTML = `<div style="margin-top:6px;"><a href="../../${escapeHtml(comment.attachment)}" target="_blank" style="color:#357a38;text-decoration:none;font-size:0.9em;">📎 ${escapeHtml(fileName)}</a></div>`;
+                    }
+                }
+
                 commentDiv.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
                         <div style="flex:1">
                             <div style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
                             <div style="color:#333;">${body}</div>
+                            ${commentAttachmentHTML}
                         </div>
                         <div style="flex:0 0 auto;display:flex;gap:6px;">
                             <button class="edit-comment-btn" data-comment-id="${comment.id}" data-post-id="${postId}" style="background:#2b6f2e;color:#fff;border:none;padding:6px 8px;border-radius:4px;font-size:0.85em;">Modifier</button>

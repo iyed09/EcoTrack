@@ -5,13 +5,81 @@ require_once __DIR__ . '/../model/post.php';
 require_once __DIR__ . '/../model/comment.php';
 
 class CommunityController {
+    
+    /**
+     * Handle file upload with validation
+     * @param array $file - $_FILES array element
+     * @return string|null - Returns file path or null if no file
+     * @throws Exception on validation failure
+     */
+    public function handleFileUpload($file) {
+        if (!isset($file) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return null; // No file uploaded
+        }
+        
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new Exception('File upload error: ' . $file['error']);
+        }
+        
+        // Validate file size (5MB max)
+        $maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if ($file['size'] > $maxSize) {
+            throw new Exception('File size exceeds 5MB limit');
+        }
+        
+        // Validate file type
+        $allowedTypes = [
+            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+            'application/pdf', 'application/msword', 
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain'
+        ];
+        
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'txt'];
+        
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+        
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        
+        if (!in_array($mimeType, $allowedTypes) || !in_array($extension, $allowedExtensions)) {
+            throw new Exception('Invalid file type. Allowed: images (jpg, png, gif, webp) and documents (pdf, doc, docx, txt)');
+        }
+        
+        // Create uploads directory if it doesn't exist
+        $uploadDir = __DIR__ . '/../uploads/';
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        // Generate unique filename
+        $uniqueName = uniqid() . '_' . time() . '.' . $extension;
+        $targetPath = $uploadDir . $uniqueName;
+        
+        // Move uploaded file
+        if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+            throw new Exception('Failed to move uploaded file');
+        }
+        
+        // Return relative path for database storage
+        return 'uploads/' . $uniqueName;
+    }
+    
     // Add a new post and its comment (message)
-    public function addPost($send_by, $contenu) {
+    public function addPost($send_by, $contenu, $attachment = null) {
         $db = config::getConnexion();
         try {
             // Use the PostCRUD helper (model) to ensure table and insert
             // PostCRUD::createTable() already called at model include
             $postId = \PostCRUD::addPost($send_by, $contenu);
+            
+            // Update attachment if provided
+            if ($attachment !== null) {
+                $stmt = $db->prepare('UPDATE post SET attachment = :attachment WHERE ID = :post_id');
+                $stmt->execute([':attachment' => $attachment, ':post_id' => $postId]);
+            }
+            
             // Automatic comment creation removed as per user request
             error_log(date('[Y-m-d H:i:s] ') . "New post insert ok: id=" . $postId . "\n", 3, __DIR__ . '/../log/error.log');
             return ['post_id' => $postId];
@@ -30,6 +98,11 @@ class CommunityController {
             if (!$col) {
                 $db->exec("ALTER TABLE post ADD COLUMN contenu TEXT NULL AFTER time");
             }
+            // Add attachment column to post table
+            $col = $db->query("SHOW COLUMNS FROM post LIKE 'attachment'")->fetch();
+            if (!$col) {
+                $db->exec("ALTER TABLE post ADD COLUMN attachment VARCHAR(255) NULL AFTER contenu");
+            }
         } catch (Exception $_) {}
         try {
             $col = $db->query("SHOW COLUMNS FROM comments LIKE 'send_by'")->fetch();
@@ -45,9 +118,14 @@ class CommunityController {
             if (!$col) {
                 $db->exec("ALTER TABLE comments ADD COLUMN `comment id` INT NULL AFTER time");
             }
+            // Add attachment column to comments table
+            $col = $db->query("SHOW COLUMNS FROM comments LIKE 'attachment'")->fetch();
+            if (!$col) {
+                $db->exec("ALTER TABLE comments ADD COLUMN attachment VARCHAR(255) NULL AFTER contenu");
+            }
         } catch (Exception $_) {}
-        // Use actual DB columns: p.ID, p.send_by, p.time, p.contenu (post text), c.id, c.contenu and c.`comment id`
-        $sql = 'SELECT p.ID as post_id, p.send_by, p.time as post_time, p.contenu as post_contenu, c.id as comment_id, c.send_by as comment_send_by, c.contenu as comment_contenu, c.`comment id` as comment_post_id FROM post p LEFT JOIN comments c ON c.`comment id` = p.ID ORDER BY p.time DESC, c.id ASC';
+        // Use actual DB columns: p.ID, p.send_by, p.time, p.contenu (post text), p.attachment, c.id, c.contenu, c.attachment and c.`comment id`
+        $sql = 'SELECT p.ID as post_id, p.send_by, p.time as post_time, p.contenu as post_contenu, p.attachment as post_attachment, c.id as comment_id, c.send_by as comment_send_by, c.contenu as comment_contenu, c.attachment as comment_attachment, c.`comment id` as comment_post_id FROM post p LEFT JOIN comments c ON c.`comment id` = p.ID ORDER BY p.time DESC, c.id ASC';
         $query = $db->prepare($sql);
         $query->execute();
         $rows = $query->fetchAll();
@@ -61,6 +139,7 @@ class CommunityController {
                     'send_by' => $row['send_by'],
                     'time' => $row['post_time'],
                     'contenu' => $row['post_contenu'] ?? '',
+                    'attachment' => $row['post_attachment'] ?? null,
                     'comments' => []
                 ];
             }
@@ -68,21 +147,32 @@ class CommunityController {
                 $posts[$pid]['comments'][] = [
                     'id' => $row['comment_id'],
                     'send_by' => $row['comment_send_by'] ?: 'Anonyme',
-                    'contenu' => $row['comment_contenu']
+                    'contenu' => $row['comment_contenu'],
+                    'attachment' => $row['comment_attachment'] ?? null
                 ];
             }
         }
         return array_values($posts);
     }
     // Update a comment
-    public function updateComment($id, $contenu) {
+    public function updateComment($id, $contenu, $attachment = null) {
         $db = config::getConnexion();
-        $sql = "UPDATE comments SET contenu = :contenu WHERE id = :id";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([
-            ':id' => $id,
-            ':contenu' => $contenu
-        ]);
+        if ($attachment !== null) {
+            $sql = "UPDATE comments SET contenu = :contenu, attachment = :attachment WHERE id = :id";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([
+                ':id' => $id,
+                ':contenu' => $contenu,
+                ':attachment' => $attachment
+            ]);
+        } else {
+            $sql = "UPDATE comments SET contenu = :contenu WHERE id = :id";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([
+                ':id' => $id,
+                ':contenu' => $contenu
+            ]);
+        }
         return $stmt->rowCount();
     }
     // Delete a comment
@@ -95,16 +185,17 @@ class CommunityController {
     }
 
     // Add a comment to an existing post
-    public function addCommentToPost($postId, $contenu, $send_by = 'Anonyme') {
+    public function addCommentToPost($postId, $contenu, $send_by = 'Anonyme', $attachment = null) {
         $db = config::getConnexion();
-        $sql = "INSERT INTO comments (send_by, contenu, time, `comment id`) VALUES (:send_by, :contenu, :time, :post_id)";
+        $sql = "INSERT INTO comments (send_by, contenu, time, `comment id`, attachment) VALUES (:send_by, :contenu, :time, :post_id, :attachment)";
         $stmt = $db->prepare($sql);
         $now = date('Y-m-d H:i:s');
         $stmt->execute([
             ':send_by' => $send_by,
             ':contenu' => $contenu,
             ':time' => $now,
-            ':post_id' => $postId
+            ':post_id' => $postId,
+            ':attachment' => $attachment
         ]);
         return $db->lastInsertId();
     }
@@ -127,13 +218,18 @@ class CommunityController {
     }
 
     // Update post: update post send_by and ensure the main comment exists (update it) with provided content
-    public function updatePost($postId, $contenu, $send_by) {
+    public function updatePost($postId, $contenu, $send_by, $attachment = null) {
         $db = config::getConnexion();
         try {
             $db->beginTransaction();
-            // Update send_by and post content on post
-            $stmt = $db->prepare('UPDATE post SET send_by = :send_by, contenu = :contenu WHERE ID = :post_id');
-            $stmt->execute([':send_by' => $send_by, ':contenu' => $contenu, ':post_id' => $postId]);
+            // Update send_by, post content, and attachment on post
+            if ($attachment !== null) {
+                $stmt = $db->prepare('UPDATE post SET send_by = :send_by, contenu = :contenu, attachment = :attachment WHERE ID = :post_id');
+                $stmt->execute([':send_by' => $send_by, ':contenu' => $contenu, ':attachment' => $attachment, ':post_id' => $postId]);
+            } else {
+                $stmt = $db->prepare('UPDATE post SET send_by = :send_by, contenu = :contenu WHERE ID = :post_id');
+                $stmt->execute([':send_by' => $send_by, ':contenu' => $contenu, ':post_id' => $postId]);
+            }
             $db->commit();
             return true;
         } catch (Exception $e) {
@@ -155,7 +251,12 @@ $controller = new CommunityController();
         error_log(date('[Y-m-d H:i:s] ') . "New post create request: send_by=" . $send_by . ", contenu=" . substr($contenu, 0, 200) . "\n", 3, __DIR__ . '/../log/error.log');
         if (trim($contenu) !== '') {
             try {
-                $result = $controller->addPost($send_by, $contenu);
+                // Handle file upload if present
+                $attachment = null;
+                if (isset($_FILES['attachment'])) {
+                    $attachment = $controller->handleFileUpload($_FILES['attachment']);
+                }
+                $result = $controller->addPost($send_by, $contenu, $attachment);
                 echo json_encode(['success' => true, 'post_id' => $result['post_id']]);
             } catch (Exception $e) {
                 echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
@@ -173,7 +274,12 @@ $controller = new CommunityController();
             $parentId = $_POST['parent_id'];
             $contenu = $_POST['contenu'];
             $send_by = isset($_POST['send_by']) ? $_POST['send_by'] : 'Anonyme';
-            $resultId = $controller->addCommentToPost($parentId, $contenu, $send_by);
+            // Handle file upload if present
+            $attachment = null;
+            if (isset($_FILES['attachment'])) {
+                $attachment = $controller->handleFileUpload($_FILES['attachment']);
+            }
+            $resultId = $controller->addCommentToPost($parentId, $contenu, $send_by, $attachment);
             echo json_encode(['success' => true, 'comment_id' => $resultId]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
@@ -188,7 +294,12 @@ $controller = new CommunityController();
             $postId = $_POST['post_id'];
             $contenu = $_POST['contenu'];
             $send_by = $_POST['send_by'];
-            $controller->updatePost($postId, $contenu, $send_by);
+            // Handle file upload if present
+            $attachment = null;
+            if (isset($_FILES['attachment'])) {
+                $attachment = $controller->handleFileUpload($_FILES['attachment']);
+            }
+            $controller->updatePost($postId, $contenu, $send_by, $attachment);
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
@@ -202,7 +313,12 @@ $controller = new CommunityController();
         try {
             $id = $_POST['id'];
             $contenu = $_POST['contenu'];
-            $controller->updateComment($id, $contenu);
+            // Handle file upload if present
+            $attachment = null;
+            if (isset($_FILES['attachment'])) {
+                $attachment = $controller->handleFileUpload($_FILES['attachment']);
+            }
+            $controller->updateComment($id, $contenu, $attachment);
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);

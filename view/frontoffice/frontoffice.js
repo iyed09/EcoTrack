@@ -40,6 +40,13 @@ createPostBtn.addEventListener('click', () => {
         modal.style.display = 'flex';
         modal.classList.add('open');
         modal.setAttribute('aria-hidden', 'false');
+
+        // Hide hero section
+        const heroSection = document.querySelector('.hero-communication');
+        if (heroSection) {
+            heroSection.style.display = 'none';
+        }
+
         // small timeout to allow CSS transition and then focus content
         setTimeout(() => {
             postContent.focus();
@@ -58,6 +65,13 @@ closeModal.addEventListener('click', () => {
         // hide after transition
         setTimeout(() => { modal.style.display = 'none'; }, 260);
     }
+
+    // Show hero section again
+    const heroSection = document.querySelector('.hero-communication');
+    if (heroSection) {
+        heroSection.style.display = 'block';
+    }
+
     postContent.value = '';
     postAuthor.value = '';
     postMessage.style.display = 'none';
@@ -77,6 +91,13 @@ window.addEventListener('click', (e) => {
             modal.setAttribute('aria-hidden', 'true');
             setTimeout(() => { modal.style.display = 'none'; }, 260);
         }
+
+        // Show hero section again
+        const heroSection = document.querySelector('.hero-communication');
+        if (heroSection) {
+            heroSection.style.display = 'block';
+        }
+
         postContent.value = '';
         postAuthor.value = '';
         editingPostId = null; editingCommentId = null;
@@ -107,11 +128,24 @@ function renderComments(list) {
         const time = item.time || '';
         const commentCount = (item.comments && Array.isArray(item.comments)) ? item.comments.length : 0;
 
+        // Build attachment HTML if present
+        let attachmentHTML = '';
+        if (item.attachment) {
+            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(item.attachment);
+            if (isImage) {
+                attachmentHTML = `<div style="margin-top:8px;"><img src="../../${escapeHtml(item.attachment)}" style="max-width:300px;max-height:300px;border-radius:6px;border:1px solid #ddd;" alt="Attachment" /></div>`;
+            } else {
+                const fileName = item.attachment.split('/').pop();
+                attachmentHTML = `<div style="margin-top:8px;"><a href="../../${escapeHtml(item.attachment)}" target="_blank" style="color:#357a38;text-decoration:none;">📎 ${escapeHtml(fileName)}</a></div>`;
+            }
+        }
+
         // Build a post card with management buttons and a collapsible comments section
         article.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
                 <div style="flex:1">
                     <p><strong>${escapeHtml(sendBy)}</strong>: <span class="post-body">${escapeHtml(contenu)}</span></p>
+                    ${attachmentHTML}
                     <div class="pub-date">${time} • ${commentCount} commentaire(s)</div>
                 </div>
                 <div style="flex:0 0 auto;">
@@ -127,10 +161,16 @@ function renderComments(list) {
                 <div class="comments-display" style="margin-bottom:12px;"></div>
             </div>
             <div class="comments-zone" style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;">
-                <div style="display:flex;gap:8px;align-items:center;">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                     <input class="comment-author" placeholder="Votre nom (optionnel)" style="width:160px;padding:8px;border:1px solid #ddd;border-radius:6px;" />
-                    <input class="comment-input" placeholder="Écrire un commentaire..." style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;" />
+                    <input class="comment-input" placeholder="Écrire un commentaire..." style="flex:1;min-width:200px;padding:8px;border:1px solid #ddd;border-radius:6px;" />
+                    <input class="comment-attachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;" data-post-id="${item.id}" />
+                    <button class="attach-file-btn btn btn-secondary" data-post-id="${item.id}" style="padding:8px 12px;">📎</button>
                     <button class="comment-btn btn btn-primary" data-parent-id="${item.id}">Commenter</button>
+                </div>
+                <div class="comment-file-preview" style="margin-top:8px;display:none;font-size:0.9em;color:#666;">
+                    <span class="comment-file-name"></span>
+                    <button type="button" class="remove-comment-file" style="margin-left:8px;background:#d9534f;color:white;border:none;padding:2px 6px;border-radius:4px;cursor:pointer;font-size:0.85em;">✕</button>
                 </div>
             </div>
         `;
@@ -190,6 +230,104 @@ document.addEventListener('DOMContentLoaded', () => {
         autoResizeTextarea(postContent);
     }
 
+    // File upload preview handling
+    const postAttachment = document.getElementById('postAttachment');
+    const filePreview = document.getElementById('filePreview');
+    const previewImage = document.getElementById('previewImage');
+    const previewFile = document.getElementById('previewFile');
+    const fileName = document.getElementById('fileName');
+    const removeFile = document.getElementById('removeFile');
+
+    if (postAttachment) {
+        postAttachment.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) {
+                filePreview.style.display = 'none';
+                return;
+            }
+
+            // Show preview
+            filePreview.style.display = 'block';
+
+            // Check if it's an image
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    previewFile.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Show file name for non-images
+                previewImage.style.display = 'none';
+                previewFile.style.display = 'block';
+                fileName.textContent = file.name;
+            }
+        });
+    }
+
+    if (removeFile) {
+        removeFile.addEventListener('click', function () {
+            if (postAttachment) postAttachment.value = '';
+            filePreview.style.display = 'none';
+            previewImage.style.display = 'none';
+            previewFile.style.display = 'none';
+        });
+    }
+
+    // Handle comment file input changes (event delegation)
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.classList.contains('comment-attachment')) {
+            const zone = e.target.closest('.comments-zone');
+            const preview = zone.querySelector('.comment-file-preview');
+            const fileNameSpan = zone.querySelector('.comment-file-name');
+
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                if (fileNameSpan) fileNameSpan.textContent = `📎 ${file.name}`;
+                if (preview) preview.style.display = 'block';
+            } else {
+                if (preview) preview.style.display = 'none';
+            }
+        }
+    });
+
+
+    // Cancel button handler
+    const cancelPost = document.getElementById('cancelPost');
+    if (cancelPost) {
+        cancelPost.addEventListener('click', function () {
+            // Close modal
+            if (modal) {
+                modal.classList.remove('open');
+                modal.setAttribute('aria-hidden', 'true');
+                setTimeout(() => { modal.style.display = 'none'; }, 260);
+            }
+
+            // Show hero section again
+            const heroSection = document.querySelector('.hero-communication');
+            if (heroSection) {
+                heroSection.style.display = 'block';
+            }
+
+            // Clear form fields
+            postContent.value = '';
+            postAuthor.value = '';
+            if (postAttachment) postAttachment.value = '';
+            filePreview.style.display = 'none';
+            postMessage.style.display = 'none';
+            editingPostId = null;
+            editingCommentId = null;
+
+            // Re-enable inputs
+            postAuthor.disabled = false;
+            postContent.disabled = false;
+            submitPost.disabled = false;
+            submitPost.style.display = '';
+        });
+    }
+
     // Sidebar slide/collapse wiring: preserve state in localStorage
     const root = document.querySelector('.app');
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -239,10 +377,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // If editingPostId is set, update existing post; otherwise create new
             if (editingPostId) {
                 console.log('Update post payload', { post_id: editingPostId, send_by: sendBy, contenu: content });
+                const formData = new FormData();
+                formData.append('post_id', editingPostId);
+                formData.append('contenu', content);
+                formData.append('send_by', sendBy);
+                // Add file if selected
+                if (postAttachment && postAttachment.files.length > 0) {
+                    formData.append('attachment', postAttachment.files[0]);
+                }
                 fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `post_id=${editingPostId}&contenu=${encodeURIComponent(content)}&send_by=${encodeURIComponent(sendBy)}`
+                    body: formData
                 }).then(parseJsonSafe).then(data => {
                     console.log('Update post response', data);
                     if (data && data.success) {
@@ -253,6 +398,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             setTimeout(() => { modal.style.display = 'none'; }, 260);
                         }
                         postContent.value = ''; postAuthor.value = '';
+                        if (postAttachment) postAttachment.value = '';
+                        filePreview.style.display = 'none';
                         fetchComments();
                     } else {
                         alert('Erreur lors de la mise à jour: ' + (data && data.error ? data.error : ''));
@@ -262,10 +409,16 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // Envoi du post au backend (create)
                 console.log('Create post payload', { send_by: sendBy, contenu: content });
+                const formData = new FormData();
+                formData.append('send_by', sendBy);
+                formData.append('contenu', content);
+                // Add file if selected
+                if (postAttachment && postAttachment.files.length > 0) {
+                    formData.append('attachment', postAttachment.files[0]);
+                }
                 fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `send_by=${encodeURIComponent(sendBy)}&contenu=${encodeURIComponent(content)}`
+                    body: formData
                 })
                     .then(parseJsonSafe)
                     .then(data => {
@@ -396,11 +549,24 @@ function toggleCommentsForPost(postId) {
                         const author = escapeHtml(comment.send_by || 'Anonyme');
                         const body = escapeHtml(comment.contenu || '');
 
+                        // Build attachment HTML if present
+                        let commentAttachmentHTML = '';
+                        if (comment.attachment) {
+                            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(comment.attachment);
+                            if (isImage) {
+                                commentAttachmentHTML = `<div style="margin-top:6px;"><img src="../../${escapeHtml(comment.attachment)}" style="max-width:200px;max-height:200px;border-radius:4px;border:1px solid #ccc;" alt="Attachment" /></div>`;
+                            } else {
+                                const fileName = comment.attachment.split('/').pop();
+                                commentAttachmentHTML = `<div style="margin-top:6px;"><a href="../../${escapeHtml(comment.attachment)}" target="_blank" style="color:#357a38;text-decoration:none;font-size:0.9em;">📎 ${escapeHtml(fileName)}</a></div>`;
+                            }
+                        }
+
                         commentDiv.innerHTML = `
                             <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
                                 <div style="flex:1">
                                     <div class="comment-author-label" style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
                                     <div class="comment-content" style="color:#333;">${body}</div>
+                                    ${commentAttachmentHTML}
                                 </div>
                                 <div style="flex:0 0 auto;display:flex;gap:6px;">
                                     <button class="edit-comment btn btn-sm btn-primary" data-comment-id="${comment.id}" style="padding:6px 8px;border-radius:4px;font-size:0.85em;">Modifier</button>
@@ -425,6 +591,26 @@ function toggleCommentsForPost(postId) {
 
 // Handle comment, edit, delete and view actions via event delegation
 postsContainer.addEventListener('click', function (e) {
+    // Handle attach file button for comments
+    const attachBtn = e.target.closest('.attach-file-btn');
+    if (attachBtn) {
+        const postId = attachBtn.getAttribute('data-post-id');
+        const fileInput = document.querySelector(`.comment-attachment[data-post-id="${postId}"]`);
+        if (fileInput) fileInput.click();
+        return;
+    }
+
+    // Handle remove comment file
+    const removeCommentFile = e.target.closest('.remove-comment-file');
+    if (removeCommentFile) {
+        const zone = removeCommentFile.closest('.comments-zone');
+        const fileInput = zone.querySelector('.comment-attachment');
+        const preview = zone.querySelector('.comment-file-preview');
+        if (fileInput) fileInput.value = '';
+        if (preview) preview.style.display = 'none';
+        return;
+    }
+
     // Comment on a post (creates a new comment record)
     const clickedCommentBtn = e.target.closest('.comment-btn');
     if (clickedCommentBtn) {
@@ -437,8 +623,17 @@ postsContainer.addEventListener('click', function (e) {
         if (text.length === 0) { alert('Écris un commentaire avant de répondre.'); return; }
         const parentId = clickedCommentBtn.getAttribute('data-parent-id');
         // Add comment to existing post using parent_id
-        const payload = `parent_id=${encodeURIComponent(parentId)}&contenu=${encodeURIComponent(text)}&send_by=${encodeURIComponent(author)}`;
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload })
+        const formData = new FormData();
+        formData.append('parent_id', parentId);
+        formData.append('contenu', text);
+        formData.append('send_by', author);
+        // Add file if selected
+        const commentZone = clickedCommentBtn.closest('.comments-zone');
+        const fileInput = commentZone.querySelector('.comment-attachment');
+        if (fileInput && fileInput.files.length > 0) {
+            formData.append('attachment', fileInput.files[0]);
+        }
+        fetch(API_URL, { method: 'POST', body: formData })
             .then(parseJsonSafe)
             .then(data => {
                 if (data && data.success) {

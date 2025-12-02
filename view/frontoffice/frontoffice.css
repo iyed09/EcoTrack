@@ -260,8 +260,38 @@ body {
 }
 
 .btn-danger {
-  background: var(--danger);
-  color: white
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-danger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.btn-danger:hover::before {
+  left: 100%;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+}
+
+.btn-danger:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 /* Local optimistic-save styling */
@@ -797,6 +827,253 @@ button:active {
   filter: blur(40px);
   animation: floatBubble 10s ease-in-out infinite reverse;
 }
+
+/* ============================================================================
+   FILE UPLOAD BUTTON STYLING - Modern Blue Design
+   ============================================================================ */
+
+/* Hide default file input */
+.form-group input[type="file"] {
+  display: none;
+}
+
+/* Custom file upload button */
+.form-group label[for="postAttachment"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  width: fit-content;
+}
+
+/* Animated gradient background */
+.form-group label[for="postAttachment"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.form-group label[for="postAttachment"]:hover::before {
+  left: 100%;
+}
+
+/* Hover effect */
+.form-group label[for="postAttachment"]:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Active/Click effect */
+.form-group label[for="postAttachment"]:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* Icon animation */
+.form-group label[for="postAttachment"]::after {
+  content: '📎';
+  font-size: 1.1em;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.form-group label[for="postAttachment"]:hover::after {
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* File preview container */
+#filePreview {
+  padding: 12px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 10px;
+  border: 2px dashed #3b82f6;
+  margin-top: 12px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Preview image styling */
+#previewImage {
+  border: 3px solid #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* File name display */
+#previewFile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+#fileName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Remove file button */
+#removeFile {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85em;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+#removeFile:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+#removeFile:active {
+  transform: scale(0.95);
+}
+
+/* Attach file button for comments */
+.attach-file-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1em;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.attach-file-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.attach-file-btn:hover::before {
+  width: 120%;
+  height: 120%;
+}
+
+.attach-file-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px) rotate(5deg);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+}
+
+.attach-file-btn:active {
+  transform: translateY(0) rotate(0deg) scale(0.95);
+}
+
+/* Comment file preview */
+.comment-file-preview {
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 8px;
+  border: 1px solid #93c5fd;
+  animation: slideDown 0.3s ease-out;
+}
+
+.comment-file-name {
+  color: #1e40af;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.remove-comment-file {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  transition: all 0.2s ease;
+}
+
+.remove-comment-file:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: scale(1.1);
+}
+
+/* Pulse animation for file input label */
+@keyframes pulse-blue {
+
+  0%,
+  100% {
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+  }
+}
+
+.form-group label[for="postAttachment"] {
+  animation: pulse-blue 2s ease-in-out infinite;
+}
+
+.form-group label[for="postAttachment"]:hover {
+  animation: none;
+}
+
 
 @keyframes floatBubble {
 
