@@ -123,9 +123,13 @@ class CommunityController {
             if (!$col) {
                 $db->exec("ALTER TABLE comments ADD COLUMN attachment VARCHAR(255) NULL AFTER contenu");
             }
+            $col = $db->query("SHOW COLUMNS FROM comments LIKE 'reply_to_id'")->fetch();
+            if (!$col) {
+                $db->exec("ALTER TABLE comments ADD COLUMN reply_to_id INT NULL AFTER `comment id`");
+            }
         } catch (Exception $_) {}
-        // Use actual DB columns: p.ID, p.send_by, p.time, p.contenu (post text), p.attachment, c.id, c.contenu, c.attachment and c.`comment id`
-        $sql = 'SELECT p.ID as post_id, p.send_by, p.time as post_time, p.contenu as post_contenu, p.attachment as post_attachment, c.id as comment_id, c.send_by as comment_send_by, c.contenu as comment_contenu, c.attachment as comment_attachment, c.`comment id` as comment_post_id FROM post p LEFT JOIN comments c ON c.`comment id` = p.ID ORDER BY p.time DESC, c.id ASC';
+        // Use actual DB columns: p.ID, p.send_by, p.time, p.contenu (post text), p.attachment, c.id, c.contenu, c.attachment, c.`comment id` and c.reply_to_id
+        $sql = 'SELECT p.ID as post_id, p.send_by, p.time as post_time, p.contenu as post_contenu, p.attachment as post_attachment, c.id as comment_id, c.send_by as comment_send_by, c.contenu as comment_contenu, c.attachment as comment_attachment, c.`comment id` as comment_post_id, c.reply_to_id FROM post p LEFT JOIN comments c ON c.`comment id` = p.ID ORDER BY p.time DESC, c.id ASC';
         $query = $db->prepare($sql);
         $query->execute();
         $rows = $query->fetchAll();
@@ -148,8 +152,10 @@ class CommunityController {
                     'id' => $row['comment_id'],
                     'send_by' => $row['comment_send_by'] ?: 'Anonyme',
                     'contenu' => $row['comment_contenu'],
-                    'attachment' => $row['comment_attachment'] ?? null
+                    'attachment' => $row['comment_attachment'] ?? null,
+                    'reply_to_id' => $row['reply_to_id'] ?? null
                 ];
+
             }
         }
         return array_values($posts);
@@ -185,9 +191,9 @@ class CommunityController {
     }
 
     // Add a comment to an existing post
-    public function addCommentToPost($postId, $contenu, $send_by = 'Anonyme', $attachment = null) {
+    public function addCommentToPost($postId, $contenu, $send_by = 'Anonyme', $attachment = null, $replyToId = null) {
         $db = config::getConnexion();
-        $sql = "INSERT INTO comments (send_by, contenu, time, `comment id`, attachment) VALUES (:send_by, :contenu, :time, :post_id, :attachment)";
+        $sql = "INSERT INTO comments (send_by, contenu, time, `comment id`, attachment, reply_to_id) VALUES (:send_by, :contenu, :time, :post_id, :attachment, :reply_to_id)";
         $stmt = $db->prepare($sql);
         $now = date('Y-m-d H:i:s');
         $stmt->execute([
@@ -195,7 +201,8 @@ class CommunityController {
             ':contenu' => $contenu,
             ':time' => $now,
             ':post_id' => $postId,
-            ':attachment' => $attachment
+            ':attachment' => $attachment,
+            ':reply_to_id' => $replyToId
         ]);
         return $db->lastInsertId();
     }
@@ -279,7 +286,12 @@ $controller = new CommunityController();
             if (isset($_FILES['attachment'])) {
                 $attachment = $controller->handleFileUpload($_FILES['attachment']);
             }
-            $resultId = $controller->addCommentToPost($parentId, $contenu, $send_by, $attachment);
+            $replyToId = isset($_POST['reply_to_id']) ? $_POST['reply_to_id'] : null;
+            // If replying to a comment, we still need the post_id (parent_id in this context is post_id)
+            // But wait, the frontend might send parent_id as the POST ID.
+            // Let's assume parent_id IS the POST ID.
+            // If we are replying to a comment, we should also receive reply_to_id.
+            $resultId = $controller->addCommentToPost($parentId, $contenu, $send_by, $attachment, $replyToId);
             echo json_encode(['success' => true, 'comment_id' => $resultId]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);

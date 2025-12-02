@@ -1026,9 +1026,7 @@ renderPosts = function (postsToRender = null) {
     setTimeout(initializeRippleEffects, 100);
 };
 
-// ============================================================================
-// SEARCH AND FILTER FUNCTIONALITY
-// ============================================================================
+
 
 /**
  * Filter posts based on search input and filter type

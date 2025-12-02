@@ -1123,3 +1123,66 @@ button:active {
     transform: translateY(0);
   }
 }
+
+/* Nested Comments */
+.comment-item {
+  background: #f9f9f9;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.comment-item.nested {
+  background: #fff;
+  border-left: 3px solid #357a38;
+  margin-left: 20px;
+}
+
+.comment-author-label {
+  font-weight: 600;
+  color: #2b3b36;
+  margin-bottom: 4px;
+}
+
+.comment-content {
+  color: #333;
+}
+
+.reply-comment-btn {
+  padding: 0;
+  font-size: 0.85em;
+  color: #357a38;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.reply-comment-btn:hover {
+  text-decoration: underline;
+}
+
+.reply-box {
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.reply-author,
+.reply-input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.reply-author {
+  width: 140px;
+}
+
+.reply-input {
+  flex: 1;
+  min-width: 180px;
+}

@@ -1004,3 +1004,313 @@
 [2025-12-02 13:05:23] Fetched posts rows: 4
 [2025-12-02 13:05:28] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
 [2025-12-02 13:05:28] Fetched posts rows: 4
+[2025-12-02 13:11:43] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:45] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:45] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:45] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:45] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:45] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:45] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:47] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:49] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:49] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:49] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:49] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:49] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:49] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:51] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:52] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:53] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:53] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:53] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:53] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:54] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:54] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:54] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:54] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:54] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+ent refusée
+[2025-12-02 13:11:55] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:55] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:56] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:57] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:57] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:57] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:57] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:57] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:57] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:57] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:57] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:58] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:58] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:59] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:59] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:11:59] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:00] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:00] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:01] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:01] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:01] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:01] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:01] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:01] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:02] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:02] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:02] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:02] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:02] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:03] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:03] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:03] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:03] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:04] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:05] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:06] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:06] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:06] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:07] DB Connexion failed on port 3306: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:09] DB Connexion failed on port 3307: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:09] DB Connexion Erreur: SQLSTATE[HY000] [2002] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée
+[2025-12-02 13:12:09] New post create request: send_by=yooo, contenu=hey
+[2025-12-02 13:12:09] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 13:12:09] New post insert ok: id=9
+[2025-12-02 13:12:09] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 13:12:09] Fetched posts rows: 5
+[2025-12-02 13:12:11] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 13:12:11] Fetched posts rows: 5
+[2025-12-02 13:12:13] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 13:12:13] Fetched posts rows: 5
+[2025-12-02 13:12:18] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 13:12:18] Fetched posts rows: 5
+[2025-12-02 14:01:11] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:01:12] Fetched posts rows: 5
+[2025-12-02 14:01:21] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:01:21] Fetched posts rows: 5
+[2025-12-02 14:01:42] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:01:42] New post create request: send_by=fff, contenu=cxxc
+[2025-12-02 14:01:42] New post insert ok: id=10
+[2025-12-02 14:01:42] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:01:42] Fetched posts rows: 6
+[2025-12-02 14:01:49] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:01:49] Fetched posts rows: 6
+[2025-12-02 14:02:00] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:00] Fetched posts rows: 6
+[2025-12-02 14:02:04] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:04] Fetched posts rows: 6
+[2025-12-02 14:02:11] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:11] Add comment request parent_id=10, send_by=fff, contenu=fff
+[2025-12-02 14:02:11] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:11] Fetched posts rows: 6
+[2025-12-02 14:02:13] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:14] Fetched posts rows: 6
+[2025-12-02 14:02:29] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:29] Add comment request parent_id=10, send_by=xxx, contenu=cccxx
+[2025-12-02 14:02:29] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:30] Fetched posts rows: 7
+[2025-12-02 14:02:32] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:32] Fetched posts rows: 7
+[2025-12-02 14:02:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:50] Update comment request id=13, contenu=cccxx bghb
+[2025-12-02 14:02:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:51] Fetched posts rows: 7
+[2025-12-02 14:02:54] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:02:54] Fetched posts rows: 7
+[2025-12-02 14:03:53] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:03:53] Fetched posts rows: 7
+[2025-12-02 14:04:05] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:04:05] Add comment request parent_id=10, send_by=Admin EcoTrack, contenu=hjhjh
+[2025-12-02 14:04:05] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:04:06] Fetched posts rows: 8
+[2025-12-02 14:04:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:04:19] Delete comment request id=13
+[2025-12-02 14:04:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:04:19] Fetched posts rows: 7
+[2025-12-02 14:04:25] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:04:25] Update comment request id=14, contenu=hjhjhccbdv
+[2025-12-02 14:04:25] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:04:25] Fetched posts rows: 7
+[2025-12-02 14:05:39] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:05:39] Update post request post_id=9, send_by=yooo, contenu= hshwsjwsw
+[2025-12-02 14:05:39] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 14:05:39] Fetched posts rows: 7
+[2025-12-02 15:24:39] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 15:24:39] Fetched posts rows: 7
+[2025-12-02 15:28:57] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 15:28:57] Fetched posts rows: 7
+[2025-12-02 15:28:57] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 15:28:57] Fetched posts rows: 7
+[2025-12-02 15:28:57] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 15:28:58] Fetched posts rows: 7
+[2025-12-02 15:28:58] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 15:28:58] Fetched posts rows: 7
+[2025-12-02 15:28:58] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 15:28:58] Fetched posts rows: 7
+[2025-12-02 15:28:58] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 15:28:58] Fetched posts rows: 7
+[2025-12-02 16:39:44] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:39:44] Fetched posts rows: 7
+[2025-12-02 16:39:48] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:39:48] Fetched posts rows: 7
+[2025-12-02 16:39:55] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:39:55] Fetched posts rows: 7
+[2025-12-02 16:39:59] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:39:59] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:39:59] Fetched posts rows: 6
+[2025-12-02 16:40:03] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:40:03] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:40:04] Fetched posts rows: 5
+[2025-12-02 16:40:10] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:40:10] Fetched posts rows: 5
+[2025-12-02 16:40:15] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:40:15] Fetched posts rows: 5
+[2025-12-02 16:49:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:49:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:49:51] Fetched posts rows: 5
+[2025-12-02 16:49:51] Fetched posts rows: 5
+[2025-12-02 16:49:51] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:49:51] Fetched posts rows: 5
+[2025-12-02 16:49:51] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:49:51] Fetched posts rows: 5
+[2025-12-02 16:49:54] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:49:54] Fetched posts rows: 5
+[2025-12-02 16:50:04] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:50:05] Fetched posts rows: 5
+[2025-12-02 16:50:05] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:50:05] Fetched posts rows: 5
+[2025-12-02 16:50:05] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:50:05] Fetched posts rows: 5
+[2025-12-02 16:50:05] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:50:05] Fetched posts rows: 5
+[2025-12-02 16:50:05] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:50:05] Fetched posts rows: 5
+[2025-12-02 16:50:07] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:50:07] Fetched posts rows: 5
+[2025-12-02 16:50:13] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:50:13] Update comment request id=12, contenu=fff
+[2025-12-02 16:50:13] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:50:13] Fetched posts rows: 5
+[2025-12-02 16:53:22] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:22] Fetched posts rows: 5
+[2025-12-02 16:53:22] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:22] Fetched posts rows: 5
+[2025-12-02 16:53:22] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:22] Fetched posts rows: 5
+[2025-12-02 16:53:22] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:23] Fetched posts rows: 5
+[2025-12-02 16:53:23] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:23] Fetched posts rows: 5
+[2025-12-02 16:53:25] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:25] Fetched posts rows: 5
+[2025-12-02 16:53:32] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:32] Add comment request parent_id=10, send_by=adw, contenu=adwawd
+[2025-12-02 16:53:32] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:32] Fetched posts rows: 6
+[2025-12-02 16:53:53] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:53:53] Fetched posts rows: 6
+[2025-12-02 16:54:20] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:54:20] Fetched posts rows: 6
+[2025-12-02 16:54:34] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:54:34] Fetched posts rows: 6
+[2025-12-02 16:54:37] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:54:37] Fetched posts rows: 6
+[2025-12-02 16:54:47] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:54:47] Add comment request parent_id=10, send_by=hjd, contenu=dthdh
+[2025-12-02 16:54:47] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:54:47] Fetched posts rows: 7
+[2025-12-02 16:59:37] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:59:38] Fetched posts rows: 7
+[2025-12-02 16:59:38] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:59:38] Fetched posts rows: 7
+[2025-12-02 16:59:38] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:59:39] Fetched posts rows: 7
+[2025-12-02 16:59:39] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:59:39] Fetched posts rows: 7
+[2025-12-02 16:59:39] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:59:40] Fetched posts rows: 7
+[2025-12-02 16:59:48] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:59:48] Fetched posts rows: 7
+[2025-12-02 16:59:55] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:59:55] Delete comment request id=15
+[2025-12-02 16:59:55] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 16:59:55] Fetched posts rows: 6
+[2025-12-02 17:00:00] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:00] Fetched posts rows: 6
+[2025-12-02 17:00:06] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:06] Fetched posts rows: 6
+[2025-12-02 17:00:07] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:07] Fetched posts rows: 6
+[2025-12-02 17:00:07] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:07] Fetched posts rows: 6
+[2025-12-02 17:00:07] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:08] Fetched posts rows: 6
+[2025-12-02 17:00:08] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:08] Fetched posts rows: 6
+[2025-12-02 17:00:08] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:08] Fetched posts rows: 6
+[2025-12-02 17:00:17] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:17] Fetched posts rows: 6
+[2025-12-02 17:00:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:19] Fetched posts rows: 6
+[2025-12-02 17:00:22] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:23] Delete comment request id=16
+[2025-12-02 17:00:23] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:23] Fetched posts rows: 5
+[2025-12-02 17:00:27] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:27] Update comment request id=12, contenu=fff
+[2025-12-02 17:00:27] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:27] Fetched posts rows: 5
+[2025-12-02 17:00:35] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:36] Add comment request parent_id=10, send_by=yyyy, contenu=yyyyy
+[2025-12-02 17:00:36] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:36] Fetched posts rows: 6
+[2025-12-02 17:00:39] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:39] Fetched posts rows: 6
+[2025-12-02 17:00:44] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:44] Fetched posts rows: 6
+[2025-12-02 17:00:45] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:45] Fetched posts rows: 6
+[2025-12-02 17:00:45] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:45] Fetched posts rows: 6
+[2025-12-02 17:00:45] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:45] Fetched posts rows: 6
+[2025-12-02 17:00:45] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-02 17:00:45] Fetched posts rows: 6

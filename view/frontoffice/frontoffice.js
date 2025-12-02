@@ -537,14 +537,32 @@ function toggleCommentsForPost(postId) {
                 if (!post.comments || post.comments.length === 0) {
                     commentsDisplay.innerHTML = '<div style="color:#666;font-style:italic;">Aucun commentaire</div>';
                 } else {
-                    post.comments.forEach(comment => {
+                    // Organize comments into a map for easy nesting
+                    const commentMap = {};
+                    const rootComments = [];
+
+                    post.comments.forEach(c => {
+                        c.replies = [];
+                        commentMap[c.id] = c;
+                    });
+
+                    post.comments.forEach(c => {
+                        if (c.reply_to_id && commentMap[c.reply_to_id]) {
+                            commentMap[c.reply_to_id].replies.push(c);
+                        } else {
+                            rootComments.push(c);
+                        }
+                    });
+
+                    // Recursive function to render comments
+                    function renderCommentTree(comment, level = 0) {
                         const commentDiv = document.createElement('div');
-                        commentDiv.className = 'comment-item'; // Added class for event delegation
-                        commentDiv.style.background = '#f9f9f9';
-                        commentDiv.style.padding = '10px';
-                        commentDiv.style.marginBottom = '8px';
-                        commentDiv.style.borderRadius = '6px';
-                        commentDiv.style.border = '1px solid #e0e0e0';
+                        commentDiv.className = 'comment-item';
+                        if (level > 0) {
+                            commentDiv.classList.add('nested');
+                            commentDiv.style.marginLeft = (level * 20) + 'px';
+                        }
+                        commentDiv.dataset.commentId = comment.id;
 
                         const author = escapeHtml(comment.send_by || 'Anonyme');
                         const body = escapeHtml(comment.contenu || '');
@@ -564,9 +582,15 @@ function toggleCommentsForPost(postId) {
                         commentDiv.innerHTML = `
                             <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
                                 <div style="flex:1">
-                                    <div class="comment-author-label" style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
-                                    <div class="comment-content" style="color:#333;">${body}</div>
+                                    <div class="comment-author-label">${author}</div>
+                                    <div class="comment-content">${body}</div>
                                     ${commentAttachmentHTML}
+                                    <div style="margin-top:8px;">
+                                        <button class="reply-comment-btn" data-comment-id="${comment.id}" data-post-id="${postId}">Répondre</button>
+                                    </div>
+                                    <div class="reply-form-container" id="reply-form-${comment.id}" style="display:none;margin-top:10px;">
+                                        <!-- Reply form will be injected here -->
+                                    </div>
                                 </div>
                                 <div style="flex:0 0 auto;display:flex;gap:6px;">
                                     <button class="edit-comment btn btn-sm btn-primary" data-comment-id="${comment.id}" style="padding:6px 8px;border-radius:4px;font-size:0.85em;">Modifier</button>
@@ -575,7 +599,14 @@ function toggleCommentsForPost(postId) {
                             </div>
                         `;
                         commentsDisplay.appendChild(commentDiv);
-                    });
+
+                        // Render replies
+                        if (comment.replies && comment.replies.length > 0) {
+                            comment.replies.forEach(reply => renderCommentTree(reply, level + 1));
+                        }
+                    }
+
+                    rootComments.forEach(c => renderCommentTree(c));
                 }
 
                 commentsSection.style.display = 'block';
@@ -699,6 +730,82 @@ postsContainer.addEventListener('click', function (e) {
     }
 
 
+    // Reply to a comment (Show form)
+    const clickedReplyBtn = e.target.closest('.reply-comment-btn');
+    if (clickedReplyBtn) {
+        e.preventDefault();
+        const commentId = clickedReplyBtn.getAttribute('data-comment-id');
+        const postId = clickedReplyBtn.getAttribute('data-post-id');
+        const formContainer = document.getElementById(`reply-form-${commentId}`);
+
+        if (formContainer.style.display === 'block') {
+            formContainer.style.display = 'none';
+            return;
+        }
+
+        // Inject form if empty or only contains comments
+        if (!formContainer.querySelector('.reply-box')) {
+            formContainer.innerHTML = `
+                <div class="reply-box">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <input class="reply-author" placeholder="Votre nom" />
+                        <input class="reply-input" placeholder="Votre réponse..." />
+                        <button class="submit-reply-btn btn btn-sm btn-primary" data-parent-comment-id="${commentId}" data-post-id="${postId}">Envoyer</button>
+                    </div>
+                </div>
+            `;
+        }
+        formContainer.style.display = 'block';
+        formContainer.querySelector('.reply-input').focus();
+    }
+
+    // Submit reply
+    const clickedSubmitReply = e.target.closest('.submit-reply-btn');
+    if (clickedSubmitReply) {
+        const parentCommentId = clickedSubmitReply.getAttribute('data-parent-comment-id');
+        const postId = clickedSubmitReply.getAttribute('data-post-id');
+        const container = clickedSubmitReply.closest('.reply-box');
+        const input = container.querySelector('.reply-input');
+        const authorInput = container.querySelector('.reply-author');
+
+        const text = input.value.trim();
+        const author = (authorInput && authorInput.value.trim()) || 'Anonyme';
+
+        if (text.length === 0) { alert('Veuillez écrire une réponse.'); return; }
+
+        const formData = new FormData();
+        formData.append('parent_id', postId); // The post ID is still the main parent
+        formData.append('reply_to_id', parentCommentId); // The comment we are replying to
+        formData.append('contenu', text);
+        formData.append('send_by', author);
+
+        clickedSubmitReply.disabled = true;
+        fetch(API_URL, { method: 'POST', body: formData })
+            .then(parseJsonSafe)
+            .then(data => {
+                if (data && data.success) {
+                    // Refresh comments for this post
+                    toggleCommentsForPost(postId);
+                    // Force refresh if it was already open (toggle closes it, so we might need to call it twice or just re-fetch)
+                    // Actually toggleCommentsForPost toggles visibility. If we want to refresh, we should just call the fetch logic again.
+                    // But toggleCommentsForPost is simple: if visible, it hides. 
+                    // Let's just hide and show again to refresh, or better: manually trigger a refresh.
+                    // For now, let's just re-open it.
+                    const commentsSection = document.querySelector(`.comments-section[data-post-id="${postId}"]`);
+                    if (commentsSection) commentsSection.style.display = 'none'; // force close
+                    setTimeout(() => toggleCommentsForPost(postId), 50); // re-open
+                } else {
+                    alert('Erreur lors de la réponse: ' + (data && data.error ? data.error : ''));
+                    clickedSubmitReply.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error('Reply submit error', err);
+                alert('Impossible d\'envoyer la réponse.');
+                clickedSubmitReply.disabled = false;
+            });
+    }
+
     // Edit/delete comments (future: only allow if user is author or admin)
     const clickedEditComment = e.target.closest('.edit-comment');
     if (clickedEditComment) {
@@ -726,7 +833,11 @@ postsContainer.addEventListener('click', function (e) {
                 .then(parseJsonSafe)
                 .then(data => {
                     if (data && data.success) {
-                        fetchComments();
+                        // Refresh comments
+                        const postId = commentEl.closest('.comments-section').getAttribute('data-post-id');
+                        const commentsSection = document.querySelector(`.comments-section[data-post-id="${postId}"]`);
+                        if (commentsSection) commentsSection.style.display = 'none';
+                        setTimeout(() => toggleCommentsForPost(postId), 50);
                     } else {
                         alert('Erreur lors de la mise à jour du commentaire: ' + (data && data.error ? data.error : ''));
                     }
@@ -748,7 +859,13 @@ postsContainer.addEventListener('click', function (e) {
         fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `id=${encodeURIComponent(commentId)}` })
             .then(parseJsonSafe)
             .then(data => {
-                if (data && data.success) { fetchComments(); } else { alert('Erreur lors de la suppression: ' + (data && data.error ? data.error : '')); }
+                if (data && data.success) {
+                    // Refresh comments
+                    const postId = commentEl.closest('.comments-section').getAttribute('data-post-id');
+                    const commentsSection = document.querySelector(`.comments-section[data-post-id="${postId}"]`);
+                    if (commentsSection) commentsSection.style.display = 'none';
+                    setTimeout(() => toggleCommentsForPost(postId), 50);
+                } else { alert('Erreur lors de la suppression: ' + (data && data.error ? data.error : '')); }
             })
             .catch(err => { console.error('Delete comment error', err); alert('Erreur lors de la suppression du commentaire.'); })
             .finally(() => { btn.disabled = false; btn.textContent = prevText; });

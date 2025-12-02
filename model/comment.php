@@ -5,25 +5,29 @@ class Comment {
     private ?int $id;
     private string $send_by;
     private ?int $comment_id; // parent post id
+    private ?int $reply_to_id; // parent comment id (for nested replies)
     private string $contenu;
     private string $time;
 
-    public function __construct($id = null, $send_by = '', $contenu = '', $time = '', $comment_id = null) {
+    public function __construct($id = null, $send_by = '', $contenu = '', $time = '', $comment_id = null, $reply_to_id = null) {
         $this->id = $id;
         $this->send_by = $send_by;
         $this->contenu = $contenu;
         $this->time = $time;
         $this->comment_id = $comment_id;
+        $this->reply_to_id = $reply_to_id;
     }
     public function getId() { return $this->id; }
     public function getSendBy() { return $this->send_by; }
     public function getContenu() { return $this->contenu; }
     public function getTime() { return $this->time; }
     public function getCommentId() { return $this->comment_id; }
+    public function getReplyToId() { return $this->reply_to_id; }
     public function setSendBy($send_by) { $this->send_by = $send_by; }
     public function setContenu($contenu) { $this->contenu = $contenu; }
     public function setTime($time) { $this->time = $time; }
     public function setCommentId($comment_id) { $this->comment_id = $comment_id; }
+    public function setReplyToId($reply_to_id) { $this->reply_to_id = $reply_to_id; }
 }
 
 class CommentCRUD {
@@ -51,6 +55,10 @@ class CommentCRUD {
             $col = $db->query("SHOW COLUMNS FROM comments LIKE 'comment id'")->fetch();
             if (!$col) {
                 $db->exec("ALTER TABLE comments ADD COLUMN `comment id` INT NULL AFTER time");
+            }
+            $col = $db->query("SHOW COLUMNS FROM comments LIKE 'reply_to_id'")->fetch();
+            if (!$col) {
+                $db->exec("ALTER TABLE comments ADD COLUMN reply_to_id INT NULL AFTER `comment id`");
             }
         } catch (Exception $_) {
             // ignore migration failures
