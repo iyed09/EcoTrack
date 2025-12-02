@@ -533,16 +533,43 @@ function toggleCommentsForPost(postId) {
         if (!post.comments || post.comments.length === 0) {
             commentsList.innerHTML = '<div style="color:#666;font-style:italic;">Aucun commentaire</div>';
         } else {
-            post.comments.forEach(comment => {
+            // Organize comments into a tree structure
+            const commentMap = {};
+            const rootComments = [];
+
+            // Initialize all comments with empty replies array
+            post.comments.forEach(c => {
+                c.replies = [];
+                commentMap[c.id] = c;
+            });
+
+            // Build the tree structure
+            post.comments.forEach(c => {
+                if (c.reply_to_id && commentMap[c.reply_to_id]) {
+                    commentMap[c.reply_to_id].replies.push(c);
+                } else {
+                    rootComments.push(c);
+                }
+            });
+
+            // Function to render a single comment (root level or reply)
+            function renderComment(comment, postId, isReply = false) {
                 const commentDiv = document.createElement('div');
-                commentDiv.style.background = '#f9f9f9';
+                commentDiv.style.background = isReply ? '#f0f8f2' : '#f9f9f9';
                 commentDiv.style.padding = '10px';
                 commentDiv.style.marginBottom = '8px';
                 commentDiv.style.borderRadius = '6px';
                 commentDiv.style.border = '1px solid #e0e0e0';
+                if (isReply) {
+                    commentDiv.style.marginLeft = '20px';
+                    commentDiv.style.borderLeft = '3px solid #60c072';
+                }
+                commentDiv.dataset.commentId = comment.id;
+                commentDiv.classList.add('comment-item');
 
                 const author = escapeHtml(comment.send_by || 'Anonyme');
                 const body = escapeHtml(comment.contenu || '');
+                const replyCount = (comment.replies && comment.replies.length > 0) ? comment.replies.length : 0;
 
                 // Build attachment HTML if present
                 let commentAttachmentHTML = '';
@@ -556,12 +583,24 @@ function toggleCommentsForPost(postId) {
                     }
                 }
 
+                // Build replies section HTML (hidden by default)
+                let repliesSectionHTML = '';
+                if (replyCount > 0) {
+                    repliesSectionHTML = `
+                        <div class="replies-section" data-comment-id="${comment.id}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;">
+                            <div class="replies-list" data-comment-id="${comment.id}"></div>
+                        </div>
+                    `;
+                }
+
                 commentDiv.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
                         <div style="flex:1">
                             <div style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
                             <div style="color:#333;">${body}</div>
                             ${commentAttachmentHTML}
+                            ${replyCount > 0 ? `<div style="margin-top:8px;"><button class="view-replies-btn" data-comment-id="${comment.id}" data-post-id="${postId}" style="background:#60c072;color:#fff;border:none;padding:6px 10px;border-radius:4px;font-size:0.85em;cursor:pointer;">💬 Voir ${replyCount} réponse(s)</button></div>` : ''}
+                            ${repliesSectionHTML}
                         </div>
                         <div style="flex:0 0 auto;display:flex;gap:6px;">
                             <button class="edit-comment-btn" data-comment-id="${comment.id}" data-post-id="${postId}" style="background:#2b6f2e;color:#fff;border:none;padding:6px 8px;border-radius:4px;font-size:0.85em;">Modifier</button>
@@ -569,12 +608,166 @@ function toggleCommentsForPost(postId) {
                         </div>
                     </div>
                 `;
+                return commentDiv;
+            }
+
+            // Render all root comments (only top-level comments, not replies)
+            rootComments.forEach(c => {
+                const commentDiv = renderComment(c, postId, false);
                 commentsList.appendChild(commentDiv);
             });
         }
 
         commentsSection.style.display = 'block';
     }
+}
+
+/**
+ * Toggles the visibility of replies for a specific comment
+ * @param {string|number} commentId - The ID of the comment whose replies to toggle
+ * @param {string|number} postId - The ID of the post containing the comment
+ */
+function toggleRepliesForComment(commentId, postId) {
+    const commentItem = document.querySelector(`.comment-item[data-comment-id="${commentId}"]`);
+    if (!commentItem) return;
+
+    const repliesSection = commentItem.querySelector(`.replies-section[data-comment-id="${commentId}"]`);
+    const repliesList = commentItem.querySelector(`.replies-list[data-comment-id="${commentId}"]`);
+    const viewRepliesBtn = commentItem.querySelector(`.view-replies-btn[data-comment-id="${commentId}"]`);
+
+    if (!repliesSection || !repliesList) return;
+
+    const isVisible = repliesSection.style.display !== 'none';
+    
+    if (isVisible) {
+        repliesSection.style.display = 'none';
+        if (viewRepliesBtn) {
+            const post = posts.find(x => String(x.id) === String(postId));
+            if (post) {
+                const comment = findCommentInPost(post, commentId);
+                if (comment && comment.replies) {
+                    viewRepliesBtn.textContent = `💬 Voir ${comment.replies.length} réponse(s)`;
+                }
+            }
+        }
+    } else {
+        // Find the comment and its replies
+        const post = posts.find(x => String(x.id) === String(postId));
+        if (!post) return;
+
+        const comment = findCommentInPost(post, commentId);
+        if (!comment || !comment.replies || comment.replies.length === 0) return;
+
+        // Clear existing replies in the list
+        repliesList.innerHTML = '';
+
+        // Recursive function to render a reply and its nested structure
+        function renderReply(reply, postId, parentElement) {
+            const replyDiv = document.createElement('div');
+            replyDiv.style.background = '#f0f8f2';
+            replyDiv.style.padding = '10px';
+            replyDiv.style.marginBottom = '8px';
+            replyDiv.style.borderRadius = '6px';
+            replyDiv.style.border = '1px solid #e0e0e0';
+            replyDiv.style.borderLeft = '3px solid #60c072';
+            replyDiv.style.marginLeft = '20px';
+            replyDiv.dataset.commentId = reply.id;
+            replyDiv.classList.add('comment-item');
+
+            const author = escapeHtml(reply.send_by || 'Anonyme');
+            const body = escapeHtml(reply.contenu || '');
+            const replyCount = (reply.replies && reply.replies.length > 0) ? reply.replies.length : 0;
+
+            // Build attachment HTML if present
+            let replyAttachmentHTML = '';
+            if (reply.attachment) {
+                const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(reply.attachment);
+                if (isImage) {
+                    replyAttachmentHTML = `<div style="margin-top:6px;"><img src="../../${escapeHtml(reply.attachment)}" style="max-width:200px;max-height:200px;border-radius:4px;border:1px solid #ccc;" alt="Attachment" /></div>`;
+                } else {
+                    const fileName = reply.attachment.split('/').pop();
+                    replyAttachmentHTML = `<div style="margin-top:6px;"><a href="../../${escapeHtml(reply.attachment)}" target="_blank" style="color:#357a38;text-decoration:none;font-size:0.9em;">📎 ${escapeHtml(fileName)}</a></div>`;
+                }
+            }
+
+            // Build nested replies section if this reply has replies
+            let nestedRepliesHTML = '';
+            if (replyCount > 0) {
+                nestedRepliesHTML = `
+                    <div class="replies-section" data-comment-id="${reply.id}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #e0e0e0;">
+                        <div class="replies-list" data-comment-id="${reply.id}"></div>
+                    </div>
+                `;
+            }
+
+            replyDiv.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
+                    <div style="flex:1">
+                        <div style="font-weight:600;color:#2b3b36;margin-bottom:4px;">${author}</div>
+                        <div style="color:#333;">${body}</div>
+                        ${replyAttachmentHTML}
+                        ${replyCount > 0 ? `<div style="margin-top:8px;"><button class="view-replies-btn" data-comment-id="${reply.id}" data-post-id="${postId}" style="background:#60c072;color:#fff;border:none;padding:6px 10px;border-radius:4px;font-size:0.85em;cursor:pointer;">💬 Voir ${replyCount} réponse(s)</button></div>` : ''}
+                        ${nestedRepliesHTML}
+                    </div>
+                    <div style="flex:0 0 auto;display:flex;gap:6px;">
+                        <button class="edit-comment-btn" data-comment-id="${reply.id}" data-post-id="${postId}" style="background:#2b6f2e;color:#fff;border:none;padding:6px 8px;border-radius:4px;font-size:0.85em;">Modifier</button>
+                        <button class="delete-comment-btn" data-comment-id="${reply.id}" style="background:#D9534F;color:#fff;border:none;padding:6px 8px;border-radius:4px;font-size:0.85em;">Supprimer</button>
+                    </div>
+                </div>
+            `;
+            parentElement.appendChild(replyDiv);
+        }
+
+        // Render each reply
+        comment.replies.forEach(reply => {
+            renderReply(reply, postId, repliesList);
+        });
+
+        repliesSection.style.display = 'block';
+        if (viewRepliesBtn) {
+            viewRepliesBtn.textContent = `🔽 Masquer les réponses`;
+        }
+    }
+}
+
+/**
+ * Helper function to find a comment in a post's comment tree
+ * @param {Object} post - The post object
+ * @param {string|number} commentId - The ID of the comment to find
+ * @returns {Object|null} - The comment object or null if not found
+ */
+function findCommentInPost(post, commentId) {
+    if (!post.comments || !Array.isArray(post.comments)) return null;
+
+    // First, build the comment tree
+    const commentMap = {};
+    post.comments.forEach(c => {
+        c.replies = [];
+        commentMap[c.id] = c;
+    });
+
+    post.comments.forEach(c => {
+        if (c.reply_to_id && commentMap[c.reply_to_id]) {
+            commentMap[c.reply_to_id].replies.push(c);
+        }
+    });
+
+    // Recursive function to search for comment
+    function searchComment(comments, targetId) {
+        for (const comment of comments) {
+            if (String(comment.id) === String(targetId)) {
+                return comment;
+            }
+            if (comment.replies && comment.replies.length > 0) {
+                const found = searchComment(comment.replies, targetId);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
+    // Search in all comments (including nested ones)
+    return searchComment(Object.values(commentMap), commentId);
 }
 
 /**
@@ -897,6 +1090,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     showBackofficeMessage('Erreur lors de la suppression. ' + (raw ? '\nRaw response:\n' + raw : 'Voir console pour détails.'), true);
                 })
                 .finally(() => { btn.disabled = false; btn.textContent = prev; });
+        }
+
+        // View replies for a comment
+        if (e.target.classList && e.target.classList.contains('view-replies-btn')) {
+            const commentId = e.target.getAttribute('data-comment-id');
+            const postId = e.target.getAttribute('data-post-id');
+            toggleRepliesForComment(commentId, postId);
         }
 
         // Toolbar: refresh
