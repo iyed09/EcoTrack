@@ -14,6 +14,44 @@ console.log('frontoffice.js loaded — API:', API_URL);
 window.addEventListener('error', function (ev) { console.error('Global JS error', ev); });
 window.addEventListener('unhandledrejection', function (ev) { console.error('Unhandled promise rejection', ev); });
 
+/**
+ * Records a modification in localStorage for backoffice stats tracking
+ * @param {string} type - 'post' or 'comment'
+ * @param {string|number} id - The ID of the modified item
+ * @param {string} author - The author name
+ * @param {string} content - The new content
+ * @param {string} originalContent - The original content before modification
+ */
+function recordModificationForBackoffice(type, id, author, content, originalContent) {
+    try {
+        const modification = {
+            type: type === 'post' ? 'Publication' : 'Commentaire',
+            id: String(id),
+            author: author || 'Anonyme',
+            content: content || '',
+            original: originalContent || '',
+            time: new Date().toLocaleTimeString(),
+            timestamp: Date.now()
+        };
+        
+        // Get existing modifications from localStorage
+        const existingMods = JSON.parse(localStorage.getItem('ecotrack_modifications') || '[]');
+        
+        // Add new modification
+        existingMods.push(modification);
+        
+        // Keep only last 100 modifications to avoid localStorage overflow
+        const trimmedMods = existingMods.slice(-100);
+        
+        // Store back in localStorage
+        localStorage.setItem('ecotrack_modifications', JSON.stringify(trimmedMods));
+        
+        console.log('Modification recorded for backoffice:', modification);
+    } catch (err) {
+        console.error('Error recording modification for backoffice:', err);
+    }
+}
+
 // Helper: parse JSON only if server returned JSON
 function parseJsonSafe(response) {
     const ct = response.headers.get('content-type') || '';
@@ -31,6 +69,35 @@ function escapeHtml(unsafe) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+/**
+ * Validates author name to prevent special characters
+ * @param {string} authorName - The author name to validate
+ * @returns {Object} - { valid: boolean, error: string } - Validation result
+ */
+function validateAuthorName(authorName) {
+    // Allow empty names (optional field) but validate if provided
+    if (!authorName || !authorName.trim()) {
+        return { valid: true, error: '' }; // Empty is allowed (optional field)
+    }
+
+    // Define forbidden special characters: . > ? ! and other potentially problematic characters
+    const forbiddenChars = /[.>?!<>{}[\]\\|`~@#$%^&*()+=\/;:"'`]/;
+    
+    if (forbiddenChars.test(authorName)) {
+        return { 
+            valid: false, 
+            error: 'Le nom d\'auteur ne peut pas contenir de caractères spéciaux comme . > ? ! < > { } [ ] \\ | ` ~ @ # $ % ^ & * ( ) + = / ; : " \' ou d\'autres caractères spéciaux.' 
+        };
+    }
+
+    // Check length (reasonable limit)
+    if (authorName.length > 100) {
+        return { valid: false, error: 'Le nom d\'auteur ne peut pas dépasser 100 caractères.' };
+    }
+
+    return { valid: true, error: '' };
 }
 
 // Ouvre la modale de création de post
@@ -162,7 +229,7 @@ function renderComments(list) {
             </div>
             <div class="comments-zone" style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;">
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                    <input class="comment-author" placeholder="Votre nom (optionnel)" style="width:160px;padding:8px;border:1px solid #ddd;border-radius:6px;" />
+                    <input class="comment-author" placeholder="Votre nom (optionnel)" style="width:160px;padding:8px;border:1px solid #ddd;border-radius:6px;" title="Caractères spéciaux interdits: . > ? ! < > { } [ ] \ | ` ~ @ # $ % ^ & * ( ) + = / ; : &quot; ' etc." />
                     <input class="comment-input" placeholder="Écrire un commentaire..." style="flex:1;min-width:200px;padding:8px;border:1px solid #ddd;border-radius:6px;" />
                     <input class="comment-attachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;" data-post-id="${item.id}" />
                     <button class="attach-file-btn btn btn-secondary" data-post-id="${item.id}" style="padding:8px 12px;">📎</button>
@@ -212,6 +279,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 modal.addEventListener('click', function (ev) { if (ev.target === modal) modal.style.display = 'none'; });
             }
             modal.style.display = 'flex';
+        });
+    }
+
+    // Add real-time validation for author name input
+    if (postAuthor) {
+        const postAuthorError = document.getElementById('postAuthorError');
+        postAuthor.addEventListener('input', function() {
+            const authorValue = this.value;
+            const validation = validateAuthorName(authorValue);
+            
+            if (authorValue.trim() && !validation.valid) {
+                this.style.border = '2px solid #D9534F';
+                this.style.backgroundColor = '#fff5f5';
+                if (postAuthorError) {
+                    postAuthorError.textContent = validation.error;
+                    postAuthorError.style.display = 'block';
+                }
+            } else {
+                this.style.border = '';
+                this.style.backgroundColor = '';
+                if (postAuthorError) {
+                    postAuthorError.style.display = 'none';
+                }
+            }
+        });
+        
+        postAuthor.addEventListener('blur', function() {
+            const authorValue = this.value;
+            const validation = validateAuthorName(authorValue);
+            
+            if (authorValue.trim() && !validation.valid) {
+                this.style.border = '2px solid #D9534F';
+                this.style.backgroundColor = '#fff5f5';
+                if (postAuthorError) {
+                    postAuthorError.textContent = validation.error;
+                    postAuthorError.style.display = 'block';
+                }
+            } else {
+                this.style.border = '';
+                this.style.backgroundColor = '';
+                if (postAuthorError) {
+                    postAuthorError.style.display = 'none';
+                }
+            }
         });
     }
 
@@ -358,10 +469,35 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('submitPost clicked', { editingPostId, editingCommentId, contentPreview: postContent ? postContent.value : null });
             const content = postContent ? postContent.value.trim() : '';
             const sendBy = (postAuthor && postAuthor.value ? postAuthor.value : 'Anonyme').trim();
+            
+            // Validate content
             if (content.length === 0) {
                 alert('Veuillez écrire quelque chose pour publier.');
                 return;
             }
+            
+            // Validate author name if provided
+            if (sendBy && sendBy !== 'Anonyme') {
+                const authorValidation = validateAuthorName(sendBy);
+                if (!authorValidation.valid) {
+                    alert(authorValidation.error);
+                    const postAuthorError = document.getElementById('postAuthorError');
+                    if (postAuthorError && postAuthor) {
+                        postAuthorError.textContent = authorValidation.error;
+                        postAuthorError.style.display = 'block';
+                        postAuthor.style.border = '2px solid #D9534F';
+                        postAuthor.style.backgroundColor = '#fff5f5';
+                        setTimeout(() => {
+                            postAuthorError.style.display = 'none';
+                            postAuthor.style.border = '';
+                            postAuthor.style.backgroundColor = '';
+                        }, 5000);
+                        postAuthor.focus();
+                    }
+                    return;
+                }
+            }
+            
             submitPost.disabled = true;
             // Play animation immediately to show the post is being published
             try {
@@ -391,6 +527,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).then(parseJsonSafe).then(data => {
                     console.log('Update post response', data);
                     if (data && data.success) {
+                        // Record modification for backoffice stats
+                        const originalContent = postContent.getAttribute('data-original-content') || '';
+                        const originalAuthor = postAuthor.getAttribute('data-original-author') || '';
+                        recordModificationForBackoffice('post', editingPostId, sendBy, content, originalContent);
+                        
                         editingPostId = null; editingCommentId = null;
                         if (modal) {
                             modal.classList.remove('open');
@@ -398,6 +539,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             setTimeout(() => { modal.style.display = 'none'; }, 260);
                         }
                         postContent.value = ''; postAuthor.value = '';
+                        postContent.removeAttribute('data-original-content');
+                        postAuthor.removeAttribute('data-original-author');
                         if (postAttachment) postAttachment.value = '';
                         filePreview.style.display = 'none';
                         fetchComments();
@@ -652,6 +795,25 @@ postsContainer.addEventListener('click', function (e) {
         const author = (authorInput && authorInput.value.trim()) || 'Anonyme';
         console.log('Comment submit', { parentId: clickedCommentBtn.getAttribute('data-parent-id'), author, text });
         if (text.length === 0) { alert('Écris un commentaire avant de répondre.'); return; }
+        
+        // Validate author name if provided
+        if (author && author !== 'Anonyme') {
+            const authorValidation = validateAuthorName(author);
+            if (!authorValidation.valid) {
+                alert(authorValidation.error);
+                if (authorInput) {
+                    authorInput.style.border = '2px solid #D9534F';
+                    authorInput.style.backgroundColor = '#fff5f5';
+                    setTimeout(() => {
+                        authorInput.style.border = '';
+                        authorInput.style.backgroundColor = '';
+                    }, 3000);
+                    authorInput.focus();
+                }
+                return;
+            }
+        }
+        
         const parentId = clickedCommentBtn.getAttribute('data-parent-id');
         // Add comment to existing post using parent_id
         const formData = new FormData();
@@ -686,8 +848,13 @@ postsContainer.addEventListener('click', function (e) {
         fetch(API_URL).then(parseJsonSafe).then(data => {
             const post = (data || []).find(p => String(p.id) === String(id));
             if (!post) { alert('Publication introuvable.'); return; }
-            document.getElementById('postAuthor').value = post.send_by || '';
-            document.getElementById('postContent').value = post.contenu || '';
+            const originalContent = post.contenu || '';
+            const originalAuthor = post.send_by || '';
+            document.getElementById('postAuthor').value = originalAuthor;
+            document.getElementById('postContent').value = originalContent;
+            // Store original content in data attributes for later use
+            document.getElementById('postContent').setAttribute('data-original-content', originalContent);
+            document.getElementById('postAuthor').setAttribute('data-original-author', originalAuthor);
             // Display modal using the same UI flow as the Create modal
             modal.style.display = 'flex';
             modal.classList.add('open');
@@ -748,7 +915,7 @@ postsContainer.addEventListener('click', function (e) {
             formContainer.innerHTML = `
                 <div class="reply-box">
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <input class="reply-author" placeholder="Votre nom" />
+                        <input class="reply-author" placeholder="Votre nom" title="Caractères spéciaux interdits: . > ? ! < > { } [ ] \ | ` ~ @ # $ % ^ & * ( ) + = / ; : &quot; ' etc." />
                         <input class="reply-input" placeholder="Votre réponse..." />
                         <button class="submit-reply-btn btn btn-sm btn-primary" data-parent-comment-id="${commentId}" data-post-id="${postId}">Envoyer</button>
                     </div>
@@ -772,6 +939,24 @@ postsContainer.addEventListener('click', function (e) {
         const author = (authorInput && authorInput.value.trim()) || 'Anonyme';
 
         if (text.length === 0) { alert('Veuillez écrire une réponse.'); return; }
+        
+        // Validate author name if provided
+        if (author && author !== 'Anonyme') {
+            const authorValidation = validateAuthorName(author);
+            if (!authorValidation.valid) {
+                alert(authorValidation.error);
+                if (authorInput) {
+                    authorInput.style.border = '2px solid #D9534F';
+                    authorInput.style.backgroundColor = '#fff5f5';
+                    setTimeout(() => {
+                        authorInput.style.border = '';
+                        authorInput.style.backgroundColor = '';
+                    }, 3000);
+                    authorInput.focus();
+                }
+                return;
+            }
+        }
 
         const formData = new FormData();
         formData.append('parent_id', postId); // The post ID is still the main parent
@@ -827,12 +1012,17 @@ postsContainer.addEventListener('click', function (e) {
             const newContent = editInput.value.trim();
             if (!newContent) return alert('Le commentaire ne peut pas être vide.');
             const commentId = clickedEditComment.getAttribute('data-comment-id');
+            const originalContent = contentEl.textContent || '';
+            const author = authorEl ? authorEl.textContent : 'Anonyme';
             console.log('Updating comment', { commentId, newContent });
             // send update to backend with comment id
             fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `id=${encodeURIComponent(commentId)}&contenu=${encodeURIComponent(newContent)}` })
                 .then(parseJsonSafe)
                 .then(data => {
                     if (data && data.success) {
+                        // Record modification for backoffice stats
+                        recordModificationForBackoffice('comment', commentId, author, newContent, originalContent);
+                        
                         // Refresh comments
                         const postId = commentEl.closest('.comments-section').getAttribute('data-post-id');
                         const commentsSection = document.querySelector(`.comments-section[data-post-id="${postId}"]`);

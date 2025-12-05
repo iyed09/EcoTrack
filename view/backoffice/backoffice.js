@@ -30,6 +30,7 @@ let commentCount = 0;    // Total comments across all posts
 let editCount = 0;       // Number of edits made
 let deleteCount = 0;     // Number of deletions made
 let modifiedItems = [];  // Track details of modified items for display
+let processedModificationTimestamps = new Set(); // Track processed modifications to avoid duplicates
 
 // ============================================================================
 // DASHBOARD UPDATE FUNCTIONS
@@ -92,6 +93,66 @@ function updateDashboard() {
     });
 }
 
+/**
+ * Synchronizes modifications from frontoffice stored in localStorage
+ * Reads modifications made in frontoffice and updates backoffice stats
+ */
+function syncModificationsFromFrontoffice() {
+    try {
+        const storedMods = JSON.parse(localStorage.getItem('ecotrack_modifications') || '[]');
+        if (!Array.isArray(storedMods) || storedMods.length === 0) {
+            return; // No modifications to sync
+        }
+
+        let newModsCount = 0;
+        const processedTimestamps = [];
+
+        storedMods.forEach(mod => {
+            // Check if this modification was already processed
+            if (mod.timestamp && processedModificationTimestamps.has(mod.timestamp)) {
+                return; // Skip already processed modifications
+            }
+
+            // Add to modified items with source indicator
+            modifiedItems.push({
+                type: mod.type || 'Publication',
+                id: mod.id,
+                author: mod.author || 'Anonyme',
+                content: mod.content || '',
+                original: mod.original || '',
+                time: mod.time || new Date().toLocaleTimeString(),
+                source: 'frontoffice' // Mark as coming from frontoffice
+            });
+
+            // Mark as processed
+            if (mod.timestamp) {
+                processedModificationTimestamps.add(mod.timestamp);
+                processedTimestamps.push(mod.timestamp);
+            }
+
+            // Increment edit count
+            editCount++;
+            newModsCount++;
+        });
+
+        // Remove processed modifications from localStorage (keep unprocessed ones)
+        if (processedTimestamps.length > 0) {
+            const remainingMods = storedMods.filter(mod => 
+                !mod.timestamp || !processedTimestamps.includes(mod.timestamp)
+            );
+            localStorage.setItem('ecotrack_modifications', JSON.stringify(remainingMods));
+        }
+
+        // Update dashboard if there were new modifications
+        if (newModsCount > 0) {
+            updateDashboard();
+            console.log(`Synchronized ${newModsCount} modification(s) from frontoffice`);
+        }
+    } catch (err) {
+        console.error('Error syncing modifications from frontoffice:', err);
+    }
+}
+
 // ============================================================================
 // USER FEEDBACK FUNCTIONS
 // ============================================================================
@@ -148,6 +209,79 @@ function escapeHtml(text) {
     return String(text).replace(/[&<>"']/g, function (s) {
         return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[s]);
     });
+}
+
+/**
+ * Validates author name to prevent special characters
+ * @param {string} authorName - The author name to validate
+ * @returns {Object} - { valid: boolean, error: string } - Validation result
+ */
+function validateAuthorName(authorName) {
+    if (!authorName || !authorName.trim()) {
+        return { valid: false, error: 'Le nom d\'auteur ne peut pas être vide.' };
+    }
+
+    // Define forbidden special characters: . > ? ! and other potentially problematic characters
+    const forbiddenChars = /[.>?!<>{}[\]\\|`~@#$%^&*()+=\/;:"'`]/;
+    
+    if (forbiddenChars.test(authorName)) {
+        return { 
+            valid: false, 
+            error: 'Le nom d\'auteur ne peut pas contenir de caractères spéciaux comme . > ? ! < > { } [ ] \\ | ` ~ @ # $ % ^ & * ( ) + = / ; : " \' ou d\'autres caractères spéciaux.' 
+        };
+    }
+
+    // Check for only whitespace
+    if (!authorName.trim()) {
+        return { valid: false, error: 'Le nom d\'auteur ne peut pas être vide.' };
+    }
+
+    // Check length (reasonable limit)
+    if (authorName.length > 100) {
+        return { valid: false, error: 'Le nom d\'auteur ne peut pas dépasser 100 caractères.' };
+    }
+
+    return { valid: true, error: '' };
+}
+
+/**
+ * Resets the author field validation state
+ */
+function resetAuthorValidation() {
+    const modalAuthor = document.getElementById('modalAuthor');
+    const modalAuthorError = document.getElementById('modalAuthorError');
+    if (modalAuthor) {
+        modalAuthor.style.border = '1px solid #ddd';
+        modalAuthor.style.backgroundColor = '';
+    }
+    if (modalAuthorError) {
+        modalAuthorError.style.display = 'none';
+        modalAuthorError.textContent = '';
+    }
+}
+
+/**
+ * Displays existing file attachment in the modal
+ * @param {string} attachmentPath - The path to the existing attachment
+ */
+function displayExistingFile(attachmentPath) {
+    if (!attachmentPath) return;
+    
+    const fileUploadLabel = document.getElementById('fileUploadLabel');
+    const fileUploadText = document.getElementById('fileUploadText');
+    const fileUploadIcon = document.getElementById('fileUploadIcon');
+    const filePreview = document.getElementById('modalFilePreview');
+    const fileName = document.getElementById('modalFileName');
+    
+    if (fileUploadLabel && fileUploadText && fileUploadIcon && filePreview && fileName) {
+        const fileNameOnly = attachmentPath.split('/').pop();
+        fileUploadText.textContent = `Fichier actuel: ${fileNameOnly}`;
+        fileUploadLabel.classList.add('file-selected');
+        fileUploadIcon.textContent = '📎';
+        
+        fileName.textContent = fileNameOnly;
+        filePreview.style.display = 'block';
+    }
 }
 
 function renderPosts(postsToRender = null) {
@@ -264,21 +398,220 @@ function ensureModal() {
     modal.style.background = 'rgba(0,0,0,0.45)';
     modal.innerHTML = `<div id="commentModalContent" style="background:#fff;padding:18px;border-radius:8px;max-width:720px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,0.2);">
         <button id="closeModal" style="float:right;background:transparent;border:none;font-size:18px;">✕</button>
-        <div style="margin-bottom:8px;"><label for="modalAuthor" style="display:block;font-weight:600;margin-bottom:6px;">Auteur</label><input id="modalAuthor" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"/></div>
+        <div style="margin-bottom:8px;">
+            <label for="modalAuthor" style="display:block;font-weight:600;margin-bottom:6px;">Auteur</label>
+            <input id="modalAuthor" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;" placeholder="Nom d'auteur (caractères spéciaux interdits: . &gt; ? ! &lt; &gt; { } [ ] \ | ` ~ @ # $ % ^ &amp; * ( ) + = / ; : &quot; ' etc.)"/>
+            <div id="modalAuthorError" style="display:none;color:#D9534F;font-size:0.85em;margin-top:4px;font-weight:500;"></div>
+        </div>
         <div id="modalTime" style="color:#666;margin-bottom:12px"></div>
         <div style="margin-bottom:8px;"><label for="modalContent" style="display:block;font-weight:600;margin-bottom:6px;">Contenu</label><textarea id="modalContent" style="width:100%;min-height:120px;padding:8px;border:1px solid #ddd;border-radius:6px;"></textarea></div>
-        <div style="margin-bottom:8px;"><label for="modalAttachment" style="display:block;font-weight:600;margin-bottom:6px;">📎 Fichier joint (optionnel)</label><input id="modalAttachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"/></div>
-        <div id="modalFilePreview" style="margin-top:8px;display:none;padding:8px;background:#f0f0f0;border-radius:6px;"><span id="modalFileName"></span></div>
+        <div style="margin-bottom:8px;">
+            <label style="display:block;font-weight:600;margin-bottom:8px;">📎 Fichier joint (optionnel)</label>
+            <div style="position:relative;display:inline-block;width:100%;">
+                <input id="modalAttachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"/>
+                <label for="modalAttachment" id="fileUploadLabel" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;background:linear-gradient(135deg, #60c072 0%, #357a38 100%);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:15px;transition:all 0.3s ease;box-shadow:0 4px 15px rgba(47, 155, 74, 0.3);position:relative;overflow:hidden;">
+                    <span id="fileUploadIcon" style="font-size:20px;transition:transform 0.3s ease;">📤</span>
+                    <span id="fileUploadText">Choisir un fichier</span>
+                    <span id="fileUploadArrow" style="margin-left:auto;font-size:18px;transition:transform 0.3s ease;">→</span>
+                </label>
+            </div>
+            <div id="modalFilePreview" style="margin-top:12px;display:none;padding:12px;background:linear-gradient(135deg, #f0f8f2 0%, #e6f2e8 100%);border-radius:8px;border:2px solid #60c072;animation:slideIn 0.3s ease;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:24px;">📎</span>
+                        <span id="modalFileName" style="font-weight:600;color:#2b3b36;"></span>
+                    </div>
+                    <button id="removeFileBtn" style="background:#D9534F;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;transition:all 0.2s ease;">✕ Supprimer</button>
+                </div>
+            </div>
+        </div>
         <input type="hidden" id="modalOriginalContent" />
         <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;"><button id="modalSave" class="btn-primary">Enregistrer</button><button id="modalDelete" class="btn-danger">Supprimer</button></div>
     </div>`;
     document.body.appendChild(modal);
     document.getElementById('closeModal').addEventListener('click', closeModal);
+    
+    // Add CSS animations for file upload button
+    if (!document.getElementById('fileUploadStyles')) {
+        const style = document.createElement('style');
+        style.id = 'fileUploadStyles';
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes pulse {
+                0%, 100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+            }
+            @keyframes bounce {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-5px);
+                }
+            }
+            #fileUploadLabel:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(47, 155, 74, 0.4);
+            }
+            #fileUploadLabel:hover #fileUploadIcon {
+                transform: rotate(15deg) scale(1.1);
+            }
+            #fileUploadLabel:hover #fileUploadArrow {
+                transform: translateX(5px);
+            }
+            #fileUploadLabel:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 10px rgba(47, 155, 74, 0.3);
+            }
+            #fileUploadLabel.file-selected {
+                background: linear-gradient(135deg, #357a38 0%, #2b6f2e 100%);
+            }
+            #fileUploadLabel.file-selected #fileUploadIcon {
+                animation: bounce 0.6s ease;
+            }
+            #removeFileBtn:hover {
+                background: #c9302c !important;
+                transform: scale(1.05);
+            }
+            #removeFileBtn:active {
+                transform: scale(0.95);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Add file upload button animations and handlers
+    const fileInput = document.getElementById('modalAttachment');
+    const fileUploadLabel = document.getElementById('fileUploadLabel');
+    const fileUploadText = document.getElementById('fileUploadText');
+    const fileUploadIcon = document.getElementById('fileUploadIcon');
+    const filePreview = document.getElementById('modalFilePreview');
+    const fileName = document.getElementById('modalFileName');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+    
+    if (fileInput && fileUploadLabel) {
+        // Handle file selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Update button text and style
+                fileUploadText.textContent = `Fichier sélectionné: ${file.name}`;
+                fileUploadLabel.classList.add('file-selected');
+                fileUploadIcon.textContent = '✅';
+                
+                // Show preview
+                fileName.textContent = file.name;
+                filePreview.style.display = 'block';
+                
+                // Add pulse animation
+                fileUploadLabel.style.animation = 'pulse 0.5s ease';
+                setTimeout(() => {
+                    fileUploadLabel.style.animation = '';
+                }, 500);
+            }
+        });
+        
+        // Handle remove file button
+        if (removeFileBtn) {
+            removeFileBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Reset file input
+                fileInput.value = '';
+                
+                // Reset button
+                fileUploadText.textContent = 'Choisir un fichier';
+                fileUploadLabel.classList.remove('file-selected');
+                fileUploadIcon.textContent = '📤';
+                
+                // Hide preview
+                filePreview.style.display = 'none';
+            });
+        }
+        
+        // Add hover effects with mouse events
+        fileUploadLabel.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        fileUploadLabel.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    }
+    
+    // Add real-time validation for author name input
+    const modalAuthor = document.getElementById('modalAuthor');
+    const modalAuthorError = document.getElementById('modalAuthorError');
+    if (modalAuthor && modalAuthorError) {
+        modalAuthor.addEventListener('input', function() {
+            const authorValue = this.value;
+            const validation = validateAuthorName(authorValue);
+            
+            if (authorValue.trim() && !validation.valid) {
+                this.style.border = '2px solid #D9534F';
+                this.style.backgroundColor = '#fff5f5';
+                modalAuthorError.textContent = validation.error;
+                modalAuthorError.style.display = 'block';
+            } else {
+                this.style.border = '1px solid #ddd';
+                this.style.backgroundColor = '';
+                modalAuthorError.style.display = 'none';
+            }
+        });
+        
+        modalAuthor.addEventListener('blur', function() {
+            const authorValue = this.value;
+            const validation = validateAuthorName(authorValue);
+            
+            if (authorValue.trim() && !validation.valid) {
+                this.style.border = '2px solid #D9534F';
+                this.style.backgroundColor = '#fff5f5';
+                modalAuthorError.textContent = validation.error;
+                modalAuthorError.style.display = 'block';
+            } else {
+                this.style.border = '1px solid #ddd';
+                this.style.backgroundColor = '';
+                modalAuthorError.style.display = 'none';
+            }
+        });
+    }
+    
     document.getElementById('modalSave').addEventListener('click', function () {
         const type = this.getAttribute('data-type');
         const contenu = document.getElementById('modalContent').value;
         const send_by = document.getElementById('modalAuthor').value || '';
         const originalContent = document.getElementById('modalOriginalContent').value || '';
+
+        // Validate author name
+        const authorValidation = validateAuthorName(send_by);
+        if (!authorValidation.valid) {
+            showBackofficeMessage(authorValidation.error, true);
+            const modalAuthor = document.getElementById('modalAuthor');
+            if (modalAuthor) {
+                modalAuthor.style.border = '2px solid #D9534F';
+                modalAuthor.style.backgroundColor = '#fff5f5';
+                setTimeout(() => {
+                    modalAuthor.style.border = '1px solid #ddd';
+                    modalAuthor.style.backgroundColor = '';
+                }, 3000);
+                modalAuthor.focus();
+            }
+            return;
+        }
 
         if (type === 'post') {
             const postId = this.getAttribute('data-post-id');
@@ -306,7 +639,8 @@ function ensureModal() {
                         author: send_by,
                         content: contenu,
                         original: originalContent,
-                        time: new Date().toLocaleTimeString()
+                        time: new Date().toLocaleTimeString(),
+                        source: 'backoffice'
                     });
                     updateDashboard();
                 } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
@@ -337,7 +671,8 @@ function ensureModal() {
                         author: send_by,
                         content: contenu,
                         original: originalContent,
-                        time: new Date().toLocaleTimeString()
+                        time: new Date().toLocaleTimeString(),
+                        source: 'backoffice'
                     });
                     updateDashboard();
                 } else { showBackofficeMessage('Erreur: ' + (data && data.error ? data.error : 'Réponse invalide'), true); }
@@ -407,10 +742,37 @@ function showModalForPost(postId) {
     const modalDelete = document.getElementById('modalDelete');
     const post = posts.find(x => String(x.id) === String(postId));
     if (!post) { showBackofficeMessage('Publication introuvable', true); return; }
+    
+    // Reset validation state
+    resetAuthorValidation();
+    
+    // Reset file upload button first
+    const fileInput = document.getElementById('modalAttachment');
+    const fileUploadLabel = document.getElementById('fileUploadLabel');
+    const fileUploadText = document.getElementById('fileUploadText');
+    const fileUploadIcon = document.getElementById('fileUploadIcon');
+    const filePreview = document.getElementById('modalFilePreview');
+    
+    if (fileInput) fileInput.value = '';
+    if (fileUploadLabel) {
+        fileUploadLabel.classList.remove('file-selected');
+        fileUploadLabel.style.transform = '';
+        fileUploadLabel.style.animation = '';
+    }
+    if (fileUploadText) fileUploadText.textContent = 'Choisir un fichier';
+    if (fileUploadIcon) fileUploadIcon.textContent = '📤';
+    if (filePreview) filePreview.style.display = 'none';
+    
     modalAuthor.value = post.send_by || 'Anonyme';
     modalTime.textContent = post.time || '';
     modalContent.value = post.contenu || '';
     document.getElementById('modalOriginalContent').value = post.contenu || ''; // Capture original
+    
+    // Display existing file if present
+    if (post.attachment) {
+        displayExistingFile(post.attachment);
+    }
+    
     modalSave.setAttribute('data-post-id', post.id);
     modalSave.setAttribute('data-type', 'post');
     modalDelete.setAttribute('data-post-id', post.id);
@@ -467,10 +829,37 @@ function showModalForComment(commentId, postId) {
     if (!post) { showBackofficeMessage('Publication introuvable', true); return; }
     const c = post.comments.find(x => String(x.id) === String(commentId));
     if (!c) { showBackofficeMessage('Commentaire introuvable', true); return; }
+    
+    // Reset validation state
+    resetAuthorValidation();
+    
+    // Reset file upload button first
+    const fileInput = document.getElementById('modalAttachment');
+    const fileUploadLabel = document.getElementById('fileUploadLabel');
+    const fileUploadText = document.getElementById('fileUploadText');
+    const fileUploadIcon = document.getElementById('fileUploadIcon');
+    const filePreview = document.getElementById('modalFilePreview');
+    
+    if (fileInput) fileInput.value = '';
+    if (fileUploadLabel) {
+        fileUploadLabel.classList.remove('file-selected');
+        fileUploadLabel.style.transform = '';
+        fileUploadLabel.style.animation = '';
+    }
+    if (fileUploadText) fileUploadText.textContent = 'Choisir un fichier';
+    if (fileUploadIcon) fileUploadIcon.textContent = '📤';
+    if (filePreview) filePreview.style.display = 'none';
+    
     modalAuthor.value = c.send_by || 'Anonyme';
     modalTime.textContent = '';
     modalContent.value = c.contenu || '';
     document.getElementById('modalOriginalContent').value = c.contenu || ''; // Capture original
+    
+    // Display existing file if present
+    if (c.attachment) {
+        displayExistingFile(c.attachment);
+    }
+    
     modalSave.setAttribute('data-comment-id', c.id);
     modalSave.setAttribute('data-type', 'comment');
     modalDelete.setAttribute('data-comment-id', c.id);
@@ -786,6 +1175,26 @@ function showAddCommentModal(postId) {
     const post = posts.find(x => String(x.id) === String(postId));
     if (!post) { showBackofficeMessage('Publication introuvable', true); return; }
 
+    // Reset validation state
+    resetAuthorValidation();
+    
+    // Reset file upload button
+    const fileInput = document.getElementById('modalAttachment');
+    const fileUploadLabel = document.getElementById('fileUploadLabel');
+    const fileUploadText = document.getElementById('fileUploadText');
+    const fileUploadIcon = document.getElementById('fileUploadIcon');
+    const filePreview = document.getElementById('modalFilePreview');
+    
+    if (fileInput) fileInput.value = '';
+    if (fileUploadLabel) {
+        fileUploadLabel.classList.remove('file-selected');
+        fileUploadLabel.style.transform = '';
+        fileUploadLabel.style.animation = '';
+    }
+    if (fileUploadText) fileUploadText.textContent = 'Choisir un fichier';
+    if (fileUploadIcon) fileUploadIcon.textContent = '📤';
+    if (filePreview) filePreview.style.display = 'none';
+
     // Set up modal for adding a new comment
     modalAuthor.value = 'Admin EcoTrack'; // Default admin username
     modalTime.textContent = 'Nouveau commentaire';
@@ -887,6 +1296,34 @@ function closeModal() {
         modalSave.style.textTransform = '';
         modalSave.style.letterSpacing = '';
     }
+
+    // Reset author field validation state
+    resetAuthorValidation();
+    
+    // Reset file upload button state
+    const fileInput = document.getElementById('modalAttachment');
+    const fileUploadLabel = document.getElementById('fileUploadLabel');
+    const fileUploadText = document.getElementById('fileUploadText');
+    const fileUploadIcon = document.getElementById('fileUploadIcon');
+    const filePreview = document.getElementById('modalFilePreview');
+    
+    if (fileInput) {
+        fileInput.value = '';
+    }
+    if (fileUploadLabel) {
+        fileUploadLabel.classList.remove('file-selected');
+        fileUploadLabel.style.transform = '';
+        fileUploadLabel.style.animation = '';
+    }
+    if (fileUploadText) {
+        fileUploadText.textContent = 'Choisir un fichier';
+    }
+    if (fileUploadIcon) {
+        fileUploadIcon.textContent = '📤';
+    }
+    if (filePreview) {
+        filePreview.style.display = 'none';
+    }
 }
 
 // ============================================================================
@@ -918,6 +1355,8 @@ function fetchPosts() {
                 const data = JSON.parse(text);
                 posts = data || [];
                 renderPosts();
+                // Sync modifications from frontoffice after fetching posts
+                syncModificationsFromFrontoffice();
             } catch (ex) {
                 console.error('Failed to parse JSON from controller response', ex);
                 const backofficeFeed = document.getElementById('backofficeFeed');
@@ -943,6 +1382,12 @@ function fetchPosts() {
 document.addEventListener('DOMContentLoaded', function () {
     // initial load
     fetchPosts();
+    
+    // Sync modifications from frontoffice
+    syncModificationsFromFrontoffice();
+    
+    // Set up periodic sync every 5 seconds to catch modifications made in frontoffice
+    setInterval(syncModificationsFromFrontoffice, 5000);
 
     // Restore sidebar collapsed state if user toggled previously
     try {
@@ -1332,9 +1777,12 @@ function showModifiedItemsModal() {
         modal.style.justifyContent = 'center';
         modal.style.background = 'rgba(0,0,0,0.45)';
         modal.style.zIndex = '2000';
-        modal.innerHTML = `<div style="background:#fff;padding:20px;border-radius:8px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,0.2);">
+        modal.innerHTML = `<div style="background:#fff;padding:20px;border-radius:8px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,0.2);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                <h3 style="margin:0;color:#2b3b36;">Modifications récentes (Session)</h3>
+                <div>
+                    <h3 style="margin:0;color:#2b3b36;">Modifications récentes</h3>
+                    <p style="margin:4px 0 0 0;font-size:0.85em;color:#666;">Inclut les modifications du Frontoffice et du Backoffice</p>
+                </div>
                 <button id="closeModifiedModal" style="background:transparent;border:none;font-size:20px;cursor:pointer;">✕</button>
             </div>
             <div id="modifiedList"></div>
@@ -1359,9 +1807,16 @@ function showModifiedItemsModal() {
             const original = escapeHtml(item.original || '');
             const current = escapeHtml(item.content || '');
 
+            const sourceBadge = item.source === 'frontoffice' 
+                ? '<span style="background:#60c072;color:#fff;padding:2px 8px;border-radius:12px;font-size:0.75em;margin-left:8px;">Frontoffice</span>'
+                : '<span style="background:#357a38;color:#fff;padding:2px 8px;border-radius:12px;font-size:0.75em;margin-left:8px;">Backoffice</span>';
+            
             div.innerHTML = `
-                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                    <span style="font-weight:700;color:#2f9b4a;">${item.type} #${item.id}</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <div style="display:flex;align-items:center;">
+                        <span style="font-weight:700;color:#2f9b4a;">${item.type} #${item.id}</span>
+                        ${sourceBadge}
+                    </div>
                     <span style="font-size:0.85em;color:#888;">${item.time}</span>
                 </div>
                 <div style="font-size:0.9em;color:#555;margin-bottom:8px;">Par: <strong>${escapeHtml(item.author)}</strong></div>
@@ -1369,11 +1824,11 @@ function showModifiedItemsModal() {
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div>
                         <div style="font-size:0.8em;text-transform:uppercase;color:#d9534f;font-weight:700;margin-bottom:4px;">Avant</div>
-                        <div style="background:#fff5f5;padding:8px;border-radius:4px;color:#333;font-size:0.95em;border:1px solid #ffcccc;min-height:40px;">${original}</div>
+                        <div style="background:#fff5f5;padding:8px;border-radius:4px;color:#333;font-size:0.95em;border:1px solid #ffcccc;min-height:40px;word-wrap:break-word;">${original || '<em style="color:#999;">Vide</em>'}</div>
                     </div>
                     <div>
                         <div style="font-size:0.8em;text-transform:uppercase;color:#357a38;font-weight:700;margin-bottom:4px;">Après</div>
-                        <div style="background:#f7fff8;padding:8px;border-radius:4px;color:#333;font-size:0.95em;border:1px solid #e6f2e8;min-height:40px;">${current}</div>
+                        <div style="background:#f7fff8;padding:8px;border-radius:4px;color:#333;font-size:0.95em;border:1px solid #e6f2e8;min-height:40px;word-wrap:break-word;">${current || '<em style="color:#999;">Vide</em>'}</div>
                     </div>
                 </div>
             `;
