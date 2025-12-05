@@ -1186,3 +1186,126 @@ button:active {
   flex: 1;
   min-width: 180px;
 }
+
+/* ============================================================================
+   ERROR MODAL - Animated validation error display
+   ============================================================================ */
+
+.error-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 7, 5, 0.6);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+
+.error-modal.open {
+  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.error-modal-content {
+  background: linear-gradient(180deg, #ffffff, #fff5f5);
+  padding: 32px 40px;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 30px 80px rgba(239, 68, 68, 0.3);
+  border: 2px solid #fecaca;
+  position: relative;
+  transform: translateY(30px) scale(0.95);
+  opacity: 0;
+  transition: transform 400ms cubic-bezier(0.2, 0.9, 0.2, 1), opacity 300ms ease;
+}
+
+.error-modal.open .error-modal-content {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.error-icon {
+  font-size: 64px;
+  text-align: center;
+  margin-bottom: 16px;
+  animation: errorShake 500ms ease-in-out;
+}
+
+@keyframes errorShake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-8px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(8px);
+  }
+}
+
+.error-message {
+  color: #991b1b;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 10px;
+}
+
+.error-close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  color: #991b1b;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.error-close:hover {
+  background: #fee2e2;
+  transform: scale(1.1);
+}
+
+.error-close:active {
+  transform: scale(0.95);
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .error-modal-content {
+    padding: 24px 20px;
+    max-width: 90%;
+  }
+
+  .error-icon {
+    font-size: 48px;
+  }
+
+  .error-message {
+    font-size: 14px;
+  }
+}

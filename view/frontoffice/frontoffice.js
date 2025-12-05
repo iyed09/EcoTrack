@@ -15,6 +15,65 @@ window.addEventListener('error', function (ev) { console.error('Global JS error'
 window.addEventListener('unhandledrejection', function (ev) { console.error('Unhandled promise rejection', ev); });
 
 /**
+ * Show animated error modal with message
+ * @param {string} message - Error message to display
+ */
+function showErrorModal(message) {
+    const errorModal = document.getElementById('errorModal');
+    const errorMessage = document.getElementById('errorMessage');
+
+    if (!errorModal || !errorMessage) {
+        console.error('Error modal elements not found');
+        alert(message); // Fallback to alert if modal not found
+        return;
+    }
+
+    // Set the error message
+    errorMessage.textContent = message;
+
+    // Show modal with animation
+    errorModal.style.display = 'flex';
+    errorModal.setAttribute('aria-hidden', 'false');
+
+    // Trigger animation by adding 'open' class after a brief delay
+    setTimeout(() => {
+        errorModal.classList.add('open');
+    }, 10);
+
+    // Auto-dismiss after 4 seconds
+    const autoDismissTimeout = setTimeout(() => {
+        closeErrorModal();
+    }, 4000);
+
+    // Store timeout ID so it can be cleared if user closes manually
+    errorModal.dataset.autoDismissTimeout = autoDismissTimeout;
+}
+
+/**
+ * Close error modal with animation
+ */
+function closeErrorModal() {
+    const errorModal = document.getElementById('errorModal');
+    if (!errorModal) return;
+
+    // Clear auto-dismiss timeout if exists
+    if (errorModal.dataset.autoDismissTimeout) {
+        clearTimeout(parseInt(errorModal.dataset.autoDismissTimeout));
+        delete errorModal.dataset.autoDismissTimeout;
+    }
+
+    // Remove 'open' class to trigger exit animation
+    errorModal.classList.remove('open');
+
+    // Hide modal after animation completes
+    setTimeout(() => {
+        errorModal.style.display = 'none';
+        errorModal.setAttribute('aria-hidden', 'true');
+    }, 300);
+}
+
+
+/**
  * Records a modification in localStorage for backoffice stats tracking
  * @param {string} type - 'post' or 'comment's
  * @param {string|number} id - The ID of the modified item
@@ -33,19 +92,19 @@ function recordModificationForBackoffice(type, id, author, content, originalCont
             time: new Date().toLocaleTimeString(),
             timestamp: Date.now()
         };
-        
+
         // Get existing modifications from localStorage
         const existingMods = JSON.parse(localStorage.getItem('ecotrack_modifications') || '[]');
-        
+
         // Add new modification
         existingMods.push(modification);
-        
+
         // Keep only last 100 modifications to avoid localStorage overflow
         const trimmedMods = existingMods.slice(-100);
-        
+
         // Store back in localStorage
         localStorage.setItem('ecotrack_modifications', JSON.stringify(trimmedMods));
-        
+
         console.log('Modification recorded for backoffice:', modification);
     } catch (err) {
         console.error('Error recording modification for backoffice:', err);
@@ -84,11 +143,11 @@ function validateAuthorName(authorName) {
 
     // Define forbidden special characters: . > ? ! and other potentially problematic characters
     const forbiddenChars = /[.>?!<>{}[\]\\|`~@#$%^&*()+=\/;:"'`]/;
-    
+
     if (forbiddenChars.test(authorName)) {
-        return { 
-            valid: false, 
-            error: 'Le nom d\'auteur ne peut pas contenir de caractères spéciaux comme . > ? ! < > { } [ ] \\ | ` ~ @ # $ % ^ & * ( ) + = / ; : " \' ou d\'autres caractères spéciaux.' 
+        return {
+            valid: false,
+            error: 'Le nom d\'auteur ne peut pas contenir de caractères spéciaux comme . > ? ! < > { } [ ] \\ | ` ~ @ # $ % ^ & * ( ) + = / ; : " \' ou d\'autres caractères spéciaux.'
         };
     }
 
@@ -282,13 +341,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Wire error modal close handlers
+    const closeErrorModalBtn = document.getElementById('closeErrorModal');
+    const errorModal = document.getElementById('errorModal');
+
+    if (closeErrorModalBtn) {
+        closeErrorModalBtn.addEventListener('click', closeErrorModal);
+    }
+
+    if (errorModal) {
+        // Close on backdrop click
+        errorModal.addEventListener('click', function (e) {
+            if (e.target === errorModal) {
+                closeErrorModal();
+            }
+        });
+    }
+
+
     // Add real-time validation for author name input
     if (postAuthor) {
         const postAuthorError = document.getElementById('postAuthorError');
-        postAuthor.addEventListener('input', function() {
+        postAuthor.addEventListener('input', function () {
             const authorValue = this.value;
             const validation = validateAuthorName(authorValue);
-            
+
             if (authorValue.trim() && !validation.valid) {
                 this.style.border = '2px solid #D9534F';
                 this.style.backgroundColor = '#fff5f5';
@@ -304,11 +381,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        
-        postAuthor.addEventListener('blur', function() {
+
+        postAuthor.addEventListener('blur', function () {
             const authorValue = this.value;
             const validation = validateAuthorName(authorValue);
-            
+
             if (authorValue.trim() && !validation.valid) {
                 this.style.border = '2px solid #D9534F';
                 this.style.backgroundColor = '#fff5f5';
@@ -469,18 +546,18 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('submitPost clicked', { editingPostId, editingCommentId, contentPreview: postContent ? postContent.value : null });
             const content = postContent ? postContent.value.trim() : '';
             const sendBy = (postAuthor && postAuthor.value ? postAuthor.value : 'Anonyme').trim();
-            
+
             // Validate content
             if (content.length === 0) {
-                alert('Veuillez écrire quelque chose pour publier.');
+                showErrorModal('Veuillez écrire quelque chose pour publier.');
                 return;
             }
-            
+
             // Validate author name if provided
             if (sendBy && sendBy !== 'Anonyme') {
                 const authorValidation = validateAuthorName(sendBy);
                 if (!authorValidation.valid) {
-                    alert(authorValidation.error);
+                    showErrorModal(authorValidation.error);
                     const postAuthorError = document.getElementById('postAuthorError');
                     if (postAuthorError && postAuthor) {
                         postAuthorError.textContent = authorValidation.error;
@@ -497,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
             }
-            
+
             submitPost.disabled = true;
             // Play animation immediately to show the post is being published
             try {
@@ -531,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const originalContent = postContent.getAttribute('data-original-content') || '';
                         const originalAuthor = postAuthor.getAttribute('data-original-author') || '';
                         recordModificationForBackoffice('post', editingPostId, sendBy, content, originalContent);
-                        
+
                         editingPostId = null; editingCommentId = null;
                         if (modal) {
                             modal.classList.remove('open');
@@ -794,13 +871,13 @@ postsContainer.addEventListener('click', function (e) {
         const text = input.value.trim();
         const author = (authorInput && authorInput.value.trim()) || 'Anonyme';
         console.log('Comment submit', { parentId: clickedCommentBtn.getAttribute('data-parent-id'), author, text });
-        if (text.length === 0) { alert('Écris un commentaire avant de répondre.'); return; }
-        
+        if (text.length === 0) { showErrorModal('Écris un commentaire avant de répondre.'); return; }
+
         // Validate author name if provided
         if (author && author !== 'Anonyme') {
             const authorValidation = validateAuthorName(author);
             if (!authorValidation.valid) {
-                alert(authorValidation.error);
+                showErrorModal(authorValidation.error);
                 if (authorInput) {
                     authorInput.style.border = '2px solid #D9534F';
                     authorInput.style.backgroundColor = '#fff5f5';
@@ -813,7 +890,7 @@ postsContainer.addEventListener('click', function (e) {
                 return;
             }
         }
-        
+
         const parentId = clickedCommentBtn.getAttribute('data-parent-id');
         // Add comment to existing post using parent_id
         const formData = new FormData();
@@ -938,13 +1015,13 @@ postsContainer.addEventListener('click', function (e) {
         const text = input.value.trim();
         const author = (authorInput && authorInput.value.trim()) || 'Anonyme';
 
-        if (text.length === 0) { alert('Veuillez écrire une réponse.'); return; }
-        
+        if (text.length === 0) { showErrorModal('Veuillez écrire une réponse.'); return; }
+
         // Validate author name if provided
         if (author && author !== 'Anonyme') {
             const authorValidation = validateAuthorName(author);
             if (!authorValidation.valid) {
-                alert(authorValidation.error);
+                showErrorModal(authorValidation.error);
                 if (authorInput) {
                     authorInput.style.border = '2px solid #D9534F';
                     authorInput.style.backgroundColor = '#fff5f5';
@@ -1022,7 +1099,7 @@ postsContainer.addEventListener('click', function (e) {
                     if (data && data.success) {
                         // Record modification for backoffice stats
                         recordModificationForBackoffice('comment', commentId, author, newContent, originalContent);
-                        
+
                         // Refresh comments
                         const postId = commentEl.closest('.comments-section').getAttribute('data-post-id');
                         const commentsSection = document.querySelector(`.comments-section[data-post-id="${postId}"]`);
