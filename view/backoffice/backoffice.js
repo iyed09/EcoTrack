@@ -400,7 +400,7 @@ function ensureModal() {
         <button id="closeModal" style="float:right;background:transparent;border:none;font-size:18px;">✕</button>
         <div style="margin-bottom:8px;">
             <label for="modalAuthor" style="display:block;font-weight:600;margin-bottom:6px;">Auteur</label>
-            <input id="modalAuthor" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;" placeholder="Nom d'auteur (caractères spéciaux interdits: . &gt; ? ! &lt; &gt; { } [ ] \ | ` ~ @ # $ % ^ &amp; * ( ) + = / ; : &quot; ' etc.)"/>
+            <input id="modalAuthor" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;" placeholder="Nom d'auteur (caractères spéciaux interdits: . > ? ! etc.)"/>
             <div id="modalAuthorError" style="display:none;color:#D9534F;font-size:0.85em;margin-top:4px;font-weight:500;"></div>
         </div>
         <div id="modalTime" style="color:#666;margin-bottom:12px"></div>

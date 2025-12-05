@@ -16,7 +16,7 @@ window.addEventListener('unhandledrejection', function (ev) { console.error('Unh
 
 /**
  * Records a modification in localStorage for backoffice stats tracking
- * @param {string} type - 'post' or 'comment'
+ * @param {string} type - 'post' or 'comment's
  * @param {string|number} id - The ID of the modified item
  * @param {string} author - The author name
  * @param {string} content - The new content
@@ -229,7 +229,7 @@ function renderComments(list) {
             </div>
             <div class="comments-zone" style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;">
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                    <input class="comment-author" placeholder="Votre nom (optionnel)" style="width:160px;padding:8px;border:1px solid #ddd;border-radius:6px;" title="Caractères spéciaux interdits: . > ? ! < > { } [ ] \ | ` ~ @ # $ % ^ & * ( ) + = / ; : &quot; ' etc." />
+                    <input class="comment-author" placeholder="Votre nom (optionnel)" style="width:160px;padding:8px;border:1px solid #ddd;border-radius:6px;" title="Caractères spéciaux interdits: . > ? ! etc." />
                     <input class="comment-input" placeholder="Écrire un commentaire..." style="flex:1;min-width:200px;padding:8px;border:1px solid #ddd;border-radius:6px;" />
                     <input class="comment-attachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;" data-post-id="${item.id}" />
                     <button class="attach-file-btn btn btn-secondary" data-post-id="${item.id}" style="padding:8px 12px;">📎</button>
@@ -915,7 +915,7 @@ postsContainer.addEventListener('click', function (e) {
             formContainer.innerHTML = `
                 <div class="reply-box">
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <input class="reply-author" placeholder="Votre nom" title="Caractères spéciaux interdits: . > ? ! < > { } [ ] \ | ` ~ @ # $ % ^ & * ( ) + = / ; : &quot; ' etc." />
+                        <input class="reply-author" placeholder="Votre nom" />
                         <input class="reply-input" placeholder="Votre réponse..." />
                         <button class="submit-reply-btn btn btn-sm btn-primary" data-parent-comment-id="${commentId}" data-post-id="${postId}">Envoyer</button>
                     </div>
