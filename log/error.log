@@ -1500,3 +1500,92 @@ ent refusée
 [2025-12-05 13:03:38] Fetched posts rows: 13
 [2025-12-05 13:03:38] Fetched posts rows: 13
 [2025-12-05 13:03:38] Fetched posts rows: 13
+[2025-12-05 13:11:37] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:11:37] Fetched posts rows: 13
+[2025-12-05 13:11:37] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:11:37] Fetched posts rows: 13
+[2025-12-05 13:11:58] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:11:58] New post create request: send_by=ddwdw, contenu=dwd
+[2025-12-05 13:11:58] New post insert ok: id=13
+[2025-12-05 13:11:58] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:11:59] Fetched posts rows: 14
+[2025-12-05 13:12:01] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:01] Fetched posts rows: 14
+[2025-12-05 13:12:09] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:09] Fetched posts rows: 14
+[2025-12-05 13:12:31] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:31] Add comment request parent_id=13, send_by=ssd, contenu=ccc
+[2025-12-05 13:12:31] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:31] Fetched posts rows: 14
+[2025-12-05 13:12:33] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:33] Fetched posts rows: 14
+[2025-12-05 13:12:37] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:38] Update comment request id=26, contenu=ccccxcxcxc
+[2025-12-05 13:12:38] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:38] Fetched posts rows: 14
+[2025-12-05 13:12:40] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:40] Fetched posts rows: 14
+[2025-12-05 13:12:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:51] Fetched posts rows: 14
+[2025-12-05 13:12:53] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:53] Fetched posts rows: 14
+[2025-12-05 13:12:56] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:56] Fetched posts rows: 14
+[2025-12-05 13:12:59] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:59] Update post request post_id=13, send_by=ddwdw, contenu=dwdcsc
+[2025-12-05 13:12:59] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:12:59] Fetched posts rows: 14
+[2025-12-05 13:13:00] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:01] Fetched posts rows: 14
+[2025-12-05 13:13:10] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:11] Fetched posts rows: 14
+[2025-12-05 13:13:12] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:13] Fetched posts rows: 14
+[2025-12-05 13:13:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:19] Add comment request parent_id=13, send_by=dsdsdsdds, contenu=ccdcxczxsds
+[2025-12-05 13:13:19] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:19] Fetched posts rows: 15
+[2025-12-05 13:13:25] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:25] Update comment request id=26, contenu=ccccxcxcxc132
+[2025-12-05 13:13:25] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:25] Fetched posts rows: 15
+[2025-12-05 13:13:29] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:29] Update comment request id=27, contenu=ccdcxczxsds dddd
+[2025-12-05 13:13:29] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:29] Fetched posts rows: 15
+[2025-12-05 13:13:31] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:31] Fetched posts rows: 15
+[2025-12-05 13:13:32] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:33] Fetched posts rows: 15
+[2025-12-05 13:13:33] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:33] Fetched posts rows: 15
+[2025-12-05 13:13:33] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:33] Fetched posts rows: 15
+[2025-12-05 13:13:38] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:38] Fetched posts rows: 15
+[2025-12-05 13:13:41] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:42] Fetched posts rows: 15
+[2025-12-05 13:13:46] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:46] Update post request post_id=12, send_by=iyed, contenu=test condition
+[2025-12-05 13:13:46] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:46] Fetched posts rows: 15
+[2025-12-05 13:13:48] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:48] Fetched posts rows: 15
+[2025-12-05 13:13:50] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:50] Fetched posts rows: 15
+[2025-12-05 13:13:55] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:55] Update comment request id=23, contenu=1
+[2025-12-05 13:13:55] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:13:55] Fetched posts rows: 15
+[2025-12-05 13:14:04] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:14:04] Update comment request id=24, contenu=2
+[2025-12-05 13:14:04] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:14:04] Fetched posts rows: 15
+[2025-12-05 13:14:10] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:14:10] Update comment request id=25, contenu=2.1
+[2025-12-05 13:14:10] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:14:10] Fetched posts rows: 15
+[2025-12-05 13:14:12] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:14:13] Fetched posts rows: 15
+[2025-12-05 13:14:26] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-05 13:14:26] Fetched posts rows: 15
