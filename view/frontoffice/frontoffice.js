@@ -279,6 +279,7 @@ function renderComments(list) {
                         <button class="view-post btn btn-secondary" data-id="${item.id}" aria-label="Voir la publication">Voir</button>
                         <button class="edit-post btn btn-primary" data-id="${item.id}" aria-label="Modifier la publication">Modifier</button>
                         <button class="delete-post btn btn-danger" data-id="${item.id}" aria-label="Supprimer la publication">Supprimer</button>
+                        <button class="report-post btn btn-warning" data-id="${item.id}" data-type="post" aria-label="Signaler la publication" style="background:#f59e0b;color:white;">Signaler</button>
                     </div>
                 </div>
             </div>
@@ -355,6 +356,119 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target === errorModal) {
                 closeErrorModal();
             }
+        });
+    }
+
+
+    // ============================================
+    // Report modal functionality
+    // ============================================
+    const reportModal = document.getElementById('reportModal');
+    const closeReportModal = document.getElementById('closeReportModal');
+    const submitReportBtn = document.getElementById('submitReport');
+    const cancelReport = document.getElementById('cancelReport');
+    const reportReason = document.getElementById('reportReason');
+    const reporterName = document.getElementById('reporterName');
+
+    let reportingContent = { type: '', id: 0 }; // Track what is being reported
+
+    // Function to open report modal
+    window.openReportModal = function (contentType, contentId) {
+        reportingContent = { type: contentType, id: contentId };
+        reportModal.style.display = 'flex';
+        reportModal.classList.add('open');
+        reportModal.setAttribute('aria-hidden', 'false');
+        if (reportReason) reportReason.selectedIndex = 0;
+        if (reporterName) reporterName.value = '';
+    };
+
+    // Function to close report modal
+    function closeReportModalFn() {
+        if (!reportModal) return;
+        reportModal.classList.remove('open');
+        setTimeout(() => {
+            reportModal.style.display = 'none';
+            reportModal.setAttribute('aria-hidden', 'true');
+        }, 260);
+        reportingContent = { type: '', id: 0 };
+    }
+
+    // Close button handler
+    if (closeReportModal) {
+        closeReportModal.addEventListener('click', closeReportModalFn);
+    }
+
+    // Cancel button handler
+    if (cancelReport) {
+        cancelReport.addEventListener('click', closeReportModalFn);
+    }
+
+    // Close on backdrop click
+    if (reportModal) {
+        reportModal.addEventListener('click', function (e) {
+            if (e.target === reportModal) {
+                closeReportModalFn();
+            }
+        });
+    }
+
+    // Submit report handler
+    if (submitReportBtn) {
+        submitReportBtn.addEventListener('click', function () {
+            const reason = reportReason ? reportReason.value : 'other';
+            const reporter = reporterName && reporterName.value.trim() ? reporterName.value.trim() : 'Anonyme';
+            const REPORT_API_URL = new URL('../../controller/reportController.php', window.location.href).href;
+
+            if (!reportingContent.type || !reportingContent.id) {
+                showErrorModal('Erreur: Contenu non identifié pour signalement.');
+                return;
+            }
+
+            submitReportBtn.disabled = true;
+            const originalText = submitReportBtn.textContent;
+            submitReportBtn.textContent = 'Envoi...';
+
+            const formData = new FormData();
+            formData.append('content_type', reportingContent.type);
+            formData.append('content_id', reportingContent.id);
+            formData.append('reason', reason);
+            formData.append('reported_by', reporter);
+
+            fetch(REPORT_API_URL, {
+                method: 'POST',
+                body: formData
+            })
+                .then(parseJsonSafe)
+                .then(data => {
+                    if (data && data.success) {
+                        closeReportModalFn();
+                        // Show success message
+                        const successMsg = document.createElement('div');
+                        successMsg.className = 'publish-success show';
+                        successMsg.innerHTML = '<div class="check">✓</div><div style="margin-top:12px;color:#2f9b4a;font-weight:600;">Signalement envoyé!</div>';
+                        successMsg.style.position = 'fixed';
+                        successMsg.style.inset = '0';
+                        successMsg.style.display = 'flex';
+                        successMsg.style.flexDirection = 'column';
+                        successMsg.style.alignItems = 'center';
+                        successMsg.style.justifyContent = 'center';
+                        successMsg.style.background = 'rgba(255, 255, 255, 0.95)';
+                        successMsg.style.zIndex = '11000';
+                        successMsg.style.borderRadius = '12px';
+                        document.body.appendChild(successMsg);
+                        setTimeout(() => successMsg.remove(), 2000);
+                    } else {
+                        showErrorModal('Erreur lors de l\'envoi du signalement: ' + (data && data.error ? data.error : ''));
+                    }
+                })
+                .catch(err => {
+                    console.error('Report submission error', err);
+                    showErrorModal('Impossible d\'envoyer le signalement.');
+                })
+                .finally(() => {
+                    submitReportBtn.disabled = false;
+                    submitReportBtn.textContent = originalText;
+                });
         });
     }
 
@@ -815,6 +929,7 @@ function toggleCommentsForPost(postId) {
                                 <div style="flex:0 0 auto;display:flex;gap:6px;">
                                     <button class="edit-comment btn btn-sm btn-primary" data-comment-id="${comment.id}" style="padding:6px 8px;border-radius:4px;font-size:0.85em;">Modifier</button>
                                     <button class="delete-comment btn btn-sm btn-danger" data-comment-id="${comment.id}" style="padding:6px 8px;border-radius:4px;font-size:0.85em;">Supprimer</button>
+                                    <button class="report-comment btn btn-sm btn-warning" data-id="${comment.id}" data-type="comment" style="padding:6px 8px;border-radius:4px;font-size:0.85em;background:#f59e0b;color:white;">Signaler</button>
                                 </div>
                             </div>
                         `;
@@ -859,6 +974,28 @@ postsContainer.addEventListener('click', function (e) {
         const preview = zone.querySelector('.comment-file-preview');
         if (fileInput) fileInput.value = '';
         if (preview) preview.style.display = 'none';
+        return;
+    }
+
+    // Handle report post button
+    const reportPostBtn = e.target.closest('.report-post');
+    if (reportPostBtn) {
+        const postId = reportPostBtn.getAttribute('data-id');
+        const contentType = reportPostBtn.getAttribute('data-type');
+        if (postId && contentType) {
+            window.openReportModal(contentType, postId);
+        }
+        return;
+    }
+
+    // Handle report comment button
+    const reportCommentBtn = e.target.closest('.report-comment');
+    if (reportCommentBtn) {
+        const commentId = reportCommentBtn.getAttribute('data-id');
+        const contentType = reportCommentBtn.getAttribute('data-type');
+        if (commentId && contentType) {
+            window.openReportModal(contentType, commentId);
+        }
         return;
     }
 

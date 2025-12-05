@@ -1838,3 +1838,133 @@ function showModifiedItemsModal() {
 
     modal.style.display = 'flex';
 }
+
+// ============================================================================
+// REPORTS MANAGEMENT
+// ============================================================================
+
+const REPORT_API_URL = new URL('../../controller/reportController.php', window.location.href).href;
+const reportsCard = document.getElementById('reportsCard');
+const reportsSection = document.getElementById('reportsSection');
+const reportsFeed = document.getElementById('reportsFeed');
+const closeReportsBtn = document.getElementById('closeReports');
+const dashboardView = document.querySelector('.dashboard-overview');
+const mainFeed = document.querySelector('.table-card');
+
+async function fetchReports() {
+    try {
+        const response = await fetch(REPORT_API_URL);
+        const data = await parseJsonSafe(response);
+        return Array.isArray(data) ? data : [];
+    } catch (err) {
+        console.error('Error fetching reports:', err);
+        return [];
+    }
+}
+
+function renderReports(reports) {
+    if (!reportsFeed) return;
+
+    const overviewReports = document.getElementById('overviewReports');
+    if (overviewReports) {
+        overviewReports.textContent = reports.length;
+    }
+
+    if (reports.length === 0) {
+        reportsFeed.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#666;"><span style="font-size:64px;">✅</span><h3 style="margin-top:16px;color:#1e7e34;">Aucun signalement en attente</h3></div>`;
+        return;
+    }
+
+    reportsFeed.innerHTML = '';
+    
+    const reasonLabels = { spam: 'Spam', offensive: 'Contenu offensant', harassment: 'Harcèlement', misinformation: 'Désinformation', other: 'Autre' };
+
+    reports.forEach(report => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:#fff;border:2px solid #f59e0b;border-radius:12px;padding:20px;box-shadow: 0 2px 8px rgba(245,158,11,0.1)';
+        const icon = report.content_type === 'post' ? '📝' : '💬';
+        const label = report.content_type === 'post' ? 'Publication' : 'Commentaire';
+        card.innerHTML = `<div style="display:flex;gap:20px;"><div style="flex:1;"><div style="display:flex;gap:8px;margin-bottom:12px;"><span>${icon}</span><strong style="color:#1e7e34;">${label} signalé</strong><span style="background:#f59e0b;color:white;padding:4px 8px;border-radius:6px;font-size:0.75rem;">${escapeHtml(reasonLabels[report.reason] || report.reason)}</span></div><div style="background:#f9fafb;padding:12px;border-radius:8px;margin-bottom:12px;border-left:4px solid #e5e7eb;"><div style="color:#6b7280;font-size:0.85rem;">Contenu:</div><div style="color:#111827;">${escapeHtml(report.content || 'Contenu supprimé')}</div></div><div style="display:flex;gap:20px;font-size:0.85rem;color:#6b7280;"><div><strong>Auteur:</strong> ${escapeHtml(report.content_author || 'Anonyme')}</div><div><strong>Signalé par:</strong> ${escapeHtml(report.reported_by || 'Anonyme')}</div><div><strong>Date:</strong> ${new Date(report.created_at).toLocaleString('fr-FR')}</div></div></div><div style="flex: 0 0 auto;display:flex;flex-direction:column;gap:8px;"><button class="btn btn-secondary dismiss-report" data-report-id="${report.id}" style="padding:8px 16px;">✓ Ignorer</button><button class="btn btn-danger delete-reported-content" data-report-id="${report.id}" style="padding:8px 16px;">🗑️ Supprimer</button></div></div>`;
+        reportsFeed.appendChild(card);
+    });
+
+    document.querySelectorAll('.dismiss-report').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            await dismissReport(this.getAttribute('data-report-id'));
+        });
+    });
+
+    document.querySelectorAll('.delete-reported-content').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            await deleteReportedContent(this.getAttribute('data-report-id'));
+        });
+    });
+}
+
+async function dismissReport(reportId) {
+    if (!confirm('Êtes-vous sûr de vouloir ignorer ce signalement ?')) return;
+    try {
+        const formData = new FormData();
+        formData.append('report_id', reportId);
+        formData.append('action', 'dismiss');
+        const response = await fetch(REPORT_API_URL, { method: 'POST', body: formData });
+        const data = await parseJsonSafe(response);
+        if (data && data.success) {
+            showBackofficeMessage('Signalement ignoré avec succès', false, 3000);
+            await loadReports();
+        } else {
+            showBackofficeMessage('Erreur lors de l\'ignorance du signalement', true);
+        }
+    } catch (err) {
+        console.error('Error dismissing report:', err);
+        showBackofficeMessage('Erreur lors de l\'ignorance du signalement', true);
+    }
+}
+
+async function deleteReportedContent(reportId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible.')) return;
+    try {
+        const formData = new FormData();
+        formData.append('report_id', reportId);
+        formData.append('action', 'delete_content');
+        const response = await fetch(REPORT_API_URL, { method: 'POST', body: formData });
+        const data = await parseJsonSafe(response);
+        if (data && data.success) {
+            showBackofficeMessage('Contenu supprimé avec succès', false, 3000);
+            await loadReports();
+            await fetchPosts();
+        } else {
+            showBackofficeMessage('Erreur lors de la suppression', true);
+        }
+    } catch (err) {
+        console.error('Error deleting content:', err);
+        showBackofficeMessage('Erreur lors de la suppression', true);
+    }
+}
+
+async function loadReports() {
+    const reports = await fetchReports();
+    renderReports(reports);
+}
+
+function showReportsSection() {
+    if (dashboardView) dashboardView.style.display = 'none';
+    if (mainFeed) mainFeed.style.display = 'none';
+    if (reportsSection) reportsSection.style.display = 'block';
+    loadReports();
+}
+
+function hideReportsSection() {
+    if (reportsSection) reportsSection.style.display = 'none';
+    if (dashboardView) dashboardView.style.display = 'block';
+    if (mainFeed) mainFeed.style.display = 'block';
+}
+
+if (reportsCard) {
+    reportsCard.addEventListener('click', showReportsSection);
+    reportsCard.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showReportsSection(); }
+    });
+}
+if (closeReportsBtn) closeReportsBtn.addEventListener('click', hideReportsSection);
+loadReports();

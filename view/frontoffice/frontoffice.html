@@ -125,6 +125,33 @@
         </div>
     </div>
 
+    <!-- Report Modal for flagging content -->
+    <div id="reportModal" class="modal" aria-hidden="true" style="display:none;">
+        <div class="modal-content">
+            <button class="close" id="closeReportModal" aria-label="Fermer">×</button>
+            <h3>Signaler ce contenu</h3>
+            <p style="color:#666;font-size:0.9em;margin-bottom:16px;">Pourquoi signalez-vous ce contenu ?</p>
+            <div class="form-group">
+                <label for="reportReason">Raison du signalement</label>
+                <select id="reportReason" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6efe6;">
+                    <option value="spam">Spam</option>
+                    <option value="offensive">Contenu offensant</option>
+                    <option value="harassment">Harcèlement</option>
+                    <option value="misinformation">Désinformation</option>
+                    <option value="other">Autre</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="reporterName">Votre nom (optionnel)</label>
+                <input id="reporterName" type="text" placeholder="Anonyme" />
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button id="submitReport" type="button" class="btn btn-danger">Signaler</button>
+                <button id="cancelReport" type="button" class="btn btn-secondary">Annuler</button>
+            </div>
+        </div>
+    </div>
+
     <script src="frontoffice.js"></script>
 </body>
 

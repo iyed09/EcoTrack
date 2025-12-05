@@ -102,6 +102,28 @@
                                 <div class="stat-label">Commentaires supprimés</div>
                             </div>
                         </div>
+                        <div class="stat-card" id="reportsCard" style="cursor:pointer;" role="button" tabindex="0"
+                            aria-label="Voir les signalements">
+                            <div class="stat-icon">🚨</div>
+                            <div class="stat-body">
+                                <div class="stat-number" id="overviewReports">0</div>
+                                <div class="stat-label">Signalements en attente</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Section (hidden by default) -->
+                <div id="reportsSection" class="card table-card" style="display:none;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h2 style="margin:0;font-size:1.5rem;color:#1e7e34;">Signalements en attente </h2>
+                        <button id="closeReports" class="btn btn-secondary">← Retour au tableau de bord</button>
+                    </div>
+                    <div id="reportsFeed" style="display:flex;flex-direction:column;gap:16px;">
+                        <div style="text-align:center;padding:40px;color:#666;">
+                            <span style="font-size:48px;">⏳</span>
+                            <p>Chargement des signalements...</p>
+                        </div>
                     </div>
                 </div>
 
