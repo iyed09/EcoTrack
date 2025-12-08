@@ -137,7 +137,7 @@ function syncModificationsFromFrontoffice() {
 
         // Remove processed modifications from localStorage (keep unprocessed ones)
         if (processedTimestamps.length > 0) {
-            const remainingMods = storedMods.filter(mod => 
+            const remainingMods = storedMods.filter(mod =>
                 !mod.timestamp || !processedTimestamps.includes(mod.timestamp)
             );
             localStorage.setItem('ecotrack_modifications', JSON.stringify(remainingMods));
@@ -223,11 +223,11 @@ function validateAuthorName(authorName) {
 
     // Define forbidden special characters: . > ? ! and other potentially problematic characters
     const forbiddenChars = /[.>?!<>{}[\]\\|`~@#$%^&*()+=\/;:"'`]/;
-    
+
     if (forbiddenChars.test(authorName)) {
-        return { 
-            valid: false, 
-            error: 'Le nom d\'auteur ne peut pas contenir de caractères spéciaux comme . > ? ! < > { } [ ] \\ | ` ~ @ # $ % ^ & * ( ) + = / ; : " \' ou d\'autres caractères spéciaux.' 
+        return {
+            valid: false,
+            error: 'Le nom d\'auteur ne peut pas contenir de caractères spéciaux comme . > ? ! < > { } [ ] \\ | ` ~ @ # $ % ^ & * ( ) + = / ; : " \' ou d\'autres caractères spéciaux.'
         };
     }
 
@@ -266,19 +266,19 @@ function resetAuthorValidation() {
  */
 function displayExistingFile(attachmentPath) {
     if (!attachmentPath) return;
-    
+
     const fileUploadLabel = document.getElementById('fileUploadLabel');
     const fileUploadText = document.getElementById('fileUploadText');
     const fileUploadIcon = document.getElementById('fileUploadIcon');
     const filePreview = document.getElementById('modalFilePreview');
     const fileName = document.getElementById('modalFileName');
-    
+
     if (fileUploadLabel && fileUploadText && fileUploadIcon && filePreview && fileName) {
         const fileNameOnly = attachmentPath.split('/').pop();
         fileUploadText.textContent = `Fichier actuel: ${fileNameOnly}`;
         fileUploadLabel.classList.add('file-selected');
         fileUploadIcon.textContent = '📎';
-        
+
         fileName.textContent = fileNameOnly;
         filePreview.style.display = 'block';
     }
@@ -430,7 +430,7 @@ function ensureModal() {
     </div>`;
     document.body.appendChild(modal);
     document.getElementById('closeModal').addEventListener('click', closeModal);
-    
+
     // Add CSS animations for file upload button
     if (!document.getElementById('fileUploadStyles')) {
         const style = document.createElement('style');
@@ -492,7 +492,7 @@ function ensureModal() {
         `;
         document.head.appendChild(style);
     }
-    
+
     // Add file upload button animations and handlers
     const fileInput = document.getElementById('modalAttachment');
     const fileUploadLabel = document.getElementById('fileUploadLabel');
@@ -501,21 +501,21 @@ function ensureModal() {
     const filePreview = document.getElementById('modalFilePreview');
     const fileName = document.getElementById('modalFileName');
     const removeFileBtn = document.getElementById('removeFileBtn');
-    
+
     if (fileInput && fileUploadLabel) {
         // Handle file selection
-        fileInput.addEventListener('change', function(e) {
+        fileInput.addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 // Update button text and style
                 fileUploadText.textContent = `Fichier sélectionné: ${file.name}`;
                 fileUploadLabel.classList.add('file-selected');
                 fileUploadIcon.textContent = '✅';
-                
+
                 // Show preview
                 fileName.textContent = file.name;
                 filePreview.style.display = 'block';
-                
+
                 // Add pulse animation
                 fileUploadLabel.style.animation = 'pulse 0.5s ease';
                 setTimeout(() => {
@@ -523,44 +523,44 @@ function ensureModal() {
                 }, 500);
             }
         });
-        
+
         // Handle remove file button
         if (removeFileBtn) {
-            removeFileBtn.addEventListener('click', function(e) {
+            removeFileBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 // Reset file input
                 fileInput.value = '';
-                
+
                 // Reset button
                 fileUploadText.textContent = 'Choisir un fichier';
                 fileUploadLabel.classList.remove('file-selected');
                 fileUploadIcon.textContent = '📤';
-                
+
                 // Hide preview
                 filePreview.style.display = 'none';
             });
         }
-        
+
         // Add hover effects with mouse events
-        fileUploadLabel.addEventListener('mouseenter', function() {
+        fileUploadLabel.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-2px)';
         });
-        
-        fileUploadLabel.addEventListener('mouseleave', function() {
+
+        fileUploadLabel.addEventListener('mouseleave', function () {
             this.style.transform = 'translateY(0)';
         });
     }
-    
+
     // Add real-time validation for author name input
     const modalAuthor = document.getElementById('modalAuthor');
     const modalAuthorError = document.getElementById('modalAuthorError');
     if (modalAuthor && modalAuthorError) {
-        modalAuthor.addEventListener('input', function() {
+        modalAuthor.addEventListener('input', function () {
             const authorValue = this.value;
             const validation = validateAuthorName(authorValue);
-            
+
             if (authorValue.trim() && !validation.valid) {
                 this.style.border = '2px solid #D9534F';
                 this.style.backgroundColor = '#fff5f5';
@@ -572,11 +572,11 @@ function ensureModal() {
                 modalAuthorError.style.display = 'none';
             }
         });
-        
-        modalAuthor.addEventListener('blur', function() {
+
+        modalAuthor.addEventListener('blur', function () {
             const authorValue = this.value;
             const validation = validateAuthorName(authorValue);
-            
+
             if (authorValue.trim() && !validation.valid) {
                 this.style.border = '2px solid #D9534F';
                 this.style.backgroundColor = '#fff5f5';
@@ -589,7 +589,7 @@ function ensureModal() {
             }
         });
     }
-    
+
     document.getElementById('modalSave').addEventListener('click', function () {
         const type = this.getAttribute('data-type');
         const contenu = document.getElementById('modalContent').value;
@@ -742,17 +742,17 @@ function showModalForPost(postId) {
     const modalDelete = document.getElementById('modalDelete');
     const post = posts.find(x => String(x.id) === String(postId));
     if (!post) { showBackofficeMessage('Publication introuvable', true); return; }
-    
+
     // Reset validation state
     resetAuthorValidation();
-    
+
     // Reset file upload button first
     const fileInput = document.getElementById('modalAttachment');
     const fileUploadLabel = document.getElementById('fileUploadLabel');
     const fileUploadText = document.getElementById('fileUploadText');
     const fileUploadIcon = document.getElementById('fileUploadIcon');
     const filePreview = document.getElementById('modalFilePreview');
-    
+
     if (fileInput) fileInput.value = '';
     if (fileUploadLabel) {
         fileUploadLabel.classList.remove('file-selected');
@@ -762,17 +762,17 @@ function showModalForPost(postId) {
     if (fileUploadText) fileUploadText.textContent = 'Choisir un fichier';
     if (fileUploadIcon) fileUploadIcon.textContent = '📤';
     if (filePreview) filePreview.style.display = 'none';
-    
+
     modalAuthor.value = post.send_by || 'Anonyme';
     modalTime.textContent = post.time || '';
     modalContent.value = post.contenu || '';
     document.getElementById('modalOriginalContent').value = post.contenu || ''; // Capture original
-    
+
     // Display existing file if present
     if (post.attachment) {
         displayExistingFile(post.attachment);
     }
-    
+
     modalSave.setAttribute('data-post-id', post.id);
     modalSave.setAttribute('data-type', 'post');
     modalDelete.setAttribute('data-post-id', post.id);
@@ -829,17 +829,17 @@ function showModalForComment(commentId, postId) {
     if (!post) { showBackofficeMessage('Publication introuvable', true); return; }
     const c = post.comments.find(x => String(x.id) === String(commentId));
     if (!c) { showBackofficeMessage('Commentaire introuvable', true); return; }
-    
+
     // Reset validation state
     resetAuthorValidation();
-    
+
     // Reset file upload button first
     const fileInput = document.getElementById('modalAttachment');
     const fileUploadLabel = document.getElementById('fileUploadLabel');
     const fileUploadText = document.getElementById('fileUploadText');
     const fileUploadIcon = document.getElementById('fileUploadIcon');
     const filePreview = document.getElementById('modalFilePreview');
-    
+
     if (fileInput) fileInput.value = '';
     if (fileUploadLabel) {
         fileUploadLabel.classList.remove('file-selected');
@@ -849,17 +849,17 @@ function showModalForComment(commentId, postId) {
     if (fileUploadText) fileUploadText.textContent = 'Choisir un fichier';
     if (fileUploadIcon) fileUploadIcon.textContent = '📤';
     if (filePreview) filePreview.style.display = 'none';
-    
+
     modalAuthor.value = c.send_by || 'Anonyme';
     modalTime.textContent = '';
     modalContent.value = c.contenu || '';
     document.getElementById('modalOriginalContent').value = c.contenu || ''; // Capture original
-    
+
     // Display existing file if present
     if (c.attachment) {
         displayExistingFile(c.attachment);
     }
-    
+
     modalSave.setAttribute('data-comment-id', c.id);
     modalSave.setAttribute('data-type', 'comment');
     modalDelete.setAttribute('data-comment-id', c.id);
@@ -1027,7 +1027,7 @@ function toggleRepliesForComment(commentId, postId) {
     if (!repliesSection || !repliesList) return;
 
     const isVisible = repliesSection.style.display !== 'none';
-    
+
     if (isVisible) {
         repliesSection.style.display = 'none';
         if (viewRepliesBtn) {
@@ -1177,14 +1177,14 @@ function showAddCommentModal(postId) {
 
     // Reset validation state
     resetAuthorValidation();
-    
+
     // Reset file upload button
     const fileInput = document.getElementById('modalAttachment');
     const fileUploadLabel = document.getElementById('fileUploadLabel');
     const fileUploadText = document.getElementById('fileUploadText');
     const fileUploadIcon = document.getElementById('fileUploadIcon');
     const filePreview = document.getElementById('modalFilePreview');
-    
+
     if (fileInput) fileInput.value = '';
     if (fileUploadLabel) {
         fileUploadLabel.classList.remove('file-selected');
@@ -1299,14 +1299,14 @@ function closeModal() {
 
     // Reset author field validation state
     resetAuthorValidation();
-    
+
     // Reset file upload button state
     const fileInput = document.getElementById('modalAttachment');
     const fileUploadLabel = document.getElementById('fileUploadLabel');
     const fileUploadText = document.getElementById('fileUploadText');
     const fileUploadIcon = document.getElementById('fileUploadIcon');
     const filePreview = document.getElementById('modalFilePreview');
-    
+
     if (fileInput) {
         fileInput.value = '';
     }
@@ -1382,10 +1382,10 @@ function fetchPosts() {
 document.addEventListener('DOMContentLoaded', function () {
     // initial load
     fetchPosts();
-    
+
     // Sync modifications from frontoffice
     syncModificationsFromFrontoffice();
-    
+
     // Set up periodic sync every 5 seconds to catch modifications made in frontoffice
     setInterval(syncModificationsFromFrontoffice, 5000);
 
@@ -1807,10 +1807,10 @@ function showModifiedItemsModal() {
             const original = escapeHtml(item.original || '');
             const current = escapeHtml(item.content || '');
 
-            const sourceBadge = item.source === 'frontoffice' 
+            const sourceBadge = item.source === 'frontoffice'
                 ? '<span style="background:#60c072;color:#fff;padding:2px 8px;border-radius:12px;font-size:0.75em;margin-left:8px;">Frontoffice</span>'
                 : '<span style="background:#357a38;color:#fff;padding:2px 8px;border-radius:12px;font-size:0.75em;margin-left:8px;">Backoffice</span>';
-            
+
             div.innerHTML = `
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                     <div style="display:flex;align-items:center;">
@@ -1876,7 +1876,7 @@ function renderReports(reports) {
     }
 
     reportsFeed.innerHTML = '';
-    
+
     const reasonLabels = { spam: 'Spam', offensive: 'Contenu offensant', harassment: 'Harcèlement', misinformation: 'Désinformation', other: 'Autre' };
 
     reports.forEach(report => {
@@ -1889,20 +1889,20 @@ function renderReports(reports) {
     });
 
     document.querySelectorAll('.dismiss-report').forEach(btn => {
-        btn.addEventListener('click', async function() {
+        btn.addEventListener('click', async function () {
             await dismissReport(this.getAttribute('data-report-id'));
         });
     });
 
     document.querySelectorAll('.delete-reported-content').forEach(btn => {
-        btn.addEventListener('click', async function() {
+        btn.addEventListener('click', async function () {
             await deleteReportedContent(this.getAttribute('data-report-id'));
         });
     });
 }
 
 async function dismissReport(reportId) {
-    if (!confirm('Êtes-vous sûr de vouloir ignorer ce signalement ?')) return;
+    if (!await customConfirm('Confirmation', 'Êtes-vous sûr de vouloir ignorer ce signalement ?')) return;
     try {
         const formData = new FormData();
         formData.append('report_id', reportId);
@@ -1922,7 +1922,7 @@ async function dismissReport(reportId) {
 }
 
 async function deleteReportedContent(reportId) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible.')) return;
+    if (!await customConfirm('Attention', 'Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible.')) return;
     try {
         const formData = new FormData();
         formData.append('report_id', reportId);
@@ -1968,3 +1968,58 @@ if (reportsCard) {
 }
 if (closeReportsBtn) closeReportsBtn.addEventListener('click', hideReportsSection);
 loadReports();
+// ============================================================================
+// CUSTOM CONFIRMATION MODAL
+// ============================================================================
+
+function customConfirm(title, message) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirmModal');
+        const modalTitle = document.getElementById('confirmModalTitle');
+        const modalMessage = document.getElementById('confirmModalMessage');
+        const okBtn = document.getElementById('confirmModalOk');
+        const cancelBtn = document.getElementById('confirmModalCancel');
+        
+        if (!modal) {
+            console.error('Confirm modal not found');
+            resolve(confirm(message)); // Fallback to native
+            return;
+        }
+        
+        // Set content
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        
+        // Show modal
+        modal.style.display = 'flex';
+        
+        // Handle clicks
+        const handleOk = () => {
+            modal.style.display = 'none';
+            cleanup();
+            resolve(true);
+        };
+        
+        const handleCancel = () => {
+            modal.style.display = 'none';
+            cleanup();
+            resolve(false);
+        };
+        
+        const handleBackdrop = (e) => {
+            if (e.target === modal) {
+                handleCancel();
+            }
+        };
+        
+        const cleanup = () => {
+            okBtn.removeEventListener('click', handleOk);
+            cancelBtn.removeEventListener('click', handleCancel);
+            modal.removeEventListener('click', handleBackdrop);
+        };
+        
+        okBtn.addEventListener('click', handleOk);
+        cancelBtn.addEventListener('click', handleCancel);
+        modal.addEventListener('click', handleBackdrop);
+    });
+}

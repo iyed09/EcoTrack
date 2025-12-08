@@ -1417,3 +1417,232 @@ fetchComments = function () {
     // Add delay to ensure DOM is updated
     setTimeout(initializeRippleEffects, 100);
 };
+
+// ============================================
+// Chatbot Logic
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    const chatbotBtn = document.getElementById('chatbotBtn');
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    const closeChatbot = document.getElementById('closeChatbot');
+    const sendMessageBtn = document.getElementById('sendMessageBtn');
+    const chatbotInput = document.getElementById('chatbotInput');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+
+    // Toggle Chatbot Window
+    if (chatbotBtn && chatbotWindow) {
+        chatbotBtn.addEventListener('click', () => {
+            const isVisible = chatbotWindow.style.display !== 'none';
+            chatbotWindow.style.display = isVisible ? 'none' : 'flex';
+            if (!isVisible) {
+                // Focus input when opening
+                setTimeout(() => chatbotInput.focus(), 100);
+            }
+        });
+    }
+
+    // Close Chatbot
+    if (closeChatbot) {
+        closeChatbot.addEventListener('click', () => {
+            chatbotWindow.style.display = 'none';
+        });
+    }
+
+    // AI-Powered Send Logic
+    function sendMessage() {
+        const text = chatbotInput.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        chatbotInput.value = '';
+
+        // Show typing indicator
+        const typingId = showTypingIndicator();
+        const AI_API_URL = new URL('../../controller/aiController.php', window.location.href).href;
+
+        // Call Backend API
+        fetch(AI_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        })
+            .then(res => res.json())
+            .then(data => {
+                removeTypingIndicator(typingId);
+
+                if (data.success && data.reply) {
+                    // Success: AI Reply
+                    addMessage(data.reply, 'bot');
+                } else if (data.fallback) {
+                    // Fallback needed (API key missing or error)
+                    console.warn('AI API Error (using fallback):', data.error);
+                    const botResponse = getBotResponse(text); // Use local logic
+                    addMessage(botResponse, 'bot');
+                } else {
+                    // Unknown error
+                    addMessage("Je rencontre un petit problème technique, mais je suis toujours là !", 'bot');
+                }
+            })
+            .catch(err => {
+                console.error('Network Error:', err);
+                removeTypingIndicator(typingId);
+                // Network fallback
+                const botResponse = getBotResponse(text);
+                addMessage(botResponse, 'bot');
+            });
+    }
+
+    function showTypingIndicator() {
+        const id = 'typing-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = 'typing-indicator';
+        div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+        chatbotMessages.appendChild(div);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        return id;
+    }
+
+    function removeTypingIndicator(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
+
+    // Event Listeners for Sending
+    if (sendMessageBtn) {
+        sendMessageBtn.addEventListener('click', sendMessage);
+    }
+
+    if (chatbotInput) {
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+
+    // Add Message to UI
+    function addMessage(text, sender) {
+        const div = document.createElement('div');
+        div.classList.add('message');
+        div.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        div.textContent = text;
+        chatbotMessages.appendChild(div);
+        // Scroll to bottom
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    // Simple Mock Bot Logic
+    function getBotResponse(input) {
+        const lowerInput = input.toLowerCase();
+
+        if (lowerInput.includes('bonjour') || lowerInput.includes('salut') || lowerInput.includes('hello')) {
+            return "Bonjour ! Comment puis-je vous aider à devenir plus écolo aujourd'hui ?";
+        }
+        if (lowerInput.includes('règle') || lowerInput.includes('charte')) {
+            return "Notre charte repose sur le respect, la bienveillance et le partage d'idées constructives pour l'environnement.";
+        }
+        if (lowerInput.includes('post') || lowerInput.includes('publier')) {
+            return "Pour publier un post, cliquez sur le bouton 'Ajouter un post' en haut du mur communautaire. Vous pouvez même ajouter une photo !";
+        }
+        if (lowerInput.includes('contact') || lowerInput.includes('admin')) {
+            return "Vous pouvez contacter les administrateurs via le formulaire de contact en bas de page ou signaler un contenu abusif directement.";
+        }
+        if (lowerInput.includes('merci')) {
+            return "Avec plaisir ! N'hésitez pas si vous avez d'autres questions.";
+        }
+
+        // Default responses
+        const defaults = [
+            "Je ne suis pas sûr de comprendre, mais je suis là pour encourager vos initiatives vertes !",
+            "C'est intéressant ! Dites-m'en plus.",
+            "Pouvez-vous reformuler votre question ?",
+            "N'oubliez pas : chaque petit geste compte pour la planète 🌍"
+        ];
+        return defaults[Math.floor(Math.random() * defaults.length)];
+    }
+
+    // ============================================
+    // Advanced Chatbot Upgrade
+    // ============================================
+
+    const knowledgeBase = {
+        greetings: {
+            keywords: ['bonjour', 'salut', 'hello', 'coucou', 'hey', 'yo', 'ça va'],
+            answers: [
+                "Bonjour ! Je suis l'assistant EcoTrack. Comment puis-je vous aider à réduire votre empreinte carbone ?",
+                "Salut ! Prêt à agir pour la planète aujourd'hui ?",
+                "Hello ! Je suis là pour répondre à toutes vos questions sur l'écologie et notre communauté."
+            ]
+        },
+        rules: {
+            keywords: ['règle', 'charte', 'loi', 'interdit', 'comportement', 'insulte'],
+            answers: [
+                "Notre charte est simple : respect, bienveillance et écologie. Tout contenu haineux ou publicitaire sera supprimé.",
+                "Pour garder cet espace sain, nous demandons à chacun de rester poli, constructif et bienveillant."
+            ]
+        },
+        posting: {
+            keywords: ['post', 'publier', 'écrire', 'ajout', 'photo', 'créer'],
+            answers: [
+                "Pour publier, cliquez sur le bouton 'Ajouter un post' en haut du mur. Vous pouvez ajouter du texte et même une image !",
+                "Envie de partager ? Utilisez le bouton 'Ajouter un post'. C'est le meilleur moyen de faire entendre votre voix."
+            ]
+        },
+        contact: {
+            keywords: ['contact', 'admin', 'modérateur', 'support', 'aide', 'problème'],
+            answers: [
+                "Vous pouvez contacter l'équipe via le formulaire en bas de page ou signaler directement un contenu problématique.",
+                "Besoin d'aide ? Les administrateurs sont à votre écoute. Signalez tout problème via les boutons 'Signaler' sur les posts."
+            ]
+        },
+        thanks: {
+            keywords: ['merci', 'top', 'super', 'cool', 'génial', 'thx'],
+            answers: [
+                "Avec grand plaisir ! 🌱",
+                "Heureux de pouvoir aider ! Ensemble, on va plus loin.",
+                "N'hésitez pas si vous avez d'autres questions. Je suis là pour ça !"
+            ]
+        },
+        ecology: {
+            keywords: ['écologie', 'bio', 'nature', 'vert', 'pollution', 'climat', 'planète', 'déchet', 'recyclage'],
+            answers: [
+                "L'écologie est au cœur de notre communauté. Avez-vous une astuce zéro déchet à partager ?",
+                "Chaque geste compte. Ici, on partage des idées concrètes pour un avenir plus vert.",
+                "Le saviez-vous ? Le recyclage d'une seule canette économise 95% de l'énergie nécessaire pour en fabriquer une nouvelle."
+            ]
+        }
+    };
+
+    // Override the previous getBotResponse function
+    getBotResponse = function (input) {
+        const lowerInput = input.toLowerCase();
+
+        let bestMatch = null;
+        let maxScore = 0;
+
+        for (const [category, data] of Object.entries(knowledgeBase)) {
+            let score = 0;
+            data.keywords.forEach(word => {
+                if (lowerInput.includes(word)) score++;
+            });
+            if (score > maxScore) {
+                maxScore = score;
+                bestMatch = data;
+            }
+        }
+
+        if (bestMatch && maxScore > 0) {
+            return bestMatch.answers[Math.floor(Math.random() * bestMatch.answers.length)];
+        }
+
+        const defaults = [
+            "Je suis en train d'apprendre sur ce sujet. Pouvez-vous reformuler votre question ?",
+            "C'est un point intéressant. Dites-m'en plus à ce propos.",
+            "Je suis là pour vous guider sur EcoTrack. Avez-vous une question spécifique sur le forum ou l'écologie ?",
+            "N'oubliez pas : chaque petit geste compte pour la planète 🌍. Comment puis-je vous aider autrement ?"
+        ];
+        return defaults[Math.floor(Math.random() * defaults.length)];
+    };
+});
