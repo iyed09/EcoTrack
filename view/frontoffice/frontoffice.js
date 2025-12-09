@@ -1470,7 +1470,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // AI-Powered Send Logic
+    // AI-Powered Send Logic with Conversation History
+    let conversationHistory = []; // Store conversation for context
+
     function sendMessage() {
         const text = chatbotInput.value.trim();
         if (!text) return;
@@ -1478,37 +1480,54 @@ document.addEventListener('DOMContentLoaded', function () {
         addMessage(text, 'user');
         chatbotInput.value = '';
 
+        // Add user message to conversation history
+        conversationHistory.push({
+            role: 'user',
+            content: text
+        });
+
         // Show typing indicator
         const typingId = showTypingIndicator();
-        const AI_API_URL = new URL('../../controller/aiController.php', window.location.href).href;
+        const MISTRAL_API_URL = new URL('../../controller/chatbot-api.php', window.location.href).href;
 
-        // Call Backend API
-        fetch(AI_API_URL, {
+        // Call Mistral AI Backend API
+        fetch(MISTRAL_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
+            body: JSON.stringify({
+                message: text,
+                history: conversationHistory.slice(-10) // Send last 10 messages for context
+            })
         })
             .then(res => res.json())
             .then(data => {
                 removeTypingIndicator(typingId);
 
-                if (data.success && data.reply) {
-                    // Success: AI Reply
-                    addMessage(data.reply, 'bot');
-                } else if (data.fallback) {
-                    // Fallback needed (API key missing or error)
-                    console.warn('AI API Error (using fallback):', data.error);
-                    const botResponse = getBotResponse(text); // Use local logic
-                    addMessage(botResponse, 'bot');
+                if (data.success && data.message) {
+                    // Success: AI Reply from Mistral
+                    addMessage(data.message, 'bot');
+
+                    // Add bot response to conversation history
+                    conversationHistory.push({
+                        role: 'assistant',
+                        content: data.message
+                    });
+
+                    // Keep conversation history to reasonable size (last 20 messages)
+                    if (conversationHistory.length > 20) {
+                        conversationHistory = conversationHistory.slice(-20);
+                    }
                 } else {
-                    // Unknown error
-                    addMessage("Je rencontre un petit problème technique, mais je suis toujours là !", 'bot');
+                    // Error from API
+                    console.error('Mistral AI Error:', data.error);
+                    const fallbackResponse = getBotResponse(text);
+                    addMessage(fallbackResponse, 'bot');
                 }
             })
             .catch(err => {
                 console.error('Network Error:', err);
                 removeTypingIndicator(typingId);
-                // Network fallback
+                // Network fallback - use local pattern matching
                 const botResponse = getBotResponse(text);
                 addMessage(botResponse, 'bot');
             });
