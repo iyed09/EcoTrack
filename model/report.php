@@ -151,6 +151,27 @@ class ReportCRUD {
     }
 
     /**
+     * Count reports for a specific content item
+     */
+    public static function countReportsByContent($content_type, $content_id) {
+        $db = config::getConnexion();
+        $sql = "SELECT COUNT(*) as count FROM reports 
+                WHERE content_type = :content_type AND content_id = :content_id";
+        $query = $db->prepare($sql);
+        
+        try {
+            $query->execute([
+                ':content_type' => $content_type,
+                ':content_id' => $content_id
+            ]);
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            return (int)$result['count'];
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
      * Delete all reports for a specific content item
      */
     public static function deleteByContent($content_type, $content_id) {

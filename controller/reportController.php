@@ -23,12 +23,48 @@ try {
 class ReportController {
     /**
      * Create a new report
+     * Auto-deletes content if it receives more than 4 reports
      */
     public function createReport($content_type, $content_id, $reported_by, $reason) {
+        $db = config::getConnexion();
         try {
+            $db->beginTransaction();
+            
+            // Create the report
             $id = ReportCRUD::create($content_type, $content_id, $reported_by, $reason);
-            return ['success' => true, 'report_id' => $id];
+            
+            // Count total reports for this content
+            $reportCount = ReportCRUD::countReportsByContent($content_type, $content_id);
+            
+            // Auto-delete if more than 4 reports
+            if ($reportCount > 4) {
+                // Delete the content
+                if ($content_type === 'comment') {
+                    CommentCRUD::deleteComment($content_id);
+                } else if ($content_type === 'post') {
+                    // Delete post and its comments
+                    $stmt1 = $db->prepare("DELETE FROM comments WHERE `comment id` = :post_id");
+                    $stmt1->execute([':post_id' => $content_id]);
+                    $stmt2 = $db->prepare("DELETE FROM post WHERE ID = :post_id");
+                    $stmt2->execute([':post_id' => $content_id]);
+                }
+                
+                // Delete all reports for this content
+                ReportCRUD::deleteByContent($content_type, $content_id);
+                
+                $db->commit();
+                return [
+                    'success' => true, 
+                    'report_id' => $id,
+                    'auto_deleted' => true,
+                    'message' => 'Content automatically deleted after exceeding 4 reports'
+                ];
+            }
+            
+            $db->commit();
+            return ['success' => true, 'report_id' => $id, 'auto_deleted' => false];
         } catch (Exception $e) {
+            $db->rollBack();
             throw $e;
         }
     }
