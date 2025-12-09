@@ -290,7 +290,11 @@ function renderComments(list) {
             <div class="comments-zone" style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;">
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                     <input class="comment-author" placeholder="Votre nom (optionnel)" style="width:160px;padding:8px;border:1px solid #ddd;border-radius:6px;" title="Caractères spéciaux interdits: . > ? ! etc." />
-                    <input class="comment-input" placeholder="Écrire un commentaire..." style="flex:1;min-width:200px;padding:8px;border:1px solid #ddd;border-radius:6px;" />
+                    <div style="position:relative;flex:1;min-width:200px;">
+                        <input class="comment-input" placeholder="Écrire un commentaire..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;" />
+                        <button class="emoji-picker-btn comment-emoji-trigger" data-post-id="${item.id}" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:4px 8px;font-size:16px;" aria-label="Ajouter un emoji" title="Ajouter un emoji">😊</button>
+                        <div class="emoji-picker comment-emoji-picker" data-post-id="${item.id}" style="display:none;"></div>
+                    </div>
                     <input class="comment-attachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;" data-post-id="${item.id}" />
                     <button class="attach-file-btn btn btn-secondary" data-post-id="${item.id}" style="padding:8px 12px;">📎</button>
                     <button class="comment-btn btn btn-primary" data-parent-id="${item.id}">Commenter</button>
@@ -311,6 +315,8 @@ function fetchComments() {
         .then(data => {
             console.log('create post returned:', data);
             renderComments(data);
+            // Initialize emoji pickers for all comment inputs
+            initCommentEmojiPickers();
         })
         .catch(err => {
             console.error('create post fetch error', err);
@@ -318,6 +324,22 @@ function fetchComments() {
             // Show empty feed instead of error message to avoid alarming users
             renderComments([]);
         });
+}
+
+/**
+ * Initialize emoji pickers for all comment inputs (called after renderComments)
+ */
+function initCommentEmojiPickers() {
+    document.querySelectorAll('.comment-emoji-trigger').forEach(trigger => {
+        const postId = trigger.getAttribute('data-post-id');
+        const picker = document.querySelector(`.comment-emoji-picker[data-post-id="${postId}"]`);
+        const input = trigger.closest('div').querySelector('.comment-input');
+
+        if (picker && input && !picker.dataset.initialized) {
+            initEmojiPicker(trigger, picker, input);
+            picker.dataset.initialized = 'true';
+        }
+    });
 }
 
 // Load existing comments on open
@@ -332,8 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!modal) {
                 modal = document.createElement('div');
                 modal.id = 'guideModalFront';
-                modal.className = 'modal';
-                modal.innerHTML = `<div class="modal-content"><button class="close" aria-label="Fermer">×</button><h2>Charte de la communauté</h2><p>Merci de respecter les autres membres, d'éviter les contenus offensants, de partager des informations vérifiées et de garder les échanges constructifs. Tout comportement abusif pourra entraîner une modération.</p><p style="margin-top:12px;font-weight:600">Principes clés:</p><ul><li>Respect mutuel</li><li>Pas de spam ni publicité</li><li>Contenus sûrs et vérifiables</li><li>Signalez les abus au support</li></ul></div>`;
+                modal.innerHTML = `<div class="modal-content"><button class="close" aria-label="Fermer">×</button><h2>Charte de la communauté</h2><p>Merci de respecter les autres membres, d'éviter les contenus offensants, de partager des informations vérifiées et de garder les échanges constructifs. Tout comportement abusif pourra entraîner une modération.</p><p style="margin-top:12px;font-weight:600">Principes clés:</p><ul><li>Respect mutuel</li><li>Pas de spam ni publicité</li><li>Contenus sûrs et vérifiables</li><li>Signalement des abus au support</li></ul></div>`;
                 document.body.appendChild(modal);
                 modal.querySelector('.close').addEventListener('click', function () { modal.style.display = 'none'; });
                 modal.addEventListener('click', function (ev) { if (ev.target === modal) modal.style.display = 'none'; });
@@ -1645,4 +1666,123 @@ document.addEventListener('DOMContentLoaded', function () {
         ];
         return defaults[Math.floor(Math.random() * defaults.length)];
     };
+});
+
+// ============================================================================
+// EMOJI PICKER FUNCTIONALITY
+// ============================================================================
+
+/**
+ * List of commonly used emojis
+ */
+const EMOJI_LIST = [
+    '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
+    '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩',
+    '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪',
+    '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨',
+    '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥',
+    '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕',
+    '🤢', '🤮', '🤧', '🥵', '🥶', '😵', '🤯', '🤠',
+    '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '☹️',
+    '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨',
+    '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞',
+    '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙',
+    '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✍️', '💪',
+    '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍',
+    '💯', '💢', '💥', '💫', '💦', '💨', '🔥', '✨',
+    '⭐', '🌟', '💎', '🎉', '🎊', '🎈', '🎁', '🏆',
+    '🌈', '☀️', '⛅', '☁️', '🌧️', '⛈️', '🌩️', '⚡',
+    '🌙', '⭐', '💫', '✨', '🌍', '🌎', '🌏', '🔮',
+    '🍕', '🍔', '🍟', '🌭', '🍿', '🧂', '🥓', '🥚',
+    '🍞', '🧀', '🥗', '🍝', '🍜', '🍲', '🍛', '🍣',
+    '🍱', '🥟', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠',
+    '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁',
+    '☕', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺'
+];
+
+/**
+ * Create emoji picker for a given textarea and picker element
+ * @param {HTMLElement} triggerBtn - Button that triggers the picker
+ * @param {HTMLElement} pickerEl - Picker container element
+ * @param {HTMLElement} targetInput - Input/textarea where emoji will be inserted
+ */
+function initEmojiPicker(triggerBtn, pickerEl, targetInput) {
+    if (!triggerBtn || !pickerEl || !targetInput) return;
+
+    // Generate emoji grid
+    const header = document.createElement('div');
+    header.className = 'emoji-picker-header';
+    header.textContent = 'Sélectionner un emoji';
+    pickerEl.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'emoji-grid';
+
+    EMOJI_LIST.forEach(emoji => {
+        const button = document.createElement('button');
+        button.className = 'emoji-item';
+        button.type = 'button';
+        button.textContent = emoji;
+        button.setAttribute('aria-label', `Insérer ${emoji}`);
+        button.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            insertEmojiAtCursor(targetInput, emoji);
+            pickerEl.style.display = 'none';
+        });
+        grid.appendChild(button);
+    });
+
+    pickerEl.appendChild(grid);
+
+    // Toggle picker on button click
+    triggerBtn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isVisible = pickerEl.style.display === 'block';
+        // Close all other emoji pickers first
+        document.querySelectorAll('.emoji-picker').forEach(p => p.style.display = 'none');
+        pickerEl.style.display = isVisible ? 'none' : 'block';
+    });
+
+    // Close picker when clicking outside
+    document.addEventListener('click', e => {
+        if (!pickerEl.contains(e.target) && e.target !== triggerBtn) {
+            pickerEl.style.display = 'none';
+        }
+    });
+}
+
+/**
+ * Insert emoji at cursor position in textarea/input
+ * @param {HTMLElement} input - The input or textarea element
+ * @param {string} emoji - The emoji to insert
+ */
+function insertEmojiAtCursor(input, emoji) {
+    if (!input) return;
+
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const text = input.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end, text.length);
+
+    input.value = before + emoji + after;
+    input.selectionStart = input.selectionEnd = start + emoji.length;
+    input.focus();
+
+    // Trigger input event for any listeners (e.g., auto-resize)
+    const event = new Event('input', { bubbles: true });
+    input.dispatchEvent(event);
+}
+
+// Initialize emoji picker for post modal
+document.addEventListener('DOMContentLoaded', () => {
+    const postEmojiBtn = document.getElementById('postEmojiBtn');
+    const postEmojiPicker = document.getElementById('postEmojiPicker');
+    const postContent = document.getElementById('postContent');
+
+    if (postEmojiBtn && postEmojiPicker && postContent) {
+        initEmojiPicker(postEmojiBtn, postEmojiPicker, postContent);
+    }
 });

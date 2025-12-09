@@ -94,7 +94,12 @@
             </div>
             <div class="form-group">
                 <label for="postContent">Contenu</label>
-                <textarea id="postContent" placeholder="Écrivez votre post ici..."></textarea>
+                <div style="position: relative;">
+                    <textarea id="postContent" placeholder="Écrivez votre post ici..."></textarea>
+                    <button type="button" class="emoji-picker-btn" id="postEmojiBtn" aria-label="Ajouter un emoji"
+                        title="Ajouter un emoji">😊</button>
+                    <div class="emoji-picker" id="postEmojiPicker" style="display: none;"></div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="postAttachment">📎 Joindre un fichier (optionnel)</label>

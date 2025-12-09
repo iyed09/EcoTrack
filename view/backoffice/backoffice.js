@@ -404,7 +404,7 @@ function ensureModal() {
             <div id="modalAuthorError" style="display:none;color:#D9534F;font-size:0.85em;margin-top:4px;font-weight:500;"></div>
         </div>
         <div id="modalTime" style="color:#666;margin-bottom:12px"></div>
-        <div style="margin-bottom:8px;"><label for="modalContent" style="display:block;font-weight:600;margin-bottom:6px;">Contenu</label><textarea id="modalContent" style="width:100%;min-height:120px;padding:8px;border:1px solid #ddd;border-radius:6px;"></textarea></div>
+        <div style="margin-bottom:8px;position:relative;"><label for="modalContent" style="display:block;font-weight:600;margin-bottom:6px;">Contenu</label><textarea id="modalContent" style="width:100%;min-height:120px;padding:8px;border:1px solid #ddd;border-radius:6px;"></textarea><button type="button" class="emoji-picker-btn" id="modalEmojiBtn" style="position:absolute;right:12px;bottom:12px;padding:6px 10px;font-size:18px;" aria-label="Ajouter un emoji" title="Ajouter un emoji">😊</button><div class="emoji-picker" id="modalEmojiPicker" style="display:none;"></div></div>
         <div style="margin-bottom:8px;">
             <label style="display:block;font-weight:600;margin-bottom:8px;">📎 Fichier joint (optionnel)</label>
             <div style="position:relative;display:inline-block;width:100%;">
@@ -1979,45 +1979,45 @@ function customConfirm(title, message) {
         const modalMessage = document.getElementById('confirmModalMessage');
         const okBtn = document.getElementById('confirmModalOk');
         const cancelBtn = document.getElementById('confirmModalCancel');
-        
+
         if (!modal) {
             console.error('Confirm modal not found');
             resolve(confirm(message)); // Fallback to native
             return;
         }
-        
+
         // Set content
         modalTitle.textContent = title;
         modalMessage.textContent = message;
-        
+
         // Show modal
         modal.style.display = 'flex';
-        
+
         // Handle clicks
         const handleOk = () => {
             modal.style.display = 'none';
             cleanup();
             resolve(true);
         };
-        
+
         const handleCancel = () => {
             modal.style.display = 'none';
             cleanup();
             resolve(false);
         };
-        
+
         const handleBackdrop = (e) => {
             if (e.target === modal) {
                 handleCancel();
             }
         };
-        
+
         const cleanup = () => {
             okBtn.removeEventListener('click', handleOk);
             cancelBtn.removeEventListener('click', handleCancel);
             modal.removeEventListener('click', handleBackdrop);
         };
-        
+
         okBtn.addEventListener('click', handleOk);
         cancelBtn.addEventListener('click', handleCancel);
         modal.addEventListener('click', handleBackdrop);
