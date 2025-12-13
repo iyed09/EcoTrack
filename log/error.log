@@ -2440,3 +2440,21 @@ ent refusée
 [2025-12-09 14:21:41] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
 [2025-12-09 14:22:20] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
 [2025-12-09 14:22:20] Fetched posts rows: 0
+[2025-12-09 15:27:45] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:27:45] New post create request: send_by=ddsd, contenu=dffd
+[2025-12-09 15:27:45] New post insert ok: id=28
+[2025-12-09 15:27:45] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:27:45] Fetched posts rows: 1
+[2025-12-09 15:27:49] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:04] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:08] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:12] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:15] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:22] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:22] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:22] Fetched posts rows: 0
+[2025-12-09 15:28:26] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:26] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:27] Fetched posts rows: 0
+[2025-12-09 15:28:28] DB Connexion OK: host=127.0.0.1;port=3306;dbname=ecotrack
+[2025-12-09 15:28:28] Fetched posts rows: 0
