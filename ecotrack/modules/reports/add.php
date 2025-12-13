@@ -124,7 +124,51 @@ include '../../includes/header.php';
 
                             <div class="mb-3">
                                 <label class="form-label">Description *</label>
-                                <textarea name="description" class="form-control" rows="4" required placeholder="Describe what you observed (type of trash, severity, etc.)"></textarea>
+                                <textarea name="description" id="description" class="form-control" rows="4" required placeholder="Describe what you observed (type of trash, severity, etc.)"></textarea>
+                                <div class="d-flex justify-content-end mt-2">
+                                    <button type="button" class="btn btn-sm btn-info text-white" onclick="analyzeTrash()">
+                                        <i class="bi-stars me-1"></i> Analyze with AI
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- AI Analysis Result Container -->
+                            <div id="aiResult" class="mb-4" style="display: none;">
+                                <div class="card bg-light border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="spinner-border text-primary me-2" role="status" id="aiSpinner" style="display: none;">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <h6 class="card-title mb-0 text-primary fw-bold" id="aiTitle">
+                                                <i class="bi-robot me-2"></i>AI Analysis Result
+                                            </h6>
+                                        </div>
+                                        
+                                        <div id="aiContent" style="display: none;">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="p-3 bg-white rounded border">
+                                                        <small class="text-muted d-block mb-1">Detected Type</small>
+                                                        <strong class="fs-5 text-dark" id="aiType"></strong>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="p-3 bg-white rounded border">
+                                                        <small class="text-muted d-block mb-1">Severity</small>
+                                                        <span class="badge" id="aiSeverity"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="p-3 bg-white rounded border">
+                                                        <small class="text-muted d-block mb-1">Environmental Impact</small>
+                                                        <p class="mb-0 text-secondary" id="aiDecomposition"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="mb-3">
@@ -158,6 +202,55 @@ function getLocation() {
     } else {
         alert('Geolocation is not supported by this browser.');
     }
+}
+
+function analyzeTrash() {
+    const description = document.getElementById('description').value;
+    const resultContainer = document.getElementById('aiResult');
+    const spinner = document.getElementById('aiSpinner');
+    const content = document.getElementById('aiContent');
+
+    if (description.length < 5) {
+        alert('Please enter a longer description first.');
+        return;
+    }
+
+    // Show processing state
+    resultContainer.style.display = 'block';
+    spinner.style.display = 'block';
+    content.style.display = 'none';
+
+    // Call API
+    const formData = new FormData();
+    formData.append('description', description);
+
+    fetch('analyze_trash.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        spinner.style.display = 'none';
+        content.style.display = 'block';
+        
+        if (data.success) {
+            const ai = data.data;
+            document.getElementById('aiType').innerHTML = '<i class="' + ai.icon + ' me-2"></i>' + ai.type;
+            
+            const badge = document.getElementById('aiSeverity');
+            badge.textContent = ai.severity;
+            badge.className = 'badge rounded-pill ' + 
+                (ai.score > 70 ? 'bg-danger' : (ai.score > 40 ? 'bg-warning' : 'bg-success'));
+            
+            document.getElementById('aiDecomposition').textContent = 
+                'Est. Decomposition: ' + ai.decomposition + '. ' + ai.message;
+        }
+    })
+    .catch(error => {
+        spinner.style.display = 'none';
+        alert('AI Analysis failed. Please try again.');
+        console.error(error);
+    });
 }
 </script>
 

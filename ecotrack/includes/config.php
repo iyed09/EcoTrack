@@ -3,7 +3,7 @@ session_start();
 
 $database_url = getenv('DATABASE_URL');
 
-if ($database_url) {
+if ($database_url && strpos($database_url, 'mysql') !== false) {
     $db_parts = parse_url($database_url);
     $host = $db_parts['host'];
     $port = $db_parts['port'] ?? 3306;
@@ -35,11 +35,11 @@ try {
 
 define('SITE_NAME', 'EcoTrack');
 define('SITE_SLOGAN', 'Save the planet, one click at a time.');
+define('MISTRAL_API_KEY', 'lsm6xhmBJfc9JBHbxjT1IdjIZfk8QIjd');
 define('UPLOAD_PATH', __DIR__ . '/../uploads/');
 
-// Determine the root path for the application
 $request_uri = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '';
-if (strpos($request_uri, '/ecotrack') === 0) {
+if (stripos($request_uri, '/ecotrack') === 0) {
     define('ROOT_PATH', '/ecotrack');
 } else {
     define('ROOT_PATH', '');

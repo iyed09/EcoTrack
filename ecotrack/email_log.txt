@@ -1,0 +1,69 @@
+[2025-12-08 17:17:28] To: bentalebdhiaeddine@gmail.com | Subject: Password Reset Code - EcoTrack | Message: Hello dhia,
+
+Your password reset code is: 048501
+
+This code expires in 15 minutes.
+
+If you did not request this, please ignore this email.
+--------------------------------------------------
+[2025-12-08 17:22:39] To: bentalebdhiaeddine@gmail.com | Subject: Password Reset Code - EcoTrack | Message: Hello bentalebdhiaeddine@gmail.com,
+
+Your password reset code is: 605811
+
+This code expires in 15 minutes.
+
+If you did not request this, please ignore this email.
+--------------------------------------------------
+[2025-12-08 17:28:05] To: 7alambos@gmail.com | Subject: Password Reset Code - EcoTrack | Message: Hello 7alambos@gmail.com,
+
+Your password reset code is: 504977
+
+This code expires in 15 minutes.
+
+If you did not request this, please ignore this email.
+--------------------------------------------------
+[2025-12-08 18:59:05] To: siwarlaridhi@gmail.com | Subject: Password Reset - EcoTrack | Message: 
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Password Reset</title>
+                </head>
+                <body style="font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 0;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 40px; margin-bottom: 40px;">
+                        
+                        <!-- Header -->
+                        <div style="background: linear-gradient(135deg, #1b5e20 0%, #4caf50 100%); padding: 30px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">EcoTrack</h1>
+                            <p style="color: #e8f5e9; margin: 5px 0 0 0; font-size: 16px;">Password Reset Request</p>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div style="padding: 40px 30px; text-align: center;">
+                            <h2 style="color: #2c3e50; font-size: 22px; margin-bottom: 20px;">Forgot your password?</h2>
+                            <p style="color: #555555; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                                No worries! We received a request to reset your password. Use the code below to complete the process.
+                            </p>
+                            
+                            <!-- Boxed Code -->
+                            <div style="background-color: #e8f5e9; border: 2px dashed #4caf50; border-radius: 8px; padding: 20px; display: inline-block; margin-bottom: 30px;">
+                                <span style="font-size: 32px; font-weight: bold; color: #1b5e20; letter-spacing: 5px;">632208</span>
+                            </div>
+                            
+                            <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 0;">
+                                This code will expire in 15 minutes.<br>
+                                If you did not request this, you can safely ignore this email.
+                            </p>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;">
+                            <p style="color: #999999; font-size: 12px; margin: 0;">
+                                &copy; 2025 EcoTrack. All rights reserved.<br>
+                                Making the world greener, one step at a time.
+                            </p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+--------------------------------------------------

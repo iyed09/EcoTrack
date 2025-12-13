@@ -42,6 +42,7 @@
                             <li><a class="dropdown-item" href="<?php echo ROOT_PATH; ?>/modules/transport/index.php"><i class="bi-car-front me-2"></i>Transport</a></li>
                             <li><a class="dropdown-item" href="<?php echo ROOT_PATH; ?>/modules/waste/index.php"><i class="bi-trash me-2"></i>Waste</a></li>
                             <li><a class="dropdown-item" href="<?php echo ROOT_PATH; ?>/modules/reports/index.php"><i class="bi-flag me-2"></i>Report Trash</a></li>
+                            <li><a class="dropdown-item" href="<?php echo ROOT_PATH; ?>/modules/reports/radar.php"><i class="bi-broadcast me-2"></i>Eco-Radar</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">

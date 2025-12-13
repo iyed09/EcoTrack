@@ -81,6 +81,13 @@ include '../../includes/header.php';
                         </div>
                         <h6><i class="bi-geo-alt me-1"></i><?php echo htmlspecialchars(substr($report['location_description'], 0, 50)); ?>...</h6>
                         <p class="text-muted small mb-0"><?php echo htmlspecialchars(substr($report['description'], 0, 100)); ?>...</p>
+                        
+                        <?php if ($report['admin_response']): ?>
+                        <div class="mt-3 pt-2 border-top">
+                            <small class="text-success fw-bold"><i class="bi-reply-fill me-1"></i>Admin Response:</small>
+                            <p class="small text-muted mb-0 mt-1 fst-italic">"<?php echo htmlspecialchars($report['admin_response']); ?>"</p>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
