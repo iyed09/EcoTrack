@@ -78,6 +78,10 @@ $pageTitle = 'Login';
                             <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
                         </div>
 
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="forgot_password.php" class="text-decoration-none small">Forgot Password?</a>
+                        </div>
+
                         <button type="submit" class="custom-btn w-100 mb-3">Sign In</button>
 
                         <p class="text-center text-muted mb-0">
