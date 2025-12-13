@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EcoTrack - Communauté Verte</title>
+    <link rel="stylesheet" href="frontoffice.css">
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-inner">
+                <div class="logo">EcoTrack</div>
+
+                <div class="sidebar-profile">
+                    <div class="avatar" aria-hidden="true">ET</div>
+                    <div class="profile-info">
+                        <div class="profile-name">Communauté EcoTrack</div>
+                        <div class="profile-role">Espace public</div>
+                    </div>
+                </div>
+
+                <div class="community-guide">
+                    <h3>Règles de la communauté</h3>
+                    <p class="guide-excerpt">Respectez les autres, partagez des idées constructives et évitez le spam.
+                    </p>
+                    <a href="#" id="openGuideFront" class="btn btn-primary">Lire la charte</a>
+                </div>
+
+                <div class="sidebar-hidden-counters" style="display:none;">
+                    <div id="sentCount">0</div>
+                    <div id="commentCount">0</div>
+                    <div id="editCount">0</div>
+                    <div id="deleteCount">0</div>
+                </div>
+
+            </div>
+
+            <!-- slide handle (clickable) -->
+            <button class="sidebar-handle" id="sidebarHandle" aria-label="Fermer la barre">‹</button>
+
+        </aside>
+        </aside>
+
+        <div class="main">
+            <header class="navbar">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Basculer la barre">☰</button>
+                    <div class="logo">EcoTrack</div>
+                </div>
+                <nav>
+                    <a href="../backoffice/backoffice.html" class="btn btn-secondary">Accéder au Backoffice</a>
+                </nav>
+            </header>
+
+            <main class="container">
+                <section class="hero-communication">
+                    <div class="hero-content">
+                        <h1>Communication is the bridge between confusion and clarity.</h1>
+                        <p>Join the conversation and help us build a greener future together.</p>
+                    </div>
+                </section>
+
+                <section id="ecoFeed">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <h2>Mur communautaire</h2>
+                        <button id="createPostBtn" class="btn btn-primary">Ajouter un post</button>
+                    </div>
+                    <div id="postsContainer" style="margin-top:18px;">
+                        <!-- Exemple statique visible dans le HTML pour montrer les boutons (sera remplacé lorsque JS charge les posts réels) -->
+                        <article id="static-example" class="publication static-sample">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+
+                        </article>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Fenêtre modale pour la création d'un post -->
+    <div id="postModal" class="modal" aria-hidden="true" style="display:none;">
+        <div class="modal-content">
+            <button class="close" id="closeModal" aria-label="Fermer">&times;</button>
+            <h3>Créer une publication écologique</h3>
+            <div class="form-group">
+                <label for="postAuthor">Votre nom (optionnel)</label>
+                <input id="postAuthor" type="text"
+                    placeholder="Votre nom (caractères spéciaux interdits: . > ? ! etc.)" />
+                <div id="postAuthorError"
+                    style="display:none;color:#D9534F;font-size:0.85em;margin-top:4px;font-weight:500;"></div>
+            </div>
+            <div class="form-group">
+                <label for="postContent">Contenu</label>
+                <div style="position: relative;">
+                    <textarea id="postContent" placeholder="Écrivez votre post ici..."></textarea>
+                    <button type="button" class="emoji-picker-btn" id="postEmojiBtn" aria-label="Ajouter un emoji"
+                        title="Ajouter un emoji">😊</button>
+                    <div class="emoji-picker" id="postEmojiPicker" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="postAttachment">📎 Joindre un fichier (optionnel)</label>
+                <input id="postAttachment" type="file" accept="image/*,.pdf,.doc,.docx,.txt" />
+                <div id="filePreview" style="margin-top:8px;display:none;">
+                    <img id="previewImage" style="max-width:200px;max-height:200px;border-radius:6px;display:none;" />
+                    <div id="previewFile" style="padding:8px;background:#f0f0f0;border-radius:6px;display:none;">
+                        <span id="fileName"></span>
+                        <button type="button" id="removeFile"
+                            style="margin-left:8px;background:#d9534f;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">✕</button>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button id="submitPost" type="button" class="btn btn-primary">Publier</button>
+                <button id="cancelPost" type="button" class="btn btn-danger">Annuler</button>
+                <span id="postMessage" style="display:none;color:green;font-weight:600;">Publié</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal for validation messages -->
+    <div id="errorModal" class="error-modal" aria-hidden="true" style="display:none;">
+        <div class="error-modal-content">
+            <button class="error-close" id="closeErrorModal" aria-label="Fermer">×</button>
+            <div class="error-icon">⚠️</div>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Report Modal for flagging content -->
+    <div id="reportModal" class="modal" aria-hidden="true" style="display:none;">
+        <div class="modal-content">
+            <button class="close" id="closeReportModal" aria-label="Fermer">×</button>
+            <h3>Signaler ce contenu</h3>
+            <p style="color:#666;font-size:0.9em;margin-bottom:16px;">Pourquoi signalez-vous ce contenu ?</p>
+            <div class="form-group">
+                <label for="reportReason">Raison du signalement</label>
+                <select id="reportReason" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6efe6;">
+                    <option value="spam">Spam</option>
+                    <option value="offensive">Contenu offensant</option>
+                    <option value="harassment">Harcèlement</option>
+                    <option value="misinformation">Désinformation</option>
+                    <option value="other">Autre</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="reporterName">Votre nom (optionnel)</label>
+                <input id="reporterName" type="text" placeholder="Anonyme" />
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button id="submitReport" type="button" class="btn btn-danger">Signaler</button>
+                <button id="cancelReport" type="button" class="btn btn-secondary">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Floating Button -->
+    <button id="chatbotBtn" class="chatbot-btn" aria-label="Ouvrir le chat">
+        💬
+    </button>
+
+    <!-- Chatbot Window -->
+    <div id="chatbotWindow" class="chatbot-window" style="display: none;">
+        <div class="chatbot-header">
+            <span>Assistant EcoTrack</span>
+            <button id="closeChatbot" aria-label="Fermer le chat">×</button>
+        </div>
+        <div id="chatbotMessages" class="chatbot-messages">
+            <!-- Messages will appear here -->
+            <div class="message bot-message">Bonjour ! Je suis l'assistant EcoTrack. Comment puis-je vous aider
+                aujourd'hui ?</div>
+        </div>
+        <div class="chatbot-input-area">
+            <input type="text" id="chatbotInput" placeholder="Posez votre question..." />
+            <button id="sendMessageBtn">➤</button>
+        </div>
+    </div>
+
+    <script src="frontoffice.js"></script>
+</body>
+
+</html>
