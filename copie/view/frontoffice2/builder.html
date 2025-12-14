@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Builder | Ingénieur Virtuel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="builder-style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>⚡ Eco-Builder</h2>
+            <p id="user-info" style="font-size: 0.8rem; color: #bdc3c7; margin-top: 5px;">Chargement...</p>
+        </div>
+        <a href="../frontoffice/index.html" class="nav-link">🏠 Retour Eco-Track</a>
+        
+        <div class="toolbox">
+            <h3>🔧 Équipements (7 sources)</h3>
+            <p class="hint">Glissez les éléments vers la zone de construction</p>
+            
+            <div class="tool-item" draggable="true" data-type="solar" data-prod="300" data-cost="200" data-space="1.6">
+                <span class="icon">☀️</span>
+                <div class="info">
+                    <strong>Panneau Solaire</strong>
+                    <small>+300 kWh/an</small>
+                    <small>200€ | 1.6m²</small>
+                </div>
+            </div>
+
+            <div class="tool-item" draggable="true" data-type="wind" data-prod="1500" data-cost="1200" data-space="10">
+                <span class="icon">🌪️</span>
+                <div class="info">
+                    <strong>Éolienne</strong>
+                    <small>+1500 kWh/an</small>
+                    <small>1200€ | 10m²</small>
+                </div>
+            </div>
+
+            <div class="tool-item" draggable="true" data-type="battery" data-prod="0" data-cost="800" data-space="0.5">
+                <span class="icon">🔋</span>
+                <div class="info">
+                    <strong>Batterie Li</strong>
+                    <small>Stockage +10%</small>
+                    <small>800€ | 0.5m²</small>
+                </div>
+            </div>
+
+            <div class="tool-item" draggable="true" data-type="hydro" data-prod="2000" data-cost="3000" data-space="15">
+                <span class="icon">💧</span>
+                <div class="info">
+                    <strong>Hydro-turbine</strong>
+                    <small>+2000 kWh/an</small>
+                    <small>3000€ | 15m²</small>
+                </div>
+            </div>
+
+            <div class="tool-item" draggable="true" data-type="heatpump" data-prod="800" data-cost="4500" data-space="5">
+                <span class="icon">🔥</span>
+                <div class="info">
+                    <strong>Pompe Chaleur</strong>
+                    <small>+800 kWh/an</small>
+                    <small>4500€ | 5m²</small>
+                </div>
+            </div>
+
+            <div class="tool-item" draggable="true" data-type="biomass" data-prod="1200" data-cost="2500" data-space="8">
+                <span class="icon">🌾</span>
+                <div class="info">
+                    <strong>Biomasse</strong>
+                    <small>+1200 kWh/an</small>
+                    <small>2500€ | 8m²</small>
+                </div>
+            </div>
+
+            <div class="tool-item" draggable="true" data-type="geothermal" data-prod="2500" data-cost="8000" data-space="12">
+                <span class="icon">🌍</span>
+                <div class="info">
+                    <strong>Géothermie</strong>
+                    <small>+2500 kWh/an</small>
+                    <small>8000€ | 12m²</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <header>
+            <h1>👷 Devenez Ingénieur Énergétique</h1>
+            <p>Construisez votre centrale pour couvrir votre consommation réelle !</p>
+        </header>
+
+        <div class="game-stats">
+            <div class="stat-box target">
+                <h3>🎯 Objectif Conso</h3>
+                <span id="target-val">0</span> kWh/an
+            </div>
+            <div class="stat-box production">
+                <h3>⚡ Production</h3>
+                <span id="current-prod">0</span> kWh
+                <div class="progress-bar">
+                    <div id="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="stat-box cost">
+                <h3>💰 Coût Total</h3>
+                <span id="total-cost">0</span> €
+            </div>
+            <div class="stat-box space">
+                <h3>📏 Surface</h3>
+                <span id="total-space">0</span> m²
+            </div>
+        </div>
+
+        <!-- ZONE DE JEU -->
+        <div class="construction-zone" id="drop-zone">
+            <div class="placeholder-text">
+                🏞️ <strong>Zone de Construction</strong><br>
+                Glissez vos équipements ici !
+            </div>
+        </div>
+
+        <!-- BARRE D'ACTIONS (C'EST ICI QU'IL MANQUAIT LE LABEL ET BOUTON) -->
+        <div class="actions-bar">
+            <div class="input-group">
+                <label for="idUserBuilder">👤 Enregistrer sous :</label>
+                <input type="text" id="idUserBuilder" placeholder="Votre ID (ex: User123)" required>
+            </div>
+            <div class="buttons-group">
+                <button id="reset-btn" class="btn-secondary">🔄 Réinitialiser</button>
+                <button id="save-project-btn" class="btn-primary" disabled>💾 Sauvegarder le Projet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SUCCÈS -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 Mission Accomplie !</h2>
+            <p>Votre centrale couvre 100% de vos besoins.</p>
+            <div class="result-summary">
+                <p>⚡ Production: <span id="modal-prod"></span> kWh</p>
+                <p>💰 Coût: <span id="modal-cost"></span> €</p>
+                <p>📏 Surface: <span id="modal-space"></span> m²</p>
+            </div>
+            <button onclick="closeModal()" class="btn-primary">Continuer</button>
+        </div>
+    </div>
+
+    <script src="../../controller/builder-script.js"></script>
+</body>
+</html>

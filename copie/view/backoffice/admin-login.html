@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Track | Admin Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #43a047 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(76, 175, 80, 0.3);
+            border-radius: 50%;
+            top: -100px;
+            left: -100px;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        body::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(129, 199, 132, 0.2);
+            border-radius: 50%;
+            bottom: -50px;
+            right: -50px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-30px) translateX(30px); }
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 50px 45px;
+            border-radius: 25px;
+            box-shadow: 0 25px 70px rgba(27, 94, 32, 0.4);
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            z-index: 10;
+            border: 3px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.3rem;
+            background: linear-gradient(135deg, #1b5e20 0%, #43a047 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        
+        .login-header p {
+            color: #558b2f;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 28px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2e7d32;
+            font-size: 1rem;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #c8e6c9;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f1f8e9;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.15);
+            background: white;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .login-btn:hover {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(67, 160, 71, 0.5);
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: none;
+            font-size: 0.95rem;
+            border-left: 5px solid #d32f2f;
+            font-weight: 500;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .back-link a {
+            color: #43a047;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .back-link a:hover {
+            color: #2e7d32;
+            text-decoration: underline;
+        }
+        
+        .lock-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="lock-icon">🔐</div>
+            <h1>Admin Login</h1>
+            <p>Eco-Track Administration</p>
+        </div>
+        
+        <div id="error-msg" class="error-message"></div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" required placeholder="admin">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit" class="login-btn">Se connecter</button>
+        </form>
+        
+        <div class="back-link">
+            <a href="../frontoffice/index.html">← Retour au site</a>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Page de login chargée');
+        
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            console.log('Tentative de connexion avec:', username);
+            
+            const formData = new FormData();
+            formData.append('action', 'adminLogin');
+            formData.append('username', username);
+            formData.append('password', password);
+            
+            // Chemin corrigé vers l'API
+            fetch('../../model/api.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Réponse reçue:', response);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Données:', data);
+                if (data.success) {
+                    console.log('Connexion réussie, redirection...');
+                    window.location.href = 'admin-dashboard.php';
+                } else {
+                    const errorMsg = document.getElementById('error-msg');
+                    errorMsg.textContent = data.message || 'Identifiants incorrects';
+                    errorMsg.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                const errorMsg = document.getElementById('error-msg');
+                errorMsg.textContent = 'Erreur de connexion au serveur: ' + error.message;
+                errorMsg.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
