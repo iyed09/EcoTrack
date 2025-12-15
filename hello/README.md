@@ -1,6 +1,6 @@
 # ⚡ ECO TRACK
 
-![ESS Banner](https://via.placeholder.com/1200x400/3498db/ffffff?text=ESS+Energy+Tracking+System)
+
 
 [![PHP](https://img.shields.io/badge/PHP-8.0+-purple.svg)](https://php.net)
 [![License: MIT](https://img.shields.io/badge/Licence-MIT-green.svg)](LICENSE)
@@ -92,6 +92,7 @@ Eco Track est une plateforme web complète de surveillance et d'optimisation de 
 ## 🏗️ Architecture du Projet
 
 ### Structure MVC
+
 
 
 
