@@ -12,8 +12,8 @@
 **Membres de l'équipe :**
 - **Votre Nom** ([@Naouar-X](https://github.com/votreusername))
 - **Membre 2** ([@iyed09](https://github.com/membre2))
-- **Membre 3** ([@dhiabt](https://github.com/membre3))
-- **Membre 4** ([@nesrineamami](https://github.com/membre4))
+- **Membre 3** ([@dhiabtlb](https://github.com/membre3))
+- **Membre 4** ([@nesrineamami64-wq](https://github.com/membre4))
 - **Membre 5** ([@haramniagalyprog](https://github.com/membre5))
 - **Membre 6** ([@narimenguitni](https://github.com/membre6))
 **Thématique :** Smart Energy Management & Sustainability
@@ -92,6 +92,7 @@ Eco Track est une plateforme web complète de surveillance et d'optimisation de 
 ## 🏗️ Architecture du Projet
 
 ### Structure MVC
+
 
 
 
