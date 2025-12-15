@@ -13,7 +13,9 @@
 - **Votre Nom** ([@Naouar-X](https://github.com/votreusername))
 - **Membre 2** ([@iyed09](https://github.com/membre2))
 - **Membre 3** ([@dhiabt](https://github.com/membre3))
-
+- **Membre 4** ([@nesrineamami](https://github.com/membre4))
+- **Membre 5** ([@haramniagalyprog](https://github.com/membre5))
+- **Membre 6** ([@narimenguitni](https://github.com/membre6))
 **Thématique :** Smart Energy Management & Sustainability
 
 ## 📊 Statistiques du Projet
@@ -90,5 +92,6 @@ ESS (Energy Tracking System) est une plateforme web complète de surveillance et
 ## 🏗️ Architecture du Projet
 
 ### Structure MVC
+
 
 
