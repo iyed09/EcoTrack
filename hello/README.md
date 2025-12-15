@@ -1,4 +1,4 @@
-# ⚡ ESS - Energy Tracking System
+# ⚡ ECO TRACK
 
 ![ESS Banner](https://via.placeholder.com/1200x400/3498db/ffffff?text=ESS+Energy+Tracking+System)
 
@@ -26,7 +26,7 @@
 
 ## 🎯 Vue d'ensemble
 
-ESS (Energy Tracking System) est une plateforme web complète de surveillance et d'optimisation de la consommation énergétique[file:1][file:5]. Développée dans le cadre d'un projet universitaire, cette application permet aux utilisateurs et organisations de suivre leur empreinte énergétique en temps réel, analyser les coûts associés, et prendre des décisions éclairées pour réduire leur impact environnemental[file:3][file:7]. La plateforme intègre un chatbot intelligent alimenté par l'API Gemini pour fournir des conseils personnalisés sur l'économie d'énergie et l'analyse de factures[file:6].
+Eco Track est une plateforme web complète de surveillance et d'optimisation de la consommation énergétique. Développée dans le cadre d'un projet universitaire, cette application permet aux utilisateurs et organisations de suivre leur empreinte énergétique en temps réel, analyser les coûts associés, et prendre des décisions éclairées pour réduire leur impact environnemental. La plateforme intègre un chatbot intelligent alimenté par l'API Gemini pour fournir des conseils personnalisés sur l'économie d'énergie et l'analyse de factures.
 
 ## ✨ Fonctionnalités Principales
 
@@ -34,31 +34,31 @@ ESS (Energy Tracking System) est une plateforme web complète de surveillance et
 - **Enregistrement détaillé** des consommations par source d'énergie
 - **Calcul automatique** des coûts énergétiques
 - **Suivi par période** (journalier, mensuel, annuel)
-- **Validation administrative** des données (statuts : En attente, Validé, Rejeté)[file:3]
+- **Validation administrative** des données (statuts : En attente, Validé, Rejeté)
 
 ### 🌍 Informations sur les Sources d'Énergie
 - **Classification** des sources (renouvelables vs non-renouvelables)
 - **Émissions CO2** détaillées par type d'énergie
 - **Impact environnemental** calculé en temps réel
-- **Base de données** complète des sources disponibles[file:8]
+- **Base de données** complète des sources disponibles
 
 ### 🤖 Chatbot Intelligent EcoBot
 - **Assistance IA** alimentée par Gemini API
 - **Analyse d'images** (factures, compteurs, installations solaires)
 - **Conseils personnalisés** sur la réduction de consommation
-- **Support multimédia** (JPG, PNG, GIF, WEBP jusqu'à 5MB)[file:6]
+- **Support multimédia** (JPG, PNG, GIF, WEBP jusqu'à 5MB)
 
 ### 🏭 Constructeur de Projet Interactif
 - **Interface drag & drop** pour conception de centrales virtuelles
 - **Objectif de production** à atteindre (100%)
 - **Visualisation en temps réel** de la production totale
-- **Sauvegarde des projets** utilisateurs[file:2]
+- **Sauvegarde des projets** utilisateurs
 
 ### 📊 Tableaux de Bord
 - **Dashboard utilisateur** avec statistiques personnalisées
 - **Backoffice administrateur** pour gestion complète
 - **Graphiques et indicateurs** de performance énergétique
-- **Rapports d'impact** environnemental et financier[file:7]
+- **Rapports d'impact** environnemental et financier
 
 ## 🛠️ Technologies Utilisées
 
@@ -69,10 +69,10 @@ ESS (Energy Tracking System) est une plateforme web complète de surveillance et
 - **API REST** pour le chatbot
 
 ### Frontend
-- **HTML / CSS** responsive design
+- **CSS** responsive design
 - **JavaScript** pour interactivité
 - **Fetch API** pour requêtes asynchrones
-- **Drag & Drop API** pour le constructeur de projet[file:2]
+- **Drag & Drop API** pour le constructeur de projet
 
 ### Base de données
 - **MySQL** avec schéma normalisé
@@ -80,7 +80,7 @@ ESS (Energy Tracking System) est une plateforme web complète de surveillance et
 - **Relations optimisées** pour performances
 
 ### APIs Externes
-- **Google Gemini API** pour le chatbot intelligent[file:6]
+- **Google Gemini API** pour le chatbot intelligent
 - **Support vision** pour analyse d'images
 
 ### Sécurité
@@ -92,6 +92,7 @@ ESS (Energy Tracking System) est une plateforme web complète de surveillance et
 ## 🏗️ Architecture du Projet
 
 ### Structure MVC
+
 
 
 
