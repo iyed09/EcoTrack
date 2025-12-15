@@ -10,9 +10,9 @@
 ## 👥 Équipe du Projet
 
 **Membres de l'équipe :**
-- **Votre Nom** ([@votreusername](https://github.com/votreusername))
-- **Membre 2** ([@membre2](https://github.com/membre2))
-- **Membre 3** ([@membre3](https://github.com/membre3))
+- **Votre Nom** ([@Naouar-X](https://github.com/votreusername))
+- **Membre 2** ([@iyed09](https://github.com/membre2))
+- **Membre 3** ([@dhiabt](https://github.com/membre3))
 
 **Thématique :** Smart Energy Management & Sustainability
 
@@ -61,14 +61,14 @@ ESS (Energy Tracking System) est une plateforme web complète de surveillance et
 ## 🛠️ Technologies Utilisées
 
 ### Backend
-- **PHP 8.0+** avec architecture MVC
+- **PHP** avec architecture MVC
 - **PDO** pour interactions base de données sécurisées
 - **Sessions PHP** pour gestion authentification
 - **API REST** pour le chatbot
 
 ### Frontend
-- **HTML5 / CSS3** responsive design
-- **JavaScript ES6+** pour interactivité
+- **HTML / CSS** responsive design
+- **JavaScript** pour interactivité
 - **Fetch API** pour requêtes asynchrones
 - **Drag & Drop API** pour le constructeur de projet[file:2]
 
@@ -90,4 +90,5 @@ ESS (Energy Tracking System) est une plateforme web complète de surveillance et
 ## 🏗️ Architecture du Projet
 
 ### Structure MVC
+
 
