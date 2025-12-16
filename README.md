@@ -8,7 +8,7 @@
 ## 👥 Équipe du Projet
 
 **Membres de l'équipe :**
-- **Votre Nom** ([@Naouar-X](https://github.com/votreusername))
+- **membre 1** ([@Naouar-X](https://github.com/votreusername))
 - **Membre 2** ([@iyed09](https://github.com/membre2))
 - **Membre 3** ([@dhiabtlb](https://github.com/membre3))
 - **Membre 4** ([@nesrineamami64-wq](https://github.com/membre4))
