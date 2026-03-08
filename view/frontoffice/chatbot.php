@@ -10,6 +10,22 @@ renderHeader("Chatbot EcoTrack");
             Posez vos questions sur l'énergie, les factures, l'empreinte carbone, ou envoyez une image liée à votre installation.
         </p>
     </div>
+
+    <!-- Définition de l'IA -->
+    <div class="mb-8 bg-brand-50 border border-brand-100 rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-brand-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i data-lucide="info" class="w-5 h-5 text-brand-600"></i>
+            </div>
+            <div>
+                <h2 class="text-lg font-semibold text-slate-800 mb-2">Qu'est-ce que l'Intelligence Artificielle ?</h2>
+                <p class="text-slate-600 text-sm">
+                    L'intelligence artificielle (IA) désigne la capacité des machines à effectuer des tâches intellectuelles telles que l'apprentissage, la résolution de problèmes, la compréhension du langage naturel et la prise de décisions.
+                    Elle repose sur des algorithmes, des modèles mathématiques et des données pour simuler l'intelligence humaine de manière autonome dans un contexte informatique.
+                </p>
+            </div>
+        </div>
+    </div>
     
     <!-- Zone de chat -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-lg overflow-hidden">
